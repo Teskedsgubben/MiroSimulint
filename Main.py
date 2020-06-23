@@ -1,12 +1,12 @@
 #------------------------------------------------------------------------------
-# Name:        Miro Simulint 
+# Name:        Miro Simulint
 # Purpose:
 #
-# Authors:     Felix Djuphammar,  
+# Authors:     Felix Djuphammar, William Nordberg
 #
 #-------------------------------------------------------------------------------
- 
- 
+
+
 import pychrono.core as chrono
 import pychrono.irrlicht as chronoirr
 
