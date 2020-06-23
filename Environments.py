@@ -23,7 +23,7 @@ def DemoTable(system):
     body_floor.GetAssets().push_back(body_floor_shape)
     
     body_floor_texture = chrono.ChTexture()
-    body_floor_texture.SetTextureFilename(chrono.GetChronoDataFile('concrete.jpg'))
+    body_floor_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/DemoBengan.png'))
     body_floor.GetAssets().push_back(body_floor_texture)
     
     system.Add(body_floor)
