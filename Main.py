@@ -1,17 +1,9 @@
 #------------------------------------------------------------------------------
-# Name:        pychrono example
+# Name:        Miro Simulint 
 # Purpose:
 #
-# Author:      Alessandro Tasora
+# Authors:     Felix Djuphammar, 
 #
-# Created:     1/01/2019
-# Copyright:   (c) ProjectChrono 2019
-#
-#
-# This file shows how to
-#   - create a small stack of bricks,
-#   - create a support that shakes like an earthquake, with motion function
-#   - simulate the bricks that fall
 #-------------------------------------------------------------------------------
  
  
