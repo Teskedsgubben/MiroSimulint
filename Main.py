@@ -2,7 +2,7 @@
 # Name:        Miro Simulint 
 # Purpose:
 #
-# Authors:     Felix Djuphammar, 
+# Authors:     Felix Djuphammar,  
 #
 #-------------------------------------------------------------------------------
  
