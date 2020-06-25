@@ -48,7 +48,6 @@ class MiroSystem():
         self.simulation = chronoirr.ChIrrApp(self.system, 'PyChrono example', chronoirr.dimension2du(1024,768))
         
         self.simulation.AddTypicalSky()
-        self.simulation.AddTypicalLogo(chrono.GetChronoDataFile('logo_pychrono_alpha.png'))
         self.simulation.AddTypicalCamera(chronoirr.vector3df(0.5,0.5,1.0))
         self.simulation.AddLightWithShadow(chronoirr.vector3df(2,4,2),    # point
                                         chronoirr.vector3df(0,0,0),    # aimpoint
