@@ -2,7 +2,7 @@
 # Name:        Miro Simulint
 # Purpose:
 #
-# Authors:     Felix Djuphammar, William Nordberg, Marcus Lindbergh, Johan Jonsson
+# Authors:     Felix Djuphammar, William Nordberg, Marcus Lindbergh, Johan Jonsson, Franz Wikner
 #
 #-------------------------------------------------------------------------------
 
