@@ -48,12 +48,12 @@ class MiroSystem():
         self.simulation = chronoirr.ChIrrApp(self.system, 'PyChrono example', chronoirr.dimension2du(1024,768))
         
         self.simulation.AddTypicalSky()
-        self.simulation.AddTypicalCamera(chronoirr.vector3df(0.5,0.5,1.0))
-        self.simulation.AddLightWithShadow(chronoirr.vector3df(2,4,2),    # point
+        self.simulation.AddTypicalCamera(chronoirr.vector3df(0.0, 4.5, 0.0), chronoirr.vector3df(5, -2.5, 1))
+        self.simulation.AddLightWithShadow(chronoirr.vector3df(2,12,2),    # point
                                         chronoirr.vector3df(0,0,0),    # aimpoint
-                                        9,                 # radius (power)
+                                        255,                 # radius (power)
                                         1,9,               # near, far
-                                        30)                # angle of FOV
+                                        70)                # angle of FOV
         
                     # ==IMPORTANT!== Use this function for adding a ChIrrNodeAsset to all items
                     # in the system. These ChIrrNodeAsset assets are 'proxies' to the Irrlicht meshes.

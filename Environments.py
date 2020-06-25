@@ -16,23 +16,27 @@ def DemoTable(system):
     Environments_Franz.Franz_Components(system)
 
 
+    MIT_floor_x = 10
+    MIT_floor_z = 10
+
+
     body_floor = chrono.ChBody()
     body_floor.SetBodyFixed(True)
-    body_floor.SetPos(chrono.ChVectorD(0, -2, 0 ))
+    body_floor.SetPos(chrono.ChVectorD(2.5, -2, -1))
     
     # Collision shape
     body_floor.GetCollisionModel().ClearModel()
-    body_floor.GetCollisionModel().AddBox(3, 1, 3) # hemi sizes
+    body_floor.GetCollisionModel().AddBox(MIT_floor_x, 1, MIT_floor_z) # hemi sizes
     body_floor.GetCollisionModel().BuildModel()
     body_floor.SetCollide(True)
     
     # Visualization shape
     body_floor_shape = chrono.ChBoxShape()
-    body_floor_shape.GetBoxGeometry().Size = chrono.ChVectorD(3, 1, 3)
+    body_floor_shape.GetBoxGeometry().Size = chrono.ChVectorD(MIT_floor_x, 1, MIT_floor_z)
     body_floor.GetAssets().push_back(body_floor_shape)
     
     body_floor_texture = chrono.ChTexture()
-    body_floor_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/DemoBengan.png'))
+    body_floor_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/wood_floor.jpg'))
     body_floor.GetAssets().push_back(body_floor_texture)
     
     system.Add(body_floor)
