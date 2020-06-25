@@ -1,10 +1,19 @@
 import pychrono.core as chrono
 import os
 
+import Environments_Johan
+import Environments_Marcus
+import Environments_Franz
+
 def DemoTable(system):
     # Create the room floor: a simple fixed rigid body with a collision shape
     # and a visualization shape
     chrono.SetChronoDataPath(os.getcwd() + "/")
+
+
+    Environments_Johan.Johans_Components(system)
+    Environments_Marcus.Marcus_Components(system)
+    Environments_Franz.Franz_Components(system)
 
 
     body_floor = chrono.ChBody()
@@ -27,9 +36,7 @@ def DemoTable(system):
     body_floor.GetAssets().push_back(body_floor_texture)
     
     system.Add(body_floor)
-    
-    
-    
+
     # Create the shaking table, as a box
     
     size_table_x = 1
