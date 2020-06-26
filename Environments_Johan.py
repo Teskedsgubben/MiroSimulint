@@ -34,3 +34,32 @@ def Johan_Components(system):
     
     system.Add(body_table)
 
+    # Create the stairs, as a cylinder
+    
+    size_stairs_x = 10
+    size_stairs_y = 0.2
+    size_stairs_z = 510
+    
+    body_stairs = chrono.ChBody()
+    body_stairs.SetBodyFixed(True)
+    body_stairs.SetPos(chrono.ChVectorD(10, 0, 5 ))
+    
+    # Collision shape
+    body_stairs.GetCollisionModel().ClearModel()
+    body_stairs.GetCollisionModel().AddBox(size_stairs_x/2, size_stairs_y/2, size_stairs_z/2) # hemi sizes
+    body_stairs.GetCollisionModel().BuildModel()
+    body_stairs.SetCollide(True)
+    
+    # Visualization shape
+    body_stairs_shape = chrono.ChCylinderShape()
+    body_stairs_shape.GetCylinderGeometry().Size = chrono.ChVectorD(size_stairs_x, size_stairs_y, size_stairs_z)
+    body_stairs_shape.SetColor(chrono.ChColor(0.4,0.4,0.5))
+    body_stairs.GetAssets().push_back(body_stairs_shape)
+    
+    body_stairs_texture = chrono.ChTexture()
+    body_stairs_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/tf-logo.jpg'))
+    body_stairs.GetAssets().push_back(body_stairs_texture)
+    
+    system.Add(body_stairs)
+
+
