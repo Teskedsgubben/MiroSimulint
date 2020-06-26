@@ -1,7 +1,7 @@
 import pychrono.core as chrono
 import os
 
-def Johans_Components(system):
+def Johan_Components(system):
     # Create the room floor: a simple fixed rigid body with a collision shape
     # and a visualization shape
     chrono.SetChronoDataPath(os.getcwd() + "/")
@@ -29,9 +29,8 @@ def Johans_Components(system):
     body_table.GetAssets().push_back(body_table_shape)
     
     body_table_texture = chrono.ChTexture()
-    body_table_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/bhgang.jpg'))
+    body_table_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/tf-logo.jpg'))
     body_table.GetAssets().push_back(body_table_texture)
     
     system.Add(body_table)
-    
-   
+

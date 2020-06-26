@@ -11,7 +11,7 @@ def DemoTable(system):
     chrono.SetChronoDataPath(os.getcwd() + "/")
 
 
-    Environments_Johan.Johans_Components(system)
+    Environments_Johan.Johan_Components(system)
     Environments_Marcus.Marcus_Components(system)
     Environments_Franz.Franz_Components(system)
 
