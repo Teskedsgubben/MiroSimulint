@@ -32,11 +32,12 @@ simulation_system.Set_Environment(env.DemoTable)
 
 simulation_system.Add_Lander(landers.DemoLander)
 
-pos_f = chrono.ChVectorD(2, 2, 2)
-pos_b = chrono.ChVectorD(2.5, 2, 1.5)
-dir_f = chrono.ChVectorD(np.cos(1), 0, np.sin(1))
-dir_b = chrono.ChVectorD(np.cos(1.2), 0, np.sin(1.2))
-w = 2
+c = chrono.ChVectorD(2, 2, 2)
+dir_f = chrono.ChVectorD(np.cos(1.0), 0, np.sin(1.0))
+dir_b = chrono.ChVectorD(np.cos(1.3), 0, np.sin(1.3))
+pos_f = c + dir_f
+pos_b = c + dir_b
+w = 2.0
 h = 0.25
 
 my_step = shp.step(pos_f, dir_f, pos_b, dir_b, w, h)

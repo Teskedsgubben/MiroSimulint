@@ -8,6 +8,9 @@ import pychrono.core as chrono
 # width:  double, Width of the step as seen when walking in the staircase
 # height: double, Thickness of the step
 def step(position_front, direction_front, position_back, direction_back, width, height):
+  direction_front.SetLength(width)
+  direction_back.SetLength(width)
+  
   # Notation: I = Inner/O = Outer, U = Upper/L = Lower, F = Front/B = Back
   # Ex: Step_ILF is the Inner Lower Front corner of the step
   Step_ILF = position_front
@@ -15,10 +18,10 @@ def step(position_front, direction_front, position_back, direction_back, width, 
   Step_ILB = position_back
   Step_IUB = position_back  + chrono.ChVectorD(0, height, 0)
 
-  Step_OLF = position_front + width*direction_front
-  Step_OUF = position_front + width*direction_front + chrono.ChVectorD(0, height, 0)
-  Step_OLB = position_back  + width*direction_back  
-  Step_OUB = position_back  + width*direction_back  + chrono.ChVectorD(0, height, 0)
+  Step_OLF = position_front + direction_front
+  Step_OUF = position_front + direction_front + chrono.ChVectorD(0, height, 0)
+  Step_OLB = position_back  + direction_back  
+  Step_OUB = position_back  + direction_back + chrono.ChVectorD(0, height, 0)
 
   Step_mesh = chrono.ChTriangleMeshConnected()
 
