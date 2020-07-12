@@ -37,6 +37,9 @@ class MiroSystem():
 
     def Add_Lander(self, Lander):
         Lander(self.system)
+
+    def Add_Object(self, object):
+        self.system.Add(object)
         
     
     def Run(self):
