@@ -19,6 +19,6 @@ simulation_system  = ms.MiroSystem()
 
 simulation_system.Set_Environment(env.DemoTable)
 
-simulation_system.Add_Lander(landers.DemoLander)
+simulation_system.Add_MiroModule(landers.DemoLander)
 
 simulation_system.Run()

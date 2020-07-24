@@ -34,9 +34,9 @@ class MiroSystem():
         
     def Set_Environment(self, Environment):
         Environment(self.system)
-
-    def Add_Lander(self, Lander):
-        Lander(self.system)
+    
+    def Add_MiroModule(self, module):
+        module.AddToSystem(self)
 
     def Add_Object(self, object):
         self.system.Add(object)
