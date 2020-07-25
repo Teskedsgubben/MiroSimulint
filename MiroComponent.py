@@ -48,6 +48,5 @@ class MiroComponent():
         self.body.SetRot(quaternion)
 
         for name, link in self.linkpoints.items():
-            print('Rotating linkpoint from: ', self.linkpoints[name],' | to: ', qr.Rotate(link))
             self.linkpoints.update({name: quaternion.Rotate(link)})
 

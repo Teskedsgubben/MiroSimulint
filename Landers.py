@@ -8,14 +8,29 @@ import MiroModule as mm
 import Components as mc
 
 
-
+deg = -25
 DemoLander = mm.Module()
 
-deg = 30
-DemoLander.AddComponent(mc.MC_0([0,deg,0], [0,0,0], True), 'Fixed Block')
-DemoLander.AddComponent(mc.MC_0([0,180+deg,0], [0,0,0], False), 'Free Block')
+# Add top and bottom plates
+DemoLander.AddComponent(mc.MC001([0,deg,0], [0,0,0], False), 'Bottom plate')
+DemoLander.AddComponent(mc.MC001([180,deg,0], [0,0,0], False), 'Top plate')
 
-DemoLander.ConnectComponents('Fixed Block', 'A', 'Free Block', 'A')
+# Add vertical rods
+DemoLander.AddComponent(mc.MC002([0,deg,0], [0,0,0], False), 'Rod A')
+DemoLander.AddComponent(mc.MC002([0,deg,0], [0,0,0], False), 'Rod B')
+DemoLander.AddComponent(mc.MC002([0,deg,0], [0,0,0], False), 'Rod C')
+DemoLander.AddComponent(mc.MC002([0,deg,0], [0,0,0], False), 'Rod D')
 
+# Connect Rods to bottom plate
+DemoLander.ConnectComponents('Bottom plate', 'A', 'Rod A', 'B')
+DemoLander.ConnectComponents('Bottom plate', 'B', 'Rod B', 'B')
+DemoLander.ConnectComponents('Bottom plate', 'C', 'Rod C', 'B')
+DemoLander.ConnectComponents('Bottom plate', 'D', 'Rod D', 'B')
 
-DemoLander.Move([1.75,3,-0.56])
+# Connect Top plate to rods (order is significant)
+DemoLander.ConnectComponents('Rod A', 'A', 'Top plate', 'C')
+DemoLander.ConnectComponents('Rod B', 'A', 'Top plate', 'D')
+DemoLander.ConnectComponents('Rod C', 'A', 'Top plate', 'A')
+DemoLander.ConnectComponents('Rod D', 'A', 'Top plate', 'B')
+
+DemoLander.Move([-1.75,3,-0.56])

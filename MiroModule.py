@@ -27,9 +27,7 @@ class Module():
         # Create a revolute constraint
         mlink = chrono.ChLinkRevolute()
         
-            # the coordinate system of the constraint reference in abs. space:
-        print('Connecting linkpoint at A: ', comp_B.GetLinkPoint(point_A))
-        print('Connecting linkpoint at B: ', comp_B.GetLinkPoint(point_B))
+        # the coordinate system of the constraint reference in abs. space:
         mframe = chrono.ChFrameD(comp_B.GetLinkPoint(point_B), comp_B.GetBody().GetRot())
 
         # initialize the constraint telling which part must be connected, and where:
