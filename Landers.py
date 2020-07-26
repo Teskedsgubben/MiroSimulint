@@ -33,4 +33,4 @@ DemoLander.ConnectComponents('Rod B', 'A', 'Top plate', 'D')
 DemoLander.ConnectComponents('Rod C', 'A', 'Top plate', 'A')
 DemoLander.ConnectComponents('Rod D', 'A', 'Top plate', 'B')
 
-DemoLander.Move([-1.75,3,-0.56])
+DemoLander.Move([8.5,4,5])
