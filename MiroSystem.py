@@ -1,5 +1,6 @@
 import pychrono.core as chrono
 import pychrono.irrlicht as chronoirr
+import time
 
 import Environments as env
 import Landers as landers
@@ -48,10 +49,12 @@ class MiroSystem():
         #  Create an Irrlicht application to visualize the system
         #
         
-        self.simulation = chronoirr.ChIrrApp(self.system, 'PyChrono example', chronoirr.dimension2du(1024,768))
+        self.simulation = chronoirr.ChIrrApp(self.system, 'MiroSimulatuion', chronoirr.dimension2du(1728,972))
         
         self.simulation.AddTypicalSky()
-        self.simulation.AddTypicalCamera(chronoirr.vector3df(0.0, 4.5, 0.0), chronoirr.vector3df(5, -2.5, 1))
+        position = chronoirr.vector3df(3,5,7.5)
+        looker = chronoirr.vector3df(0.4,-0.2,-1).setLength(2)
+        self.simulation.AddTypicalCamera(position, position + looker)
         self.simulation.AddLightWithShadow(chronoirr.vector3df(2,12,2),    # point
                                         chronoirr.vector3df(0,0,0),    # aimpoint
                                         255,                 # radius (power)
@@ -78,13 +81,18 @@ class MiroSystem():
         #  Run the simulation
         #
         
-        self.simulation.SetTimestep(0.001)
+        self.simulation.SetTimestep(0.002)
         self.simulation.SetTryRealtime(True)
 
+
+        self.simulation.BeginScene()
+        self.simulation.DrawAll()
+        self.simulation.EndScene()
+        time.sleep(2)
 
         while(self.simulation.GetDevice().run()):
             self.simulation.BeginScene()
             self.simulation.DrawAll()
-            for substep in range(0,5):
+            for substep in range(0,3):
                 self.simulation.DoStep()
             self.simulation.EndScene()

@@ -50,3 +50,10 @@ class MiroComponent():
         for name, link in self.linkpoints.items():
             self.linkpoints.update({name: quaternion.Rotate(link)})
 
+    def SetVelocity(self, vel):
+        vel_x = vel[0]
+        vel_y = vel[1]
+        vel_z = vel[2]
+
+        self.body.SetPos_dt(chrono.ChVectorD(vel_x, vel_y, vel_z))
+

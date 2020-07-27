@@ -44,6 +44,10 @@ class Module():
     def Move(self, distance):
         for _, comp in self.components.items():
             comp.MoveBy(distance)
+    
+    def SetVelocity(self, vel):
+        for _, comp in self.components.items():
+            comp.SetVelocity(vel)
 
 
 

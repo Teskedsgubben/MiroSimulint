@@ -76,7 +76,7 @@ def MC002(rot = [0,0,0], pos = [0,0,0], Fixed = False):
     
     body_brick_shape.SetColor(chrono.ChColor(0.65, 0.65, 0.6)) # set gray color 
     body_brick.AddAsset(body_brick_shape)
-
+    
     COMPONENT = mc.MiroComponent(body_brick)
 
     COMPONENT.AddLinkPoint('A', chrono.ChVectorD(0,  size_brick_y/2, 0))
