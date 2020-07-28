@@ -5,11 +5,14 @@ import Environments_Johan
 import Environments_Marcus
 import Environments_Franz
 
-def DemoTable(system):
+def MIT_place(system):
     # Create the room floor: a simple fixed rigid body with a collision shape
     # and a visualization shape
     chrono.SetChronoDataPath(os.getcwd() + "/")
 
+    # Throwing paramters for lander in the environment
+    start_position = [10.5,7,0]
+    throw_velocity = [-6.5,3,0]
 
     Environments_Johan.Johan_Components(system)
     Environments_Marcus.Marcus_Components(system)
@@ -89,3 +92,5 @@ def DemoTable(system):
     # your custom function by class inheritance (see demo_python.py), or also
     # set a function for table rotation , etc.
     
+    
+    return [start_position, throw_velocity]

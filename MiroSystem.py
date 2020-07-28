@@ -18,6 +18,9 @@ class MiroSystem():
         #
         
         self.system = chrono.ChSystemNSC()
+
+        self.start_position = [0,0,0]
+        self.throw_velocity = [0,0,0]
         
         
         # Set the default outward/inward shape margins for collision detection,
@@ -34,9 +37,11 @@ class MiroSystem():
         
         
     def Set_Environment(self, Environment):
-        Environment(self.system)
+        [self.start_position, self.throw_velocity] = Environment(self.system)
     
     def Add_MiroModule(self, module):
+        module.Move(self.start_position)
+        module.SetVelocity(self.throw_velocity)
         module.AddToSystem(self)
 
     def Add_Object(self, object):
