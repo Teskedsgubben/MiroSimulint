@@ -39,31 +39,38 @@ def MIT_stairs(system, center):
     system.Add(body_stairs)
 
     # Add steps to 3rd floor
+    H = 4 
+    dh = H/stepNum
+
+    start_dir = [1, 0, 0]
+    T_theta = 270/360*2*np.pi
+
     for step in range(3,stepNum):
         h = step*dh                     
         theta = 2*step*np.pi/stepNum    # Angle between each step
 
-        MIT_stairsStep(system, center, stair_r, h, theta)
+        MIT_stairsStep(system, center, stair_r, h, theta, theta)
 
         # if step % 2 == 0:           
         #     MIT_stairsHandle(system, center, stair_r, h, theta-0.4)
 
     # Add steps to 4th floor
-    for step in range(3,stepNum):
+    for step in range(stepNum):
         h = step*dh                     
-        theta = 2*step*np.pi/stepNum    # Angle between each step
+        theta_f = 1/360*2*np.pi*(90 + 270*step/stepNum)    # Angle between each step
+        theta_b = 1/360*2*np.pi*(90 + 270*(step+1)/stepNum)
         pos = center + chrono.ChVectorD(0, stair_h/2, 0)
-        MIT_stairsStep(system, pos, stair_r, h, theta)
+        MIT_stairsStep(system, pos, stair_r, h, theta_f, theta_b)
 
         # if step % 2 == 0:           
         #     MIT_stairsHandle(system, center, stair_r, h, theta-0.4)
 
-def MIT_stairsStep(system, center, stair_r, h, theta):
+def MIT_stairsStep(system, center, stair_r, h, theta_f, theta_b):
 
     width = 1.75
     height = 0.2
-    theta_f = theta
-    theta_b = theta + 0.5
+    # theta_f = theta
+    # theta_b = theta + 270/14*(2*np.pi/360)
     
     df = chrono.ChVectorD(np.cos(theta_f), 0, np.sin(theta_f))   # Direction front
     pos_f = center + df*stair_r + chrono.ChVectorD(0, h, 0)     # Start postiton front of step
