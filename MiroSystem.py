@@ -22,6 +22,34 @@ class MiroSystem():
         self.start_position = [0,0,0]
         self.throw_velocity = [0,0,0]
         
+        self.camname = 'default'
+        self.camviews = {
+            'default': {
+                'pos': [-7, 3, 0],
+                'dir': [1,0,0],
+                'lah': 10
+            },
+            '3rd floor staircase': {
+                'pos': [3, 5, 7.5],
+                'dir': [0.4,-0.2,-1],
+                'lah': 0.05
+            },
+            '4th floor behind lander': {
+                'pos': [11.75,9.25,-1],
+                'dir': [-1,-0.4,0.1],
+                'lah': 0.05
+            },
+            '2nd (ground) floor front view': {
+                'pos': [-3,0.8,-1.5],
+                'dir': [1,0.1,0.1],
+                'lah': 0.05
+            },
+            '2nd (ground) floor side view': {
+                'pos': [1,0.35,-10.15],
+                'dir': [0.25,0.3,1],
+                'lah': 0.05
+            }
+        }
         
         # Set the default outward/inward shape margins for collision detection,
         # this is epecially important for very large or very small objects.
@@ -39,14 +67,26 @@ class MiroSystem():
     def Set_Environment(self, Environment):
         [self.start_position, self.throw_velocity] = Environment(self.system)
     
+    def Set_Perspective(self, camname):
+        if camname in self.camviews:
+            self.camname = camname
+        else:
+            print('Error: "'+camname+'" is not a recognized camera position, using default')
+    
     def Add_MiroModule(self, module):
         module.Move(self.start_position)
         module.SetVelocity(self.throw_velocity)
         module.AddToSystem(self)
+        self.links = module.GetLinks()
 
     def Add_Object(self, object):
         self.system.Add(object)
-        
+    
+    def Set_Camera(self):
+        cam = self.camviews[self.camname]
+        position = chronoirr.vector3df(cam['pos'][0], cam['pos'][1], cam['pos'][2])
+        looker = position + chronoirr.vector3df(cam['dir'][0], cam['dir'][1], cam['dir'][2]).setLength(cam['lah'])
+        self.simulation.AddTypicalCamera(position, looker)
     
     def Run(self):
         # ---------------------------------------------------------------------
@@ -54,12 +94,10 @@ class MiroSystem():
         #  Create an Irrlicht application to visualize the system
         #
         
-        self.simulation = chronoirr.ChIrrApp(self.system, 'MiroSimulatuion', chronoirr.dimension2du(1728,972))
+        self.simulation = chronoirr.ChIrrApp(self.system, 'MiroSimulation', chronoirr.dimension2du(1728,972))
         
         self.simulation.AddTypicalSky()
-        position = chronoirr.vector3df(3,5,7.5)
-        looker = chronoirr.vector3df(0.4,-0.2,-1).setLength(2)
-        self.simulation.AddTypicalCamera(position, position + looker)
+        self.Set_Camera()
         self.simulation.AddLightWithShadow(chronoirr.vector3df(2,12,2),    # point
                                         chronoirr.vector3df(0,0,0),    # aimpoint
                                         255,                 # radius (power)
@@ -86,7 +124,7 @@ class MiroSystem():
         #  Run the simulation
         #
         
-        self.simulation.SetTimestep(0.002)
+        self.simulation.SetTimestep(0.004)
         self.simulation.SetTryRealtime(True)
 
 
@@ -96,8 +134,13 @@ class MiroSystem():
         time.sleep(2)
 
         while(self.simulation.GetDevice().run()):
+            # for _, link in self.links.items():
+            #     if abs(link.Get_react_force().Length()) > 22000:
+            #         link.SetBroken(True)
+
             self.simulation.BeginScene()
             self.simulation.DrawAll()
-            for substep in range(0,3):
+            for substep in range(0,1):
                 self.simulation.DoStep()
             self.simulation.EndScene()
+
