@@ -34,7 +34,7 @@ simulation_system.Set_Environment(env.MIT_place)
 # 4: 2nd (ground) floor side view
 # 5: default
 # Using default moves the camera much more when rotating
-simulation_system.Set_Perspective('3rd floor staircase')
+simulation_system.Set_Perspective('default')
 
 # Add the Demo Lander to the system
 simulation_system.Add_MiroModule(landers.DemoLander)
