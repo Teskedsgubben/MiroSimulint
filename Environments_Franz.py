@@ -6,7 +6,7 @@ def Franz_Components(system):
     # Create the room floor: a simple fixed rigid body with a collision shape
     # and a visualization shape
     chrono.SetChronoDataPath(os.getcwd() + "/")
-    start_table_pos = chrono.ChVectorD(10, -0.1, -9.8)  # The position for the table
+    start_table_pos = chrono.ChVectorD(10, 1-0.1, -9.8)  # The position for the table
     num_table_1 = 5                                    # Tabels anlong the 
     num_table_2 = 6                                  #
     size_table_x = 1.2
@@ -14,7 +14,7 @@ def Franz_Components(system):
     size_table_z = 1.2
     size_leg_h = 0.8
     size_leg_r = 0.05
-    start_table_pos.y = -1 + size_leg_h #makes sure the legs of the tale touches the ground
+    start_table_pos.y = 0 + size_leg_h #makes sure the legs of the tale touches the ground
     length = np.sqrt((size_table_x/2)**2 + (size_table_z/2)**2) 
 
     for table_i in range(num_table_1):
@@ -71,7 +71,7 @@ def tabletop(system, table_pos, size_table):
     body_table.GetAssets().push_back(body_table_shape)
     
     body_table_texture = chrono.ChTexture()
-    body_table_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/BHgang.jpg'))
+    body_table_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/MITbord.jpg'))
     body_table.GetAssets().push_back(body_table_texture)
     
     system.Add(body_table)
@@ -92,7 +92,7 @@ def table_leg(system,leg_pos, size_leg_r, size_leg_h):
     
     # Visualization shape
     body_table_leg_texture = chrono.ChTexture()
-    body_table_leg_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/BHgang.jpg'))
+    body_table_leg_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/brushsteel.jpg'))
     body_table_leg.GetAssets().push_back(body_table_leg_texture)
     
     system.Add(body_table_leg)
@@ -107,7 +107,7 @@ def MIT_chair(system, pos_chair,rotation):
     size_leg_r = 0.06 
     size_back_cylinder_r = 0.02 # the back of the chair
     size_back_cylinder_h = 0.5
-    pos_chair.y = -1 + size_chair_leg_h #makes sure the chair stands on first floor
+    pos_chair.y = 0 + size_chair_leg_h #makes sure the chair stands on first floor
     size_back_x = size_chair_x/7
     size_back_y = 0.2
     size_back_z = size_chair_z + 0.05 
@@ -167,7 +167,7 @@ def chair_back(system, pos_back, size_back_x,size_back_y, size_back_z):
     chair_back.GetAssets().push_back(chair_back_shape)
     
     chair_back_texture = chrono.ChTexture()
-    chair_back_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/BHgang.jpg'))
+    chair_back_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/MITbord.jpg'))
     chair_back.GetAssets().push_back(chair_back_texture)
     
     system.Add(chair_back)
