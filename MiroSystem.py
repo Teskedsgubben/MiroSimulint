@@ -25,27 +25,27 @@ class MiroSystem():
         self.camname = 'default'
         self.camviews = {
             'default': {
-                'pos': [-7, 3, 0],
+                'pos': [-7, 4, 0],
                 'dir': [1,0,0],
                 'lah': 10
             },
             '3rd floor staircase': {
-                'pos': [3, 5, 7.5],
+                'pos': [3, 6, 7.5],
                 'dir': [0.4,-0.2,-1],
                 'lah': 0.05
             },
             '4th floor behind lander': {
-                'pos': [11.75,9.25,-1],
+                'pos': [11.75,10.25,-1],
                 'dir': [-1,-0.4,0.1],
                 'lah': 0.05
             },
             '2nd (ground) floor front view': {
-                'pos': [-3,0.8,-1.5],
+                'pos': [-3,1.8,-1.5],
                 'dir': [1,0.1,0.1],
                 'lah': 0.05
             },
             '2nd (ground) floor side view': {
-                'pos': [1,0.35,-10.15],
+                'pos': [1,1.35,-10.15],
                 'dir': [0.25,0.3,1],
                 'lah': 0.05
             }
