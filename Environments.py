@@ -12,7 +12,7 @@ def MIT_place(system):
     chrono.SetChronoDataPath(os.getcwd() + "/")
 
     # Throwing paramters for lander in the environment
-    start_position = [10.5,8,0]
+    start_position = [10.5,8.5,0]
     throw_velocity = [-6.5,3,0]
 
     Environments_Johan.Johan_Components(system)
