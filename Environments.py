@@ -12,7 +12,7 @@ def MIT_place(system):
     chrono.SetChronoDataPath(os.getcwd() + "/")
 
     # Throwing paramters for lander in the environment
-    start_position = [10.5,7,0]
+    start_position = [10.5,8,0]
     throw_velocity = [-6.5,3,0]
 
     Environments_Johan.Johan_Components(system)
@@ -53,7 +53,7 @@ def MIT_place(system):
     size_table_z = 1
     
     body_table = chrono.ChBody()
-    body_table.SetPos(chrono.ChVectorD(0, -size_table_y/2, 0 ))
+    body_table.SetPos(chrono.ChVectorD(0, 1-size_table_y/2, 0 ))
     
     # Collision shape
     body_table.GetCollisionModel().ClearModel()
@@ -97,7 +97,7 @@ def MIT_place(system):
 
     step_comp = chrono.ChBody()
     step_comp.SetBodyFixed(True)
-    step_comp.SetPos(chrono.ChVectorD(2,1.1,-3))
+    step_comp.SetPos(chrono.ChVectorD(2,2.1,-3))
     # Collision shape
     step_comp.GetCollisionModel().ClearModel()
     step_comp.GetCollisionModel().AddBox(1, 0.1, 1) # hemi sizes
@@ -127,18 +127,18 @@ def roof(system):
 
     beams = 4
     for b in range(beams):
-        p1 = chrono.ChVectorD(-5 + 4.2*b - 0.06, 12-0.2, 6-0.06)
-        p2 = chrono.ChVectorD(-5 + 4.2*b + 0.06, 12-0.2, 6-0.06)
+        p1 = chrono.ChVectorD(-5 + 4.2*b - 0.06, 13-0.2, 6-0.06)
+        p2 = chrono.ChVectorD(-5 + 4.2*b + 0.06, 13-0.2, 6-0.06)
         d1 = chrono.ChVectorD(0,-0.08,-1)
         d2 = chrono.ChVectorD(0,-0.08,-1)
-        system.Add(shp.step(p1,d1, p2,d2, 18, 0.2))
+        system.Add(shp.step(p1,d1, p2,d2, 15, 0.2))
     
     beams = 10
     for b in range(beams):
         step_comp = chrono.ChBody()
         step_comp.SetBodyFixed(True)
         step_comp.SetCollide(False)
-        step_comp.SetPos(chrono.ChVectorD(-5 + 1.4*b, 11, 6))
+        step_comp.SetPos(chrono.ChVectorD(-5 + 1.4*b, 12, 6))
 
         # Visualization shape
         step_comp_shape = chrono.ChBoxShape()
@@ -152,7 +152,7 @@ def roof(system):
         step_comp = chrono.ChBody()
         step_comp.SetBodyFixed(True)
         step_comp.SetCollide(False)
-        step_comp.SetPos(chrono.ChVectorD(-5 +6.3, 10-0.06+(2/3)*b, 6))
+        step_comp.SetPos(chrono.ChVectorD(-5 +6.3, 11-0.06+(2/3)*b, 6))
 
         # Visualization shape
         step_comp_shape = chrono.ChBoxShape()
