@@ -4,21 +4,23 @@ import numpy as np
 import Shapes as shp
 
 def Johan_Components(system):
-    # Create the room floor: a simple fixed rigid body with a collision shape
+    # Create the room: simple fixed rigid bodys with a collision shape
     # and a visualization shape
     chrono.SetChronoDataPath(os.getcwd() + "/")
-    center = chrono.ChVectorD(7, -2, 4)  # Center position for the stair
-    MIT_stairs(system, center)  
-    MIT_floors(system)
+    center = chrono.ChVectorD(7, 0, 4)  # Center position for the stair
+    Height = 4              # Height between each floor
+    MIT_stairs(system, center, Height)  
+    MIT_floors(system, Height)
 
-def MIT_stairs(system, center):
+def MIT_stairs(system, center, H):
         
     stair_r =  0.3       # Radius
     stair_h = 9          # Hight
     stair_d = 1          # Density
-    dh = 0.35             # Hight between steps
-    stepNum = 14          # Number of steps
-    pos_stair = center + chrono.ChVectorD(0, 5.5, 0)  # Correction for stair position
+    stepNum = 14         # Number of steps
+    dh = H/stepNum       # Heigth between each step
+    rad = 1/360*2*np.pi  # Degrees to radians
+    pos_stair = center + chrono.ChVectorD(0, stair_h/2, 0)  # Correction for stair position
 
     # Create middle cylinder for stairs
     body_stairs = chrono.ChBodyEasyCylinder(stair_r, stair_h, stair_d)
@@ -34,22 +36,22 @@ def MIT_stairs(system, center):
     # Body texture
     body_stairs_texture = chrono.ChTexture()
     body_stairs_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/white_bricks.jpg'))
+    body_stairs_texture.SetTextureScale(3.5, 3.5)
     body_stairs.GetAssets().push_back(body_stairs_texture)
 
     system.Add(body_stairs)
 
-    # Add steps to 3rd floor
-    H = 4 
-    dh = H/stepNum
+    # Add steps to 3rd floor        
 
-    start_dir = [1, 0, 0]
-    T_theta = 270/360*2*np.pi
+    # start_dir = [1, 0, 0]
+    # T_theta = 270/360*2*np.pi
 
-    for step in range(3,stepNum):
+    for step in range(stepNum):
         h = step*dh                     
-        theta = 2*step*np.pi/stepNum    # Angle between each step
+        theta_f = rad*(90 + 270*step/stepNum)    # Angle between each front step
+        theta_b = rad*(90 + 270*(step+1)/stepNum) # Angle between each back step
 
-        MIT_stairsStep(system, center, stair_r, h, theta, theta)
+        MIT_stairsStep(system, center, stair_r, h, theta_f, theta_b)
 
         # if step % 2 == 0:           
         #     MIT_stairsHandle(system, center, stair_r, h, theta-0.4)
@@ -57,10 +59,11 @@ def MIT_stairs(system, center):
     # Add steps to 4th floor
     for step in range(stepNum):
         h = step*dh                     
-        theta_f = 1/360*2*np.pi*(90 + 270*step/stepNum)    # Angle between each step
-        theta_b = 1/360*2*np.pi*(90 + 270*(step+1)/stepNum)
-        pos = center + chrono.ChVectorD(0, stair_h/2, 0)
-        MIT_stairsStep(system, pos, stair_r, h, theta_f, theta_b)
+        theta_f = rad*(90 + 270*step/stepNum)       # Angle between each front step
+        theta_b = rad*(90 + 270*(step+1)/stepNum)   # Angle between each back step
+        pos_topStair = center + chrono.ChVectorD(0, H, 0)
+
+        MIT_stairsStep(system, pos_topStair, stair_r, h, theta_f, theta_b)
 
         # if step % 2 == 0:           
         #     MIT_stairsHandle(system, center, stair_r, h, theta-0.4)
@@ -69,8 +72,6 @@ def MIT_stairsStep(system, center, stair_r, h, theta_f, theta_b):
 
     width = 1.75
     height = 0.2
-    # theta_f = theta
-    # theta_b = theta + 270/14*(2*np.pi/360)
     
     df = chrono.ChVectorD(np.cos(theta_f), 0, np.sin(theta_f))   # Direction front
     pos_f = center + df*stair_r + chrono.ChVectorD(0, h, 0)     # Start postiton front of step
@@ -110,7 +111,7 @@ def MIT_stairsHandle(system, center, stair_r, h, theta):
 
     system.Add(body_handle)
 
-def MIT_floors(system):
+def MIT_floors(system, H):
 
     # Add floor, as a box
 
@@ -121,9 +122,9 @@ def MIT_floors(system):
     size_floor_z = 4 
 
     for floor in range(floorsNum):
-        y_pos = floor*3 + 3         # Increase floor hight
-        floor_pos_1 = chrono.ChVectorD(0.5, y_pos, 8)     
-        floor_pos_2 = chrono.ChVectorD(11, y_pos, 0)
+        y_pos = floor*H + H     # Increase floor hight
+        floor_pos_1 = chrono.ChVectorD(0.5, y_pos, 8)     # Add floors left side stair
+        floor_pos_2 = chrono.ChVectorD(11, y_pos, 0)      # Add floors right side stair
 
         MIT_add_floors(system, size_floor_x, size_floor_y, size_floor_z, floor_pos_1)
         MIT_add_floors(system, size_floor_z, size_floor_y, size_floor_x, floor_pos_2)
@@ -143,6 +144,17 @@ def MIT_floors(system):
 
                 MIT_fence_post(system, fence_pos_3)
                 MIT_fence_post(system, fence_pos_4)
+
+    # Add floor piece for the stir
+    floor_x = 2
+    floor_y = 0.2
+    floor_z = 2
+
+    for piece in range(2):
+        y_pos = piece*H + H
+        floor_pos = chrono.ChVectorD(8, y_pos, 5) 
+        
+        MIT_add_floors(system, floor_x, floor_y, floor_z, floor_pos)
 
 def MIT_add_floors(system, size_x, size_y, size_z, floor_pos):
 
@@ -164,6 +176,7 @@ def MIT_add_floors(system, size_x, size_y, size_z, floor_pos):
     
     body_floor_texture = chrono.ChTexture()
     body_floor_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/stone_floor.jpg'))
+    body_floor_texture.SetTextureScale(10, 10)
     body_floor.GetAssets().push_back(body_floor_texture)
     
     system.Add(body_floor)
