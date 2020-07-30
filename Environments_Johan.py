@@ -35,8 +35,8 @@ def MIT_stairs(system, center, H):
 
     # Body texture
     body_stairs_texture = chrono.ChTexture()
-    body_stairs_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/white_bricks.jpg'))
-    body_stairs_texture.SetTextureScale(3.5, 3.5)
+    body_stairs_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/white concrete.jpg'))
+    body_stairs_texture.SetTextureScale(6.5, 6.5)
     body_stairs.GetAssets().push_back(body_stairs_texture)
 
     system.Add(body_stairs)
@@ -51,10 +51,10 @@ def MIT_stairs(system, center, H):
         theta_f = rad*(90 + 270*step/stepNum)    # Angle between each front step
         theta_b = rad*(90 + 270*(step+1)/stepNum) # Angle between each back step
 
-        MIT_stairsStep(system, center, stair_r, h, theta_f, theta_b)
+        MIT_stairsStep(system, center, stair_r, h, theta_f, theta_b, dh)
 
-        # if step % 2 == 0:           
-        #     MIT_stairsHandle(system, center, stair_r, h, theta-0.4)
+        if step % 2 == 0:           
+            MIT_stairsHandle(system, center, stair_r, h, theta_f)
 
     # Add steps to 4th floor
     for step in range(stepNum):
@@ -63,12 +63,12 @@ def MIT_stairs(system, center, H):
         theta_b = rad*(90 + 270*(step+1)/stepNum)   # Angle between each back step
         pos_topStair = center + chrono.ChVectorD(0, H, 0)
 
-        MIT_stairsStep(system, pos_topStair, stair_r, h, theta_f, theta_b)
+        MIT_stairsStep(system, pos_topStair, stair_r, h, theta_f, theta_b, dh)
 
-        # if step % 2 == 0:           
-        #     MIT_stairsHandle(system, center, stair_r, h, theta-0.4)
+        if step % 2 == 0:           
+            MIT_stairsHandle(system, center, stair_r, h, theta_f)
 
-def MIT_stairsStep(system, center, stair_r, h, theta_f, theta_b):
+def MIT_stairsStep(system, center, stair_r, h, theta_f, theta_b, dh):
 
     width = 1.75
     height = 0.2
@@ -83,6 +83,38 @@ def MIT_stairsStep(system, center, stair_r, h, theta_f, theta_b):
         
     system.Add(step)
 
+    # Add rail handle for stair
+    df.SetLength(width)
+    db.SetLength(width)
+    n = (df+db)/2
+    
+    df.SetLength(width)
+    pos_rail = (pos_f+pos_b)/2 + (df+db)/2 + chrono.ChVectorD(0, 1, 0)
+    body_handle = chrono.ChBodyEasyCylinder(0.05, 0.8, 1)
+    body_handle.SetBodyFixed(True)
+    body_handle.SetPos(pos_rail)
+
+    dist = np.sqrt((df.x-db.x)**2 + (df.y-db.y)**2 + (df.z-db.z)**2)    # Calculate distance between df and db
+    alpha = np.arctan((dist+0.1)/dh)
+    
+    qr = chrono.Q_from_AngAxis(alpha, n.GetNormalized())
+    quaternion = qr * body_handle.GetRot()
+    body_handle.SetRot(quaternion)
+
+    # Collision shape
+    body_handle.GetCollisionModel().ClearModel()
+    body_handle.GetCollisionModel().AddCylinder(0.05, 0.1, 1) # hemi sizes
+    body_handle.GetCollisionModel().BuildModel()
+    # body_handle.SetCollide(True)
+
+    # Body texture
+    body_handle_texture = chrono.ChTexture()
+    body_handle_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/wood_floor.jpg'))
+    body_handle.GetAssets().push_back(body_handle_texture)
+
+    system.Add(body_handle)
+    
+
 def MIT_stairsHandle(system, center, stair_r, h, theta):
 
     size_handle_r = 0.04
@@ -93,7 +125,7 @@ def MIT_stairsHandle(system, center, stair_r, h, theta):
     body_handle = chrono.ChBodyEasyCylinder(size_handle_r, size_handle_h, size_handle_d)
     body_handle.SetBodyFixed(True)
     center_corr = chrono.ChVectorD(0, size_handle_h/2, 0)     # Correction for handle position
-    position = 3.2*stair_r
+    position = 1.75+stair_r
     n = chrono.ChVectorD(np.cos(theta), 2*h*stair_r/position, np.sin(theta))   # Normal vector
     start = center + n*position + center_corr      # Start postiton for each step                              
     body_handle.SetPos(start)
@@ -111,12 +143,14 @@ def MIT_stairsHandle(system, center, stair_r, h, theta):
 
     system.Add(body_handle)
 
+# def MIT_stairRail(system,)
+
 def MIT_floors(system, H):
 
     # Add floor, as a box
 
     floorsNum = 2               # Number of floors
-    postNum = 5                 # How many fence post there is to each side of floors center position
+    postNum = 7                 # How many fence post there is to each side of floors center position
     size_floor_x = 20
     size_floor_y = 0.2
     size_floor_z = 4 
@@ -124,7 +158,7 @@ def MIT_floors(system, H):
     for floor in range(floorsNum):
         y_pos = floor*H + H     # Increase floor hight
         floor_pos_1 = chrono.ChVectorD(0.5, y_pos, 8)     # Add floors left side stair
-        floor_pos_2 = chrono.ChVectorD(11, y_pos, 0)      # Add floors right side stair
+        floor_pos_2 = chrono.ChVectorD(11, y_pos, -1)      # Add floors right side stair
 
         MIT_add_floors(system, size_floor_x, size_floor_y, size_floor_z, floor_pos_1)
         MIT_add_floors(system, size_floor_z, size_floor_y, size_floor_x, floor_pos_2)
@@ -132,7 +166,7 @@ def MIT_floors(system, H):
         for post in range(postNum):
             # Add fence post to the rigth of the floors center position
             fence_pos_1 = chrono.ChVectorD(0.5+post, y_pos, 8-size_floor_z/2) 
-            fence_pos_2 = chrono.ChVectorD(11-size_floor_z/2, y_pos, 0+post)
+            fence_pos_2 = chrono.ChVectorD(11-size_floor_z/2, y_pos, 0+post) # Right side stair
 
             MIT_fence_post(system, fence_pos_1)
             MIT_fence_post(system, fence_pos_2)
@@ -140,12 +174,12 @@ def MIT_floors(system, H):
             if post > 0:
                 # Add fence post to the left of the floors center position
                 fence_pos_3 = chrono.ChVectorD(0.5-post, y_pos, 8-size_floor_z/2)
-                fence_pos_4 = chrono.ChVectorD(11-size_floor_z/2, y_pos, 0-post)
+                fence_pos_4 = chrono.ChVectorD(11-size_floor_z/2, y_pos, 0-post) # Right side stair
 
                 MIT_fence_post(system, fence_pos_3)
                 MIT_fence_post(system, fence_pos_4)
 
-    # Add floor piece for the stir
+    # Add floor piece by the stir
     floor_x = 2
     floor_y = 0.2
     floor_z = 2
@@ -205,33 +239,3 @@ def MIT_fence_post(system, fence_pos):
     body_fence.GetAssets().push_back(body_fence_texture)
 
     system.Add(body_fence)
-
-# def
-
-    # # Create the table, as a box
-    
-    # size_table_x = 1
-    # size_table_y = 0.2
-    # size_table_z = 0.3
-    
-    # body_table = chrono.ChBody()
-    # body_table.SetBodyFixed(True)
-    # body_table.SetPos(chrono.ChVectorD(0, 0, 0 ))
-    
-    # # Collision shape
-    # body_table.GetCollisionModel().ClearModel()
-    # body_table.GetCollisionModel().AddBox(size_table_x/2, size_table_y/2, size_table_z/2) # hemi sizes
-    # body_table.GetCollisionModel().BuildModel()
-    # body_table.SetCollide(True)
-    
-    # # Visualization shape
-    # body_table_shape = chrono.ChBoxShape()
-    # body_table_shape.GetBoxGeometry().Size = chrono.ChVectorD(size_table_x/2, size_table_y/2, size_table_z/2)
-    # body_table_shape.SetColor(chrono.ChColor(0.4,0.4,0.5))
-    # body_table.GetAssets().push_back(body_table_shape)
-    
-    # body_table_texture = chrono.ChTexture()
-    # body_table_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/tf-logo.jpg'))
-    # body_table.GetAssets().push_back(body_table_texture)
-    
-    # system.Add(body_table)
