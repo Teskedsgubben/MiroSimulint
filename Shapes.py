@@ -26,38 +26,49 @@ def step(position_front, direction_front, position_back, direction_back, width, 
   Step_mesh = chrono.ChTriangleMeshConnected()
 
   # inner side
-  Step_mesh.addTriangle(Step_ILF, Step_IUF, Step_ILB)
-  Step_mesh.addTriangle(Step_IUB, Step_ILB, Step_IUF)
+  Step_mesh.addTriangle(Step_ILF, Step_ILB, Step_IUF)
+  Step_mesh.addTriangle(Step_IUB, Step_IUF, Step_ILB)
 
   # outer side
-  Step_mesh.addTriangle(Step_OLF, Step_OLB, Step_OUB)
-  Step_mesh.addTriangle(Step_OLF, Step_OUB, Step_OUF)
+  Step_mesh.addTriangle(Step_OLF, Step_OUB, Step_OLB)
+  Step_mesh.addTriangle(Step_OLF, Step_OUF, Step_OUB)
 
   # top side
-  Step_mesh.addTriangle(Step_IUF, Step_OUF, Step_OUB)
-  Step_mesh.addTriangle(Step_IUF, Step_OUB, Step_IUB)
+  Step_mesh.addTriangle(Step_IUF, Step_OUB, Step_OUF)
+  Step_mesh.addTriangle(Step_IUF, Step_IUB, Step_OUB)
 
   # bottom side
-  Step_mesh.addTriangle(Step_ILF, Step_OLB, Step_OLF)
-  Step_mesh.addTriangle(Step_ILF, Step_ILB, Step_OLB)
+  Step_mesh.addTriangle(Step_ILF, Step_OLF, Step_OLB)
+  Step_mesh.addTriangle(Step_ILF, Step_OLB, Step_ILB)
 
   # back side
-  Step_mesh.addTriangle(Step_ILB, Step_IUB, Step_OLB)
-  Step_mesh.addTriangle(Step_OUB, Step_OLB, Step_IUB)
+  Step_mesh.addTriangle(Step_ILB, Step_OLB, Step_IUB)
+  Step_mesh.addTriangle(Step_OUB, Step_IUB, Step_OLB)
 
   # front side
-  Step_mesh.addTriangle(Step_ILF, Step_OLF, Step_IUF)
-  Step_mesh.addTriangle(Step_OUF, Step_IUF, Step_OLF)
+  Step_mesh.addTriangle(Step_ILF, Step_IUF, Step_OLF)
+  Step_mesh.addTriangle(Step_OUF, Step_OLF, Step_IUF)
 
   Step_mesh.RepairDuplicateVertexes()
 
   Step = chrono.ChBody()
-  Step.SetCollide(False)
   Step.SetBodyFixed(True)
 
   Step_shape = chrono.ChTriangleMeshShape()
   Step_shape.SetMesh(Step_mesh)
-  Step_shape.SetColor(chrono.ChColor(0.9, 0.1, 0.1))
+  # Step_shape.SetColor(chrono.ChColor(0.9, 0.9, 0.9))
+
+
+  Step.GetCollisionModel().ClearModel()	
+  Step.GetCollisionModel().AddTriangleMesh(Step_mesh, True, False)
+  Step.GetCollisionModel().BuildModel()
+  Step.SetCollide(True)
+      
+  Step_texture = chrono.ChTexture()
+  Step_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/stone_floor.jpg'))
+  Step_texture.SetTextureScale(10, 10)
+  Step.GetAssets().push_back(Step_texture)
+        
 
   Step.GetAssets().push_back(Step_shape)
 

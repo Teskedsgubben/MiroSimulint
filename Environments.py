@@ -1,5 +1,6 @@
 import pychrono.core as chrono
 import os
+import Shapes as shp 
 
 import Environments_Johan
 import Environments_Marcus
@@ -25,7 +26,7 @@ def MIT_place(system):
 
     body_floor = chrono.ChBody()
     body_floor.SetBodyFixed(True)
-    body_floor.SetPos(chrono.ChVectorD(2.5, -2, -1))
+    body_floor.SetPos(chrono.ChVectorD(2.5, -1, -1))
     
     # Collision shape
     body_floor.GetCollisionModel().ClearModel()
@@ -40,6 +41,7 @@ def MIT_place(system):
     
     body_floor_texture = chrono.ChTexture()
     body_floor_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/wood_floor.jpg'))
+    body_floor_texture.SetTextureScale(3.5, 3.5)
     body_floor.GetAssets().push_back(body_floor_texture)
     
     system.Add(body_floor)
@@ -87,10 +89,74 @@ def MIT_place(system):
     # ..create the function for imposed y vertical motion, etc.
     mfunZ = chrono.ChFunction_Sine(0,1.5,0.12)  # phase, frequency, amplitude
     link_shaker.SetMotion_Z(mfunZ)
+
+
+    roof(system)
     
+
+
+    step_comp = chrono.ChBody()
+    step_comp.SetBodyFixed(True)
+    step_comp.SetPos(chrono.ChVectorD(2,1.1,-3))
+    # Collision shape
+    step_comp.GetCollisionModel().ClearModel()
+    step_comp.GetCollisionModel().AddBox(1, 0.1, 1) # hemi sizes
+    step_comp.GetCollisionModel().BuildModel()
+    step_comp.SetCollide(True)
+    # Visualization shape
+    step_comp_shape = chrono.ChBoxShape()
+    step_comp_shape.GetBoxGeometry().Size = chrono.ChVectorD(1, 0.1, 1)
+    step_comp_shape.SetColor(chrono.ChColor(0.4,0.4,0.5))
+    step_comp.GetAssets().push_back(step_comp_shape)
+    step_comp_texture = chrono.ChTexture()
+    step_comp_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/test_texture.png'))
+    step_comp_texture.SetTextureScale(0.05, 0.05)
+    step_comp.GetAssets().push_back(step_comp_texture)
+
+
+    system.Add(step_comp)
+
     # Note that you could use other types of ChFunction_ objects, or create
     # your custom function by class inheritance (see demo_python.py), or also
     # set a function for table rotation , etc.
     
     
     return [start_position, throw_velocity]
+    
+def roof(system):
+
+    beams = 4
+    for b in range(beams):
+        p1 = chrono.ChVectorD(-5 + 4.2*b - 0.06, 12-0.2, 6-0.06)
+        p2 = chrono.ChVectorD(-5 + 4.2*b + 0.06, 12-0.2, 6-0.06)
+        d1 = chrono.ChVectorD(0,-0.08,-1)
+        d2 = chrono.ChVectorD(0,-0.08,-1)
+        system.Add(shp.step(p1,d1, p2,d2, 18, 0.2))
+    
+    beams = 10
+    for b in range(beams):
+        step_comp = chrono.ChBody()
+        step_comp.SetBodyFixed(True)
+        step_comp.SetCollide(False)
+        step_comp.SetPos(chrono.ChVectorD(-5 + 1.4*b, 11, 6))
+
+        # Visualization shape
+        step_comp_shape = chrono.ChBoxShape()
+        step_comp_shape.GetBoxGeometry().Size = chrono.ChVectorD(0.06, 1, 0.06)
+        step_comp_shape.SetColor(chrono.ChColor(0.4,0.4,0.5))
+        step_comp.GetAssets().push_back(step_comp_shape)
+        system.Add(step_comp)
+
+    beams = 4
+    for b in range(beams):
+        step_comp = chrono.ChBody()
+        step_comp.SetBodyFixed(True)
+        step_comp.SetCollide(False)
+        step_comp.SetPos(chrono.ChVectorD(-5 +6.3, 10-0.06+(2/3)*b, 6))
+
+        # Visualization shape
+        step_comp_shape = chrono.ChBoxShape()
+        step_comp_shape.GetBoxGeometry().Size = chrono.ChVectorD(6.3+0.06, 0.06, 0.06)
+        step_comp_shape.SetColor(chrono.ChColor(0.4,0.4,0.5))
+        step_comp.GetAssets().push_back(step_comp_shape)
+        system.Add(step_comp)

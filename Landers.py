@@ -8,7 +8,7 @@ import MiroModule as mm
 import Components as mc
 
 
-deg = -25
+deg = -45
 DemoLander = mm.Module()
 
 # Add top and bottom plates

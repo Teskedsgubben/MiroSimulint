@@ -98,11 +98,7 @@ class MiroSystem():
         
         self.simulation.AddTypicalSky()
         self.Set_Camera()
-        self.simulation.AddLightWithShadow(chronoirr.vector3df(2,12,2),    # point
-                                        chronoirr.vector3df(0,0,0),    # aimpoint
-                                        255,                 # radius (power)
-                                        1,9,               # near, far
-                                        70)                # angle of FOV
+        self.Set_Lights(False)
         
                     # ==IMPORTANT!== Use this function for adding a ChIrrNodeAsset to all items
                     # in the system. These ChIrrNodeAsset assets are 'proxies' to the Irrlicht meshes.
@@ -144,3 +140,49 @@ class MiroSystem():
                 self.simulation.DoStep()
             self.simulation.EndScene()
 
+    def Set_Lights(self, ambients = True):
+        lightpos = [5,25,20]
+        # lightpos[0], lightpos[1], lightpos[2]
+
+        # Sky lighting
+        # self.simulation.AddLightWithShadow(chronoirr.vector3df(2,25,-1),    # point
+        #                                 chronoirr.vector3df(2,0,-1),    # aimpoint
+        #                                 100,                 # radius (power)
+        #                                 7,30,               # near, far
+        #                                 50)                # angle of FOV
+
+        # Sun lighting
+        self.simulation.AddLightWithShadow(chronoirr.vector3df(lightpos[0], lightpos[1], lightpos[2]),    # point
+                                        chronoirr.vector3df(3,0,-5),    # aimpoint
+                                        100,                 # radius (power)
+                                        15,40,               # near, far
+                                        40)                # angle of FOV
+        self.lightsource(lightpos)
+
+        
+        # Ambient from sides
+        if(ambients):
+            self.simulation.AddLightWithShadow(chronoirr.vector3df(-20,1,0),    # point
+                                        chronoirr.vector3df(0,0,0),    # aimpoint
+                                        24,                 # radius (power)
+                                        7,40,               # near, far
+                                        70)                # angle of FOV
+            self.simulation.AddLightWithShadow(chronoirr.vector3df(0,1,-20),    # point
+                                        chronoirr.vector3df(0,0,0),    # aimpoint
+                                        24,                 # radius (power)
+                                        7,40,               # near, far
+                                        70)                # angle of FOV
+
+
+    def lightsource(self, pos):
+        sun = chrono.ChBody()
+        sun.SetBodyFixed(True)
+        sun.SetCollide(False)
+        sun.SetPos(chrono.ChVectorD(pos[0], pos[1], pos[2]))
+
+        # Visualization shape
+        sun_box = chrono.ChBoxShape()
+        sun_box.GetBoxGeometry().Size = chrono.ChVectorD(0.2,0.2,0.2)
+        sun_box.SetColor(chrono.ChColor(1,1,0.1))
+        sun.GetAssets().push_back(sun_box)
+        self.system.Add(sun)
