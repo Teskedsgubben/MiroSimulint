@@ -19,6 +19,7 @@ import pychrono.irrlicht as chronoirr
 
 import Environments as env
 import Landers as landers
+import Launcher as ls
 import MiroSystem as ms
 
 # Initialize a Miro System
@@ -34,10 +35,13 @@ simulation_system.Set_Environment(env.MIT_place)
 # 4: 2nd (ground) floor side view
 # 5: default
 # Using default moves the camera much more when rotating
-simulation_system.Set_Perspective('default')
+simulation_system.Set_Perspective('4th fsdfloor behind lander')
 
 # Add the Demo Lander to the system
-simulation_system.Add_MiroModule(landers.DemoLander)
+simulation_system.Add_MiroModule(landers.DemoLander, [10.5, 8.5, 0])
+
+# Add the Launcher to the system
+simulation_system.Add_MiroModule(ls.Launcher, [10, 8.705, -2], False)
 
 # Run the system simulation
 simulation_system.Run()

@@ -18,6 +18,7 @@ class MiroSystem():
         #
         
         self.system = chrono.ChSystemNSC()
+        self.modules = []
 
         self.start_position = [0,0,0]
         self.throw_velocity = [0,0,0]
@@ -49,6 +50,12 @@ class MiroSystem():
                 'dir': [0.25,0.3,1],
                 'lah': 0.05
             }
+            ,
+            'maccans': {
+                'pos': [1,15,-1.15],
+                'dir': [0,1,0],
+                'lah': 0.05
+            }
         }
         
         # Set the default outward/inward shape margins for collision detection,
@@ -73,11 +80,14 @@ class MiroSystem():
         else:
             print('Error: "'+camname+'" is not a recognized camera position, using default')
     
-    def Add_MiroModule(self, module):
-        module.Move(self.start_position)
-        module.SetVelocity(self.throw_velocity)
+    def Add_MiroModule(self, module, position = False, vel = True):
+        module.Move(position)
+        if vel:
+            module.SetVelocity(self.throw_velocity)
         module.AddToSystem(self)
         self.links = module.GetLinks()
+        self.modules.append(module)
+
 
     def Add_Object(self, object):
         self.system.Add(object)
@@ -98,7 +108,7 @@ class MiroSystem():
         
         self.simulation.AddTypicalSky()
         self.Set_Camera()
-        self.Set_Lights(False)
+        self.Set_Lights(True)
         
                     # ==IMPORTANT!== Use this function for adding a ChIrrNodeAsset to all items
                     # in the system. These ChIrrNodeAsset assets are 'proxies' to the Irrlicht meshes.
@@ -123,11 +133,24 @@ class MiroSystem():
         self.simulation.SetTimestep(0.004)
         self.simulation.SetTryRealtime(True)
 
-
+        delay = 3
+        start = time.time()
+        substeps = 1
+        
         self.simulation.BeginScene()
         self.simulation.DrawAll()
         self.simulation.EndScene()
-        time.sleep(2)
+        time.sleep(1)
+        
+        while(self.simulation.GetDevice().run() and start + delay > time.time()):
+            self.simulation.BeginScene()
+            self.simulation.DrawAll()
+            for substep in range(0,substeps):
+                self.simulation.DoStep()
+            self.simulation.EndScene()
+        
+        for module in self.modules:
+            module.Release()
 
         while(self.simulation.GetDevice().run()):
             # for _, link in self.links.items():
@@ -136,7 +159,7 @@ class MiroSystem():
 
             self.simulation.BeginScene()
             self.simulation.DrawAll()
-            for substep in range(0,1):
+            for substep in range(0,substeps):
                 self.simulation.DoStep()
             self.simulation.EndScene()
 

@@ -37,7 +37,7 @@ DemoLander.ConnectComponents('Rod B', 'A', 'Top plate', 'D')
 DemoLander.ConnectComponents('Rod C', 'A', 'Top plate', 'A')
 DemoLander.ConnectComponents('Rod D', 'A', 'Top plate', 'B')
 
-
+# DemoLander.Fixate('Bottom plate')
 # DemoLander.AddComponent(mc.MC044([0,deg,0]), 'Chute')
 # DemoLander.ChuteUp('Top plate', 'E', 'Chute')
 

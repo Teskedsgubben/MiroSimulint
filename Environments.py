@@ -40,8 +40,8 @@ def MIT_place(system):
     body_floor.GetAssets().push_back(body_floor_shape)
     
     body_floor_texture = chrono.ChTexture()
-    body_floor_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/wood_floor.jpg'))
-    body_floor_texture.SetTextureScale(3.5, 3.5)
+    body_floor_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/MITfloor.png'))
+    body_floor_texture.SetTextureScale(23, 18)
     body_floor.GetAssets().push_back(body_floor_texture)
     
     system.Add(body_floor)
@@ -68,7 +68,8 @@ def MIT_place(system):
     body_table.GetAssets().push_back(body_table_shape)
     
     body_table_texture = chrono.ChTexture()
-    body_table_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/bhgang.jpg'))
+    body_table_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/grid.png'))
+    body_table_texture.SetTextureScale(1, 1)
     body_table.GetAssets().push_back(body_table_texture)
     
     system.Add(body_table)
@@ -110,7 +111,7 @@ def MIT_place(system):
     step_comp.GetAssets().push_back(step_comp_shape)
     step_comp_texture = chrono.ChTexture()
     step_comp_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/test_texture.png'))
-    step_comp_texture.SetTextureScale(0.05, 0.05)
+    step_comp_texture.SetTextureScale(0.04, 0.04)
     step_comp.GetAssets().push_back(step_comp_texture)
 
 

@@ -65,7 +65,7 @@ def step(position_front, direction_front, position_back, direction_back, width, 
   Step.SetCollide(True)
       
   Step_texture = chrono.ChTexture()
-  Step_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/stone_floor.jpg'))
+  Step_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/MITstol.jpg'))
   Step_texture.SetTextureScale(10, 10)
   Step.GetAssets().push_back(Step_texture)
         

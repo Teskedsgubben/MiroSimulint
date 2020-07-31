@@ -5,6 +5,7 @@ class Module():
         self.components = {}
         self.links = {}
         self.nonames = 0
+        self.fixed = []
     
     def AddComponent(self, comp, name='unnamed'):
         if(name == 'unnamed'):
@@ -17,6 +18,18 @@ class Module():
 
     def GetLinks(self):
         return self.links
+    
+    def Fixate(self, name, permanent = False):
+        self.perm = permanent
+        if name in self.components:
+            self.fixed.append(name)
+            self.components[name].GetBody().SetBodyFixed(True)
+    
+    def Release(self):
+        for name in self.fixed:
+            if not self.perm:
+                self.components[name].GetBody().SetBodyFixed(False)
+        self.fixed = []
     
     def ConnectComponents(self, name_A, point_A, name_B, point_B, move = True):
         comp_A = self.components[name_A]
@@ -45,6 +58,19 @@ class Module():
         
         self.links.update({name: mlink})
 
+    def SetSpring(self, name_A, point_A, name_B, point_B, L, K):
+        comp_A = self.components[name_A]
+        comp_B = self.components[name_B]
+
+        name = name_A+"_"+point_A + "_TO_" + name_B+"_"+point_B
+
+        mlink = chrono.ChLinkTSDA()
+        mlink.Initialize(comp_A.GetBody(), comp_B.GetBody(), False, comp_A.GetLinkPoint(point_A), comp_B.GetLinkPoint(point_B))
+        mlink.SetSpringCoefficient(K)
+        mlink.SetRestLength(L)
+
+        self.links.update({name: mlink})
+
     def ChuteUp(self, name_A, point_A, name_chute):
         comp_A = self.components[name_A]
         comp_chute = self.components[name_chute]
@@ -59,10 +85,10 @@ class Module():
         # mframe = chrono.ChCoordsysD(comp_B.GetLinkPoint(point_B), comp_B.GetBody().GetRot())
         # initialize the constraint telling which part must be connected, and where:
         mlink.Initialize(comp_A.GetBody(), comp_chute.GetBody(), False, comp_A.GetLinkPoint(point_A), comp_chute.GetLinkPoint('B'))
-        mlink.RegisterForceFunctor()
-        chrono.ForceFunctor()
-        # mlink.SetSpringCoefficient(0.02)
-        # mlink.SetDampingCoefficient(0.5)
+        # mlink.RegisterForceFunctor()
+        # chrono.ForceFunctor()
+        mlink.SetSpringCoefficient(0.02)
+        mlink.SetDampingCoefficient(0.001)
         mlink.SetRestLength(1)
 
         self.links.update({name: mlink})
