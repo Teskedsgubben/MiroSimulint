@@ -49,12 +49,16 @@ class MiroSystem():
                 'pos': [1,1.35,-10.15],
                 'dir': [0.25,0.3,1],
                 'lah': 0.05
-            }
-            ,
+            },
             'maccans': {
                 'pos': [1,15,-1.15],
-                'dir': [0,1,0],
+                'dir': [0,-1,0],
                 'lah': 0.05
+            },
+            '4th floor observing launcher': {
+                'pos': [10.5,9.5,3],
+                'dir': [-0.2,-0.1,-1],
+                'lah': 3
             }
         }
         
@@ -80,10 +84,11 @@ class MiroSystem():
         else:
             print('Error: "'+camname+'" is not a recognized camera position, using default')
     
-    def Add_MiroModule(self, module, position = False, vel = True):
-        module.Move(position)
+    def Add_MiroModule(self, module, position = False, vel = False):
+        if(position):
+            module.Move(position)
         if vel:
-            module.SetVelocity(self.throw_velocity)
+            module.SetVelocity(vel)
         module.AddToSystem(self)
         self.links = module.GetLinks()
         self.modules.append(module)
@@ -98,13 +103,13 @@ class MiroSystem():
         looker = position + chronoirr.vector3df(cam['dir'][0], cam['dir'][1], cam['dir'][2]).setLength(cam['lah'])
         self.simulation.AddTypicalCamera(position, looker)
     
-    def Run(self):
+    def Run(self, resolution = [1280, 720]):
         # ---------------------------------------------------------------------
         #
         #  Create an Irrlicht application to visualize the system
         #
         
-        self.simulation = chronoirr.ChIrrApp(self.system, 'MiroSimulation', chronoirr.dimension2du(1728,972))
+        self.simulation = chronoirr.ChIrrApp(self.system, 'MiroSimulation', chronoirr.dimension2du(resolution[0], resolution[1]))
         
         self.simulation.AddTypicalSky()
         self.Set_Camera()

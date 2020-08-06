@@ -33,15 +33,16 @@ simulation_system.Set_Environment(env.MIT_place)
 # 2: 4th floor behind lander
 # 3: 2nd (ground) floor front view
 # 4: 2nd (ground) floor side view
-# 5: default
+# 5: 4th floor observing launcher
+# 0: default
 # Using default moves the camera much more when rotating
-simulation_system.Set_Perspective('4th fsdfloor behind lander')
+simulation_system.Set_Perspective('4th floor observing launcher')
 
 # Add the Demo Lander to the system
-simulation_system.Add_MiroModule(landers.DemoLander, [10.5, 8.5, 0])
+simulation_system.Add_MiroModule(landers.DemoLander, [11.4, 9.25, 0])
 
 # Add the Launcher to the system
-simulation_system.Add_MiroModule(ls.Launcher, [10, 8.705, -2], False)
+simulation_system.Add_MiroModule(ls.Launcher, [10, 8.15, -0.2])
 
 # Run the system simulation
-simulation_system.Run()
+simulation_system.Run([1920, 1080])

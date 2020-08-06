@@ -67,6 +67,7 @@ class Module():
         mlink = chrono.ChLinkTSDA()
         mlink.Initialize(comp_A.GetBody(), comp_B.GetBody(), False, comp_A.GetLinkPoint(point_A), comp_B.GetLinkPoint(point_B))
         mlink.SetSpringCoefficient(K)
+        mlink.SetDampingCoefficient(K/200)
         mlink.SetRestLength(L)
 
         self.links.update({name: mlink})
