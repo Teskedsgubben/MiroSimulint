@@ -157,7 +157,7 @@ class MiroSystem():
         while(self.simulation.GetDevice().run() and start + delay > time.time()):
             self.simulation.BeginScene()
             self.simulation.DrawAll()
-            for substep in range(0,substeps):
+            for _ in range(0,substeps):
                 self.simulation.DoStep()
             self.simulation.EndScene()
         
@@ -171,7 +171,7 @@ class MiroSystem():
 
             self.simulation.BeginScene()
             self.simulation.DrawAll()
-            for substep in range(0,substeps):
+            for _ in range(0,substeps):
                 self.simulation.DoStep()
             self.simulation.EndScene()
 
