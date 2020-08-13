@@ -18,10 +18,8 @@ class MiroSystem():
         #
         
         self.system = chrono.ChSystemNSC()
-        self.modules = []
-
-        self.start_position = [0,0,0]
-        self.throw_velocity = [0,0,0]
+        self.modules = {}
+        self.links = {}
         
         self.camname = 'default'
         self.camviews = {
@@ -64,8 +62,8 @@ class MiroSystem():
         
         # Set the default outward/inward shape margins for collision detection,
         # this is epecially important for very large or very small objects.
-        chrono.ChCollisionModel.SetDefaultSuggestedEnvelope(0.001)
-        chrono.ChCollisionModel.SetDefaultSuggestedMargin(0.001)
+        chrono.ChCollisionModel.SetDefaultSuggestedEnvelope(0.00001)
+        chrono.ChCollisionModel.SetDefaultSuggestedMargin(0.00001)
         
         # Maybe you want to change some settings for the solver. For example you
         # might want to use SetSolverMaxIterations to set the number of iterations
@@ -76,7 +74,10 @@ class MiroSystem():
         
         
     def Set_Environment(self, Environment):
-        [self.start_position, self.throw_velocity] = Environment(self.system)
+        self.target = Environment(self.system)
+
+    def Get_Target(self):
+        return self.target
     
     def Set_Perspective(self, camname):
         if camname in self.camviews:
@@ -84,15 +85,19 @@ class MiroSystem():
         else:
             print('Error: "'+camname+'" is not a recognized camera position, using default')
     
-    def Add_MiroModule(self, module, position = False, vel = False):
+    def Add_MiroModule(self, module, name, position = False, vel = False):
         if(position):
             module.Move(position)
         if vel:
             module.SetVelocity(vel)
         module.AddToSystem(self)
-        self.links = module.GetLinks()
-        self.modules.append(module)
+        self.links.update(module.GetLinks())
+        self.modules.update({name: module})
 
+    def MoveToReference(self, move_module, ref_module):
+        moveMod = self.modules[move_module]
+        refMod = self.modules[ref_module]
+        moveMod.SetPosition(refMod.GetReferencePoint())
 
     def Add_Object(self, object):
         self.system.Add(object)
@@ -135,12 +140,14 @@ class MiroSystem():
         #  Run the simulation
         #
         
-        self.simulation.SetTimestep(0.004)
+        dt = 0.004 # per frame
+        substeps = 1
+
+        self.simulation.SetTimestep(dt/substeps)
         self.simulation.SetTryRealtime(True)
 
-        delay = 3
+        delay = 5
         start = time.time()
-        substeps = 1
         
         self.simulation.BeginScene()
         self.simulation.DrawAll()
@@ -154,7 +161,7 @@ class MiroSystem():
                 self.simulation.DoStep()
             self.simulation.EndScene()
         
-        for module in self.modules:
+        for _, module in self.modules.items():
             module.Release()
 
         while(self.simulation.GetDevice().run()):

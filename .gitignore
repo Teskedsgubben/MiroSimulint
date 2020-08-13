@@ -5,3 +5,5 @@ __pycache__
 *.pyc
 # min progress mapp
 progress
+# fram capture mappen
+video_capture

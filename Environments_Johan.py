@@ -262,7 +262,7 @@ def MIT_add_box(system, size_x, size_y, size_z, box_pos, texture):
     
     # Collision shape
     body_box.GetCollisionModel().ClearModel()
-    body_box.GetCollisionModel().AddBox(size_x/2, size_y/2, size_z/2) # hemi sizes
+    body_box.GetCollisionModel().AddBox(size_x, size_y, size_z) # hemi sizes
     body_box.GetCollisionModel().BuildModel()
     body_box.SetCollide(True)
     

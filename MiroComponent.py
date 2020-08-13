@@ -4,16 +4,28 @@ import numpy as np
 class MiroComponent():
     def __init__(self, body):
         self.linkpoints = {}
+        self.linkdirs = {}
         self.body = body
 
     def AddToSystem(self, system):
         system.Add_Object(self.body)
 
-    def AddLinkPoint(self, name, coord):
+    def AddLinkPoint(self, name, normal, coord):
         self.linkpoints.update({name: coord})
+        self.linkdirs.update({name: chrono.ChVectorD(normal[0], normal[1], normal[2]).GetNormalized()})
+
+    def GetPosition(self):
+        return self.body.GetPos()
 
     def GetLinkPoint(self, name):
         return self.body.GetPos() + self.linkpoints[name]
+
+    def GetLinkDir(self, name):
+        return self.body.GetRot().Rotate(self.linkdirs[name])
+        
+    def GetLinkPointXYZ(self, name):
+        lp = self.body.GetPos() + self.linkpoints[name]
+        return [lp.x, lp.y, lp.z]
     
     def GetBody(self):
         return self.body
@@ -34,18 +46,21 @@ class MiroComponent():
         posvec = chrono.ChVectorD(pos_x, pos_y, pos_z)
         
         self.body.Move(posvec - self.body.GetPos())
-    def MoveToMatch(self, pointname, other_component, other_pointname):
-        self.body.Move(other_component.GetLinkPoint(other_pointname) - self.GetLinkPoint(pointname))
+    def MoveToMatch(self, pointname, other_component, other_pointname, dist = 0):
+        marg = other_component.GetLinkDir(other_pointname).GetNormalized()
+        marg.SetLength(dist)
+        self.body.Move(other_component.GetLinkPoint(other_pointname) - self.GetLinkPoint(pointname) + marg)
 
-    def Rotate(self, rotation):
-        rot_x = np.pi/180 * rotation[0]
-        rot_y = np.pi/180 * rotation[1]
-        rot_z = np.pi/180 * rotation[2]
+    def Rotate(self, rotation, quaternion = False):
+        if not quaternion:
+            rot_x = np.pi/180 * rotation[0]
+            rot_y = np.pi/180 * rotation[1]
+            rot_z = np.pi/180 * rotation[2]
 
-        qr = chrono.Q_from_Euler123(chrono.ChVectorD(rot_x, rot_y, rot_z))
-        quaternion = qr * self.body.GetRot()
-
-        self.body.SetRot(quaternion)
+            quaternion = chrono.Q_from_Euler123(chrono.ChVectorD(rot_x, rot_y, rot_z))
+        
+        q_rotation = quaternion * self.body.GetRot()
+        self.body.SetRot(q_rotation)
 
         for name, link in self.linkpoints.items():
             self.linkpoints.update({name: quaternion.Rotate(link)})

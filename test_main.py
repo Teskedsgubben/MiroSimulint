@@ -1,46 +1,51 @@
 #------------------------------------------------------------------------------
-# Name:        pychrono example
-# Purpose:
+# Name:         Miro Simulint
+# 
+# Purpose:      Main script to run a lander simulation designed to temporarilty 
+#               replace the physically 3D-printed modules that are normally used
+#               in the course. This is a virtual adaption due to COVID-19.
+# 
+# Usage:        Create a lander in the Landers.py file, or modify the DemoLander.
+#               This Main file will then insert that lander into the MIT place at
+#               the predetermined coordinates and throw it over the edge. 
 #
-# Author:      Alessandro Tasora
+# Authors:      Felix Djuphammar, William Nordberg, Marcus Lindbergh, Johan Jonsson, Franz Wikner
 #
-# Created:     1/01/2019
-# Copyright:   (c) ProjectChrono 2019
-#
-#
-# This file shows how to
-#   - create a small stack of bricks,
-#   - create a support that shakes like an earthquake, with motion function
-#   - simulate the bricks that fall
 #-------------------------------------------------------------------------------
- 
- 
+
+
 import pychrono.core as chrono
 import pychrono.irrlicht as chronoirr
 
 import Environments as env
 import Landers as landers
+import Launcher as ls
 import MiroSystem as ms
 
-import Shapes as shp
-import numpy as np
-
-
+# Initialize a Miro System
 simulation_system  = ms.MiroSystem()
 
-simulation_system.Set_Environment(env.DemoTable)
+# Set the environment to MIT place
+simulation_system.Set_Environment(env.MIT_place)
 
-simulation_system.Add_MiroModule(landers.DemoLander)
+# Set camera viewing perspective, options are:
+# 1: '3rd floor staircase'
+# 2: '4th floor behind lander'
+# 3: '2nd (ground) floor front view'
+# 4: '2nd (ground) floor side view'
+# 5: '4th floor observing launcher'
+# 0: 'default'
+# Use mouse, scroll wheel, arrow keys and pg up & pg down to move
+simulation_system.Set_Perspective('default')
 
-c = chrono.ChVectorD(2, 2, 2)
-dir_f = chrono.ChVectorD(np.cos(1.0), 0, np.sin(1.0))
-dir_b = chrono.ChVectorD(np.cos(1.3), 0, np.sin(1.3))
-pos_f = c + dir_f
-pos_b = c + dir_b
-w = 2.0
-h = 0.25
+# Add the Demo Lander to the system
+simulation_system.Add_MiroModule(landers.DemoLander, 'Lander', [11.4, 9, -0.2])
 
-my_step = shp.step(pos_f, dir_f, pos_b, dir_b, w, h)
-simulation_system.Add_Object(my_step)
+# Add the Launcher to the system
+simulation_system.Add_MiroModule(ls.Cannon, 'Launcher', [10, 8.15, -0.2])
 
-simulation_system.Run()
+# Move the Lander to the point set by the Launcher
+simulation_system.MoveToReference('Lander', 'Launcher')
+
+# Run the system simulation
+simulation_system.Run([1920, 1080])

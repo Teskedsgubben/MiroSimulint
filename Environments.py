@@ -7,13 +7,11 @@ import Environments_Marcus
 import Environments_Franz
 
 def MIT_place(system):
+    target = [0,1,0]
+
     # Create the room floor: a simple fixed rigid body with a collision shape
     # and a visualization shape
     chrono.SetChronoDataPath(os.getcwd() + "/")
-
-    # Throwing paramters for lander in the environment
-    start_position = [10.5,8.5,0]
-    throw_velocity = [-6.5,3,0]
 
     Environments_Johan.Johan_Components(system)
     Environments_Marcus.Marcus_Components(system)
@@ -117,12 +115,7 @@ def MIT_place(system):
 
     system.Add(step_comp)
 
-    # Note that you could use other types of ChFunction_ objects, or create
-    # your custom function by class inheritance (see demo_python.py), or also
-    # set a function for table rotation , etc.
-    
-    
-    return [start_position, throw_velocity]
+    return target
     
 def roof(system):
 
