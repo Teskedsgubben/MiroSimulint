@@ -6,15 +6,23 @@ def Franz_Components(system):
     # Create the room floor: a simple fixed rigid body with a collision shape
     # and a visualization shape
     chrono.SetChronoDataPath(os.getcwd() + "/")
-    start_table_pos = chrono.ChVectorD(10, 1-0.1, -9.8)  # The position for the table
-    num_table_1 = 5                                    # Tabels anlong the 
-    num_table_2 = 6                                  #
+    second_floor(system)
+    third_floor(system)
+
+
+def second_floor(system):
+    start_table_pos = chrono.ChVectorD(10, 0, -9.8)  # The position for the table in x and z direction
+    num_table_1 = 5     # Tabels along the z axis 
+    num_table_2 = 6     # Tabels along the x axis
+    #The table size and position in y direction.                              
     size_table_x = 1.2
     size_table_y = 0.1
     size_table_z = 1.2
     size_leg_h = 0.8
     size_leg_r = 0.03
-    start_table_pos.y = 0 + size_leg_h #makes sure the legs of the tale touches the ground
+    level_pos = [0, 4, 8] # the of the floor in the y direction.
+    level = 0   #what floor? 0 = second floor and so on.
+    start_table_pos.y = level_pos[level] + size_leg_h #makes sure the legs of the tale touches the ground
     length = np.sqrt((size_table_x/2)**2 + (size_table_z/2)**2) 
 
     for table_i in range(num_table_1):
@@ -24,7 +32,7 @@ def Franz_Components(system):
             theta = chair_i*0.5*np.pi
             n = chrono.ChVectorD(-length*np.cos(theta), 0, length*np.sin(theta))
             pos_chair = table_pos + n
-            MIT_chair(system, pos_chair,chair_i)
+            MIT_chair(system, pos_chair,chair_i, level)
     
     for table_i in range(1,num_table_2):
         table_pos = start_table_pos + chrono.ChVectorD(-3, 0, random.random()/2)*table_i
@@ -33,10 +41,42 @@ def Franz_Components(system):
             theta = chair_i*0.5*np.pi
             n = chrono.ChVectorD(-length*np.cos(theta), 0, length*np.sin(theta))
             pos_chair = table_pos + n
-            MIT_chair(system, pos_chair,chair_i)
+            MIT_chair(system, pos_chair,chair_i, level)
 
-
-
+# 3. 4. 8
+def third_floor(system):
+    start_table_pos = chrono.ChVectorD(9.55,4,6.55)
+    num_table_x = 4     # Tabels in the x direction 
+    #The table size and position in y direction.                              
+    size_table_x = 1
+    size_table_y = 0.1
+    size_table_z = 1
+    size_leg_h = 0.8
+    size_leg_r = 0.03
+    level_pos = [0, 4, 8] # the y coordinate of the floors.
+    level = 1   #what floor? 0 = second floor and so on.
+    start_table_pos.y = level_pos[level] + size_leg_h #makes sure the legs of the tale touches the ground
+    length = np.sqrt((size_table_x/2)**2 + (size_table_z/2)**2)
+    # The tables in the x dircetion on thirdfloor
+    for table_i in range(num_table_x):
+        table_pos = start_table_pos + chrono.ChVectorD(-3, 0, 0)*(table_i + 2)
+        MIT_table(system, table_pos, size_table_x, size_table_y, size_table_z, size_leg_h, size_leg_r)   # The table
+        for chair_i in range(0,4,2):
+            length_rand = length - random.random()/2
+            theta = chair_i*0.5*np.pi
+            n = chrono.ChVectorD(-length_rand*np.cos(theta), 0, length_rand*np.sin(theta))
+            pos_chair = table_pos + n
+            MIT_chair(system, pos_chair,chair_i, level)  
+    # the tables in z direction on thirdfloor
+    for table_i in range(num_table_x):
+        table_pos = start_table_pos + chrono.ChVectorD(0, 0, -3)*(table_i + 2)
+        MIT_table(system, table_pos, size_table_x, size_table_y, size_table_z, size_leg_h, size_leg_r)   # The table
+        for chair_i in range(1,4,2):
+            length_rand = length - random.random()/2 #makes the chairs look more natural because they wont be perfect inline
+            theta = chair_i*0.5*np.pi
+            n = chrono.ChVectorD(-length_rand*np.cos(theta), 0, length_rand*np.sin(theta))
+            pos_chair = table_pos + n
+            MIT_chair(system, pos_chair,chair_i, level)  
 
 
 
@@ -102,7 +142,7 @@ def table_leg(system,leg_pos, size_leg_r, size_leg_h):
     system.Add(body_table_leg)
 
 
-def MIT_chair(system, pos_chair,rotation):
+def MIT_chair(system, pos_chair,rotation, level):
     #dimensions of the chair
     size_chair_x = 0.5
     size_chair_y = 0.1
@@ -111,7 +151,8 @@ def MIT_chair(system, pos_chair,rotation):
     size_leg_r = 0.02 
     size_back_cylinder_r = 0.015 # the back of the chair
     size_back_cylinder_h = 0.5
-    pos_chair.y = 0 + size_chair_leg_h #makes sure the chair stands on first floor
+    level_pos = [0, 4, 8] # the of the floor in the y direction.
+    pos_chair.y = level_pos[level] + size_chair_leg_h #makes sure the chair stands on second floor
     size_back_x = size_chair_x/7
     size_back_y = 0.2
     size_back_z = size_chair_z + 0.05 
