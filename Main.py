@@ -47,7 +47,7 @@ aim = 0         # Example of direction to shoot
 pullback = 10   # Example of how much strength is needed
 
 # Add the Launcher to the system at the specified position
-simulation_system.Add_MiroModule(launchers.DemoLauncher([aim, pullback]), 'Launcher', [10, 8.15, -0.2])
+simulation_system.Add_MiroModule(launchers.DemoLauncher([aim, pullback]), 'Launcher', [10, 8.15, -2.2])
 
 # Add the Lander to the system
 simulation_system.Add_MiroModule(landers.DemoLander([aim, pullback]), 'Lander')
@@ -56,4 +56,4 @@ simulation_system.Add_MiroModule(landers.DemoLander([aim, pullback]), 'Lander')
 simulation_system.MoveToReference('Lander', 'Launcher')
 
 # Run the system simulation
-simulation_system.Run([1920, 1080])
+simulation_system.Run([1920, 1080], 3)

@@ -108,7 +108,7 @@ class MiroSystem():
         looker = position + chronoirr.vector3df(cam['dir'][0], cam['dir'][1], cam['dir'][2]).setLength(cam['lah'])
         self.simulation.AddTypicalCamera(position, looker)
     
-    def Run(self, resolution = [1280, 720]):
+    def Run(self, resolution = [1280, 720], delay = 5):
         # ---------------------------------------------------------------------
         #
         #  Create an Irrlicht application to visualize the system
@@ -146,13 +146,12 @@ class MiroSystem():
         self.simulation.SetTimestep(dt/substeps)
         self.simulation.SetTryRealtime(True)
 
-        delay = 5
         start = time.time()
         
         self.simulation.BeginScene()
         self.simulation.DrawAll()
         self.simulation.EndScene()
-        time.sleep(1)
+        time.sleep(0.25)
         
         while(self.simulation.GetDevice().run() and start + delay > time.time()):
             self.simulation.BeginScene()
