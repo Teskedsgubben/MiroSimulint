@@ -59,14 +59,20 @@ def add_stairStep(system, center, stair_r, h, theta_f, theta_b, dh, i, stepNum):
     height = 0.2    # Step height
     
     dir_f = chrono.ChVectorD(np.cos(theta_f), 0, np.sin(theta_f))   # Direction front
-    pos_f = center + dir_f*stair_r + chrono.ChVectorD(0, h, 0)     # Start postiton front of step
+    pos_f = center + dir_f*stair_r + chrono.ChVectorD(0, h-0.05, 0)     # Start postiton front of step
 
     dir_b = chrono.ChVectorD(np.cos(theta_b), 0, np.sin(theta_b))   # Direction back
-    pos_b = center + dir_b*stair_r + chrono.ChVectorD(0, h, 0)     # Start postiton back of step                              
+    pos_b = center + dir_b*stair_r + chrono.ChVectorD(0, h-0.05, 0)     # Start postiton back of step                              
     
     step = shp.step(pos_f, dir_f, pos_b, dir_b, width, height)        # Create each step
         
     system.Add(step)
+
+    # top part
+    pos_f = center + dir_f*stair_r + chrono.ChVectorD(0, h+0.05, 0)     # Start postiton front of step
+    pos_b = center + dir_b*stair_r + chrono.ChVectorD(0, h+0.05, 0)     # Start postiton back of step                              
+    step_top = shp.step(pos_f, dir_f, pos_b, dir_b, width, height)        # Create each step  
+    system.Add(step_top)
 
     # Add apiral rail for stair
     handle_r = 0.05     # Radius
