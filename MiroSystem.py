@@ -192,6 +192,7 @@ class MiroSystem():
                                         15,40,               # near, far
                                         40)                # angle of FOV
         self.lightsource(lightpos)
+        self.Set_Lights_Johan(ambients)
 
         
         # Ambient from sides
@@ -207,6 +208,9 @@ class MiroSystem():
                                         7,40,               # near, far
                                         70)                # angle of FOV
 
+    def Set_Lights_Johan(self, ambients = True):
+        return
+
 
     def lightsource(self, pos):
         sun = chrono.ChBody()
@@ -220,3 +224,5 @@ class MiroSystem():
         sun_box.SetColor(chrono.ChColor(1,1,0.1))
         sun.GetAssets().push_back(sun_box)
         self.system.Add(sun)
+
+
