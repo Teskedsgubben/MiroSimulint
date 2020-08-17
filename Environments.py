@@ -6,16 +6,16 @@ import Environments_Johan
 import Environments_Marcus
 import Environments_Franz
 
-def MIT_place(system):
+def MIT_place(system, SPEEDMODE = False):
     target = [0,1,0]
 
     # Create the room floor: a simple fixed rigid body with a collision shape
     # and a visualization shape
     chrono.SetChronoDataPath(os.getcwd() + "/")
 
-    Environments_Johan.Johan_Components(system)
-    Environments_Marcus.Marcus_Components(system)
-    Environments_Franz.Franz_Components(system)
+    Environments_Johan.Johan_Components(system, SPEEDMODE)
+    Environments_Marcus.Marcus_Components(system, SPEEDMODE)
+    Environments_Franz.Franz_Components(system, SPEEDMODE)
 
 
     MIT_floor_x = 10

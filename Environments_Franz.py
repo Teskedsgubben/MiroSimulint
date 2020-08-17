@@ -2,7 +2,7 @@ import pychrono.core as chrono
 import os
 import numpy as np
 import random
-def Franz_Components(system):
+def Franz_Components(system, SPEEDMODE = False):
     # Create the room floor: a simple fixed rigid body with a collision shape
     # and a visualization shape
     chrono.SetChronoDataPath(os.getcwd() + "/")
@@ -12,8 +12,8 @@ def Franz_Components(system):
 
 def second_floor(system):
     start_table_pos = chrono.ChVectorD(10, 0, -9.8)  # The position for the table in x and z direction
-    num_table_1 = 5     # Tabels along the z axis 
-    num_table_2 = 6     # Tabels along the x axis
+    num_table_1 = 2     # Tabels along the z axis 
+    num_table_2 = 3     # Tabels along the x axis
     #The table size and position in y direction.                              
     size_table_x = 1.2
     size_table_y = 0.1
@@ -46,7 +46,7 @@ def second_floor(system):
 # 3. 4. 8
 def third_floor(system):
     start_table_pos = chrono.ChVectorD(9.55,4,6.55)
-    num_table_x = 4     # Tabels in the x direction 
+    num_table_x = 2     # Tabels in the x direction 
     #The table size and position in y direction.                              
     size_table_x = 1
     size_table_y = 0.1
@@ -132,7 +132,7 @@ def table_leg(system,leg_pos, size_leg_r, size_leg_h):
     body_table_leg.GetCollisionModel().ClearModel()
     body_table_leg.GetCollisionModel().AddCylinder(size_leg_r, size_leg_h, size_leg_d) # hemi sizes
     body_table_leg.GetCollisionModel().BuildModel()
-    body_table_leg.SetCollide(True)
+    body_table_leg.SetCollide(False)
     
     # Visualization shape
     body_table_leg_texture = chrono.ChTexture()

@@ -73,8 +73,8 @@ class MiroSystem():
         self.system.SetSolverMaxIterations(70)
         
         
-    def Set_Environment(self, Environment):
-        self.target = Environment(self.system)
+    def Set_Environment(self, Environment, SPEEDMODE = False):
+        self.target = Environment(self.system, SPEEDMODE)
 
     def Get_Target(self):
         return self.target

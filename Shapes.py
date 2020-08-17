@@ -7,7 +7,7 @@ import pychrono.core as chrono
 # direction_back:  chrono.ChVectorD, normal direction that aligns with back of the step
 # width:  double, Width of the step as seen when walking in the staircase
 # height: double, Thickness of the step
-def step(position_front, direction_front, position_back, direction_back, width, height):
+def step(position_front, direction_front, position_back, direction_back, width, height, clr = [0.5,0.5,0.5]):
   direction_front.SetLength(width)
   direction_back.SetLength(width)
   
@@ -56,7 +56,7 @@ def step(position_front, direction_front, position_back, direction_back, width, 
 
   Step_shape = chrono.ChTriangleMeshShape()
   Step_shape.SetMesh(Step_mesh)
-  # Step_shape.SetColor(chrono.ChColor(0.9, 0.9, 0.9))
+  Step_shape.SetColor(chrono.ChColor(clr[0], clr[1], clr[2]))
 
 
   Step.GetCollisionModel().ClearModel()	
@@ -64,10 +64,10 @@ def step(position_front, direction_front, position_back, direction_back, width, 
   Step.GetCollisionModel().BuildModel()
   Step.SetCollide(True)
       
-  Step_texture = chrono.ChTexture()
-  Step_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/MITstol.jpg'))
-  Step_texture.SetTextureScale(10, 10)
-  Step.GetAssets().push_back(Step_texture)
+  # Step_texture = chrono.ChTexture()
+  # Step_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/red_dot.png'))
+  # Step_texture.SetTextureScale(10, 10)
+  # Step.GetAssets().push_back(Step_texture)
         
 
   Step.GetAssets().push_back(Step_shape)
