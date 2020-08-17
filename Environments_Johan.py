@@ -3,7 +3,7 @@ import os
 import numpy as np
 import Shapes as shp
 
-def Johan_Components(system):
+def Johan_Components(system, SPEEDMODE = False):
     # Create the room: simple fixed rigid bodys with a collision shape
     # and a visualization shape
     chrono.SetChronoDataPath(os.getcwd() + "/")
