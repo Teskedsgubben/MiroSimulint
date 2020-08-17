@@ -8,7 +8,7 @@ def Johan_Components(system):
     # and a visualization shape
     chrono.SetChronoDataPath(os.getcwd() + "/")
     Height = 4              # Height between each floor
-    center = chrono.ChVectorD(7, 0, 4)  # Center position for the stair
+    center = chrono.ChVectorD(6.5, 0, 3)  # Center position for the stair
     MIT_stair(system, center, Height)  # Adds a spiral stair
     MIT_floors(system, Height)  # Add floors
     MIT_walls(system, Height)   # Add walls
@@ -122,17 +122,12 @@ def add_spiralRail(system, radius, length, density, pos, alpha, n, texture):
 def add_stairPosts(system, center, stair_r, h, theta_f, theta_b):
 
     width = 1.75
-    # height = 0.2
 
     dir_f = chrono.ChVectorD(np.cos(theta_f), 0, np.sin(theta_f))   # Direction front of step
     pos_f = center + dir_f*stair_r + chrono.ChVectorD(0, h, 0)     # Postiton front of step
 
     dir_b = chrono.ChVectorD(np.cos(theta_b), 0, np.sin(theta_b))   # Direction back of step
     pos_b = center + dir_b*stair_r + chrono.ChVectorD(0, h, 0)     # Postiton back of step
-
-    # step = shp.step(pos_f, dir_f, pos_b, dir_b, width, height)        # Create each step
-
-    # system.Add(step)
 
     # Add rail pole for stair
     post_r = 0.02   # Radius
@@ -149,7 +144,7 @@ def MIT_floors(system, H):
 
     # Add floor, as a box
     floorsNum = 2               # Number of floors
-    postNum = 7                 # How many fence post there is to each side of floors center position
+    postNum = 7                 # Number of fence post on each side of floors center position
     floor_l = 10                # Floor length
     floor_t = 0.1               # Floor thickness
     floor_w = 2                 # Floor width
@@ -165,38 +160,38 @@ def MIT_floors(system, H):
 
     for floor in range(floorsNum):
         # Add floors
-        y_pos = floor*H + H                                 # Increase floor hight
-        floor_pos_1 = chrono.ChVectorD(3, y_pos, 8)         # Add floors left side stair
-        floor_pos_2 = chrono.ChVectorD(11, y_pos, -1)       # Add floors right side stair
+        y_pos = floor*H + H                                 
+        floor_pos_1 = chrono.ChVectorD(2.5-2, y_pos, 7)       # Add floors left side stair
+        floor_pos_2 = chrono.ChVectorD(10.5, y_pos, -1)       # Add floors right side stair
 
-        add_boxShape(system, floor_l, floor_t, floor_w, floor_pos_1, texture_floor, scale_floor)
+        add_boxShape(system, floor_l-2, floor_t, floor_w, floor_pos_1, texture_floor, scale_floor)
         add_boxShape(system, floor_w, floor_t, floor_l, floor_pos_2, texture_floor, scale_floor)
 
         for post in range(postNum):
             # Add fence post to the rigth of the floors center position
-            fence_pos_1 = chrono.ChVectorD(0.5+post, H, 8-floor_w) + fence_corr
-            fence_pos_2 = chrono.ChVectorD(11-floor_w, y_pos, -3+post) + fence_corr # Right side stair
+            fence_pos_1 = chrono.ChVectorD(0+post, H, 7-floor_w) + fence_corr
+            fence_pos_2 = chrono.ChVectorD(10.5-floor_w, y_pos, -4+post) + fence_corr # Right side stair
 
             add_cylinderShape(system, fence_r, fence_h, fence_d ,fence_pos_1, texture)
             add_cylinderShape(system, fence_r, fence_h, fence_d ,fence_pos_2, texture)
 
             if post > 0:
                 # Add fence post to the left of the floors center position
-                fence_pos_3 = chrono.ChVectorD(0.5-post, H, 8-floor_w) + fence_corr
-                fence_pos_4 = chrono.ChVectorD(11-floor_w, y_pos, -3-post) + fence_corr # Right side stair
+                fence_pos_3 = chrono.ChVectorD(0-post, H, 7-floor_w) + fence_corr
+                fence_pos_4 = chrono.ChVectorD(10.5-floor_w, y_pos, -4-post) + fence_corr # Right side stair
 
                 add_cylinderShape(system, fence_r, fence_h, fence_d ,fence_pos_3, texture)
                 add_cylinderShape(system, fence_r, fence_h, fence_d ,fence_pos_4, texture)
     
     # Add handle for each floor
     handle_r = 0.05         # Radius
-    handle_l = 12.5         # Length
+    handle_l = 13           # Length
     handle_d = 1            # Density
     n_x = chrono.ChVectorD(1, 0, 0)     # Normalvector for handle
     n_z = chrono.ChVectorD(0, 0, 1)     # Normalvector for handle
-    pos_rail_1 = chrono.ChVectorD(0.5, H+fence_h, 8-floor_w)      # Fence third floor left of stair
-    pos_rail_2 = chrono.ChVectorD(11-floor_w, H+fence_h, -3)      # Fence third floor
-    pos_rail_3 = chrono.ChVectorD(11-floor_w, 2*H+fence_h, -3)    # Fence fourth floor
+    pos_rail_1 = chrono.ChVectorD(0, H+fence_h, 7-floor_w)          # Fence third floor left of stair
+    pos_rail_2 = chrono.ChVectorD(10.5-floor_w, H+fence_h, -4)      # Fence third floor
+    pos_rail_3 = chrono.ChVectorD(10.5-floor_w, 2*H+fence_h, -4)    # Fence fourth floor
 
     pos = [pos_rail_1, pos_rail_2, pos_rail_3]
     dirr = [n_z, n_x, n_x]
@@ -234,14 +229,14 @@ def MIT_floors(system, H):
 
     for piece in range(2):
         y_pos = piece*H + H
-        floor_pos = chrono.ChVectorD(8, y_pos, 5) 
+        floor_pos = chrono.ChVectorD(7.5, y_pos, 4) 
         
         add_boxShape(system, floor_x, floor_y, floor_z, floor_pos, texture_floor, scale_piece)
 
 def MIT_walls(system, H):
 
     # Add main walls as a box 
-    wall_thickness = 0.25
+    wall_thickness = 0.1
     wall_height = 2*H
     wall_length = 10
     texture_wall = 'textures/BHgang.jpg'
@@ -263,14 +258,22 @@ def MIT_walls(system, H):
     # Add top floor wall
     topWall_height = 2
     topWall_length = 7
-    topWall_pos = chrono.ChVectorD(0, 2*H+topWall_height, 6.25)
+    topWall_pos = chrono.ChVectorD(-0.5, 2*H+topWall_height, 5.1)
     add_boxShape(system, topWall_length, topWall_height, wall_thickness, topWall_pos, texture_wall, scale)
 
     # Add bottom floor wall
-    bWall_height = 2
+    bWall_height = 2 - 0.025            # -0.025 Correction of floor thickness
     bWall_length = 6
-    bWall_pos = chrono.ChVectorD(-1, 0+topWall_height, 6.25)
+    bWall_pos = chrono.ChVectorD(-1.5, 0+bWall_height-0.025, 5.1)
     add_boxShape(system, bWall_length, bWall_height, wall_thickness, bWall_pos, texture_wall, scale)
+
+    # Add top floor door wall
+    topDoor_height = 2
+    topDoor_length = 2
+    topDoor_pos = chrono.ChVectorD(6.5, 2*H+topWall_height, 7)
+    texture_door = 'textures/glass_door.jpg'
+    scale = 5
+    add_boxShape(system, wall_thickness, topDoor_height, topDoor_length, topDoor_pos, texture_door, scale)
 
 def add_boxShape(system, size_x, size_y, size_z, pos, texture, scale):
 
