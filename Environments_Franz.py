@@ -45,7 +45,7 @@ def second_floor(system):
 
 # 3. 4. 8
 def third_floor(system):
-    start_table_pos = chrono.ChVectorD(9.55,4,6.55)
+    start_table_pos = chrono.ChVectorD(9.05,4,5.55)
     num_table_x = 2     # Tabels in the x direction 
     #The table size and position in y direction.                              
     size_table_x = 1
