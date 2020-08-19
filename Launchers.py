@@ -51,5 +51,5 @@ def DemoLauncher(args):
 
     Launcher.SetSpring('Base', 'A', 'Main arm', 'C', 1.15, 17500)
 # 
-    # Launcher.Fixate('Main arm')
+    Launcher.Fixate('Main arm')
     return Launcher
