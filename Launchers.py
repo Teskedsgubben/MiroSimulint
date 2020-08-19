@@ -43,13 +43,13 @@ def DemoLauncher(args):
     Launcher.ConnectComponents('Main arm', 'A', 'Rotation pole', 'B')
 
     # To find the global coordinate of a link point, you can print it like this
-    print(Launcher.GetComponent('Main arm').GetLinkPointXYZ('B'))
+    # print(Launcher.GetComponent('Main arm').GetLinkPointXYZ('B'))
 
     # To visualize where a link point is, you can use the DUMMY component
     Launcher.AddComponent(mc.DUMMY(), 'Dummy')
     Launcher.ConnectComponents('Base', 'A', 'Dummy', 'A')
 
     Launcher.SetSpring('Base', 'A', 'Main arm', 'C', 1.15, 17500)
-
+# 
     Launcher.Fixate('Main arm')
     return Launcher

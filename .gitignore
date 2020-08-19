@@ -7,3 +7,5 @@ __pycache__
 progress
 # fram capture mappen
 video_capture
+# MIT vägg utvecklingsfil  (för stor fil)
+textures/MITwall.pdn

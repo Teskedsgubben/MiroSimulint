@@ -24,23 +24,23 @@ class MiroSystem():
         self.camname = 'default'
         self.camviews = {
             'default': {
-                'pos': [-7, 4, 0],
+                'pos': [-7.5, 4, -1],
                 'dir': [1,0,0],
                 'lah': 10
             },
             '3rd floor staircase': {
-                'pos': [3, 6, 7.5],
-                'dir': [0.4,-0.2,-1],
+                'pos': [2, 6, 7],
+                'dir': [0.2,-0.2,-1],
                 'lah': 0.05
             },
             '4th floor behind lander': {
-                'pos': [11.75,10.25,-1],
+                'pos': [12,10.25,-2],
                 'dir': [-1,-0.4,0.1],
                 'lah': 0.05
             },
             '2nd (ground) floor front view': {
-                'pos': [-3,1.8,-1.5],
-                'dir': [1,0.1,0.1],
+                'pos': [-4,1.8,-2.5],
+                'dir': [1,0.1,0.05],
                 'lah': 0.05
             },
             '2nd (ground) floor side view': {
@@ -54,9 +54,9 @@ class MiroSystem():
                 'lah': 0.05
             },
             '4th floor observing launcher': {
-                'pos': [10.5,9.5,3],
+                'pos': [10.5,9.5,0.75],
                 'dir': [-0.2,-0.1,-1],
-                'lah': 3
+                'lah': 2.75
             }
         }
         
@@ -192,6 +192,7 @@ class MiroSystem():
                                         15,40,               # near, far
                                         40)                # angle of FOV
         self.lightsource(lightpos)
+        self.Set_Lights_Johan(ambients)
 
         
         # Ambient from sides
@@ -207,6 +208,9 @@ class MiroSystem():
                                         7,40,               # near, far
                                         70)                # angle of FOV
 
+    def Set_Lights_Johan(self, ambients = True):
+        return
+
 
     def lightsource(self, pos):
         sun = chrono.ChBody()
@@ -220,3 +224,5 @@ class MiroSystem():
         sun_box.SetColor(chrono.ChColor(1,1,0.1))
         sun.GetAssets().push_back(sun_box)
         self.system.Add(sun)
+
+

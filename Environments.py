@@ -15,16 +15,15 @@ def MIT_place(system, SPEEDMODE = False):
 
     Environments_Johan.Johan_Components(system, SPEEDMODE)
     Environments_Marcus.Marcus_Components(system, SPEEDMODE)
-    Environments_Franz.Franz_Components(system, SPEEDMODE)
+    # Environments_Franz.Franz_Components(system, SPEEDMODE)
 
-
-    MIT_floor_x = 10
-    MIT_floor_z = 10
-
+    # Add MIT floor as a box
+    MIT_floor_x = 8
+    MIT_floor_z = 8
 
     body_floor = chrono.ChBody()
     body_floor.SetBodyFixed(True)
-    body_floor.SetPos(chrono.ChVectorD(2.5, -1, -1))
+    body_floor.SetPos(chrono.ChVectorD(0.5, -1, -3))    #2.5, -1, -1
     
     # Collision shape
     body_floor.GetCollisionModel().ClearModel()
