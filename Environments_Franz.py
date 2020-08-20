@@ -9,6 +9,7 @@ def Franz_Components(system, SPEEDMODE = False):
     chrono.SetChronoDataPath(os.getcwd() + "/")
     stage(system)
     screen(system)
+    back_stage(system)
     if not SPEEDMODE:
         second_floor(system)
         third_floor(system)
@@ -227,7 +228,7 @@ def chair_back(system, pos_back, size_back_x,size_back_y, size_back_z):
 def stage(system): 
     theta_f = np.pi/5
     theta_b = np.pi/3
-    pos_f = chrono.ChVectorD(-5, 0, -11)
+    pos_f = chrono.ChVectorD(-5.5, 0, -11)
     dir_f = chrono.ChVectorD(np.cos(theta_f), 0, np.sin(theta_f)) 
     pos_b = chrono.ChVectorD(-7.5, 0, -9)
     dir_b = chrono.ChVectorD(np.cos(theta_b), 0, np.sin(theta_b))
@@ -244,7 +245,7 @@ def screen(system):
     pro_screen.SetPos(screen_pos)
 
     size_len = 5
-    size_width = 0.2
+    size_width = 0.01
     size_height = 4
     # Collision shape
     pro_screen.GetCollisionModel().ClearModel()
@@ -255,9 +256,13 @@ def screen(system):
     # Visualization shape
     pro_screen_shape = chrono.ChBoxShape()
     pro_screen_shape.GetBoxGeometry().Size = chrono.ChVectorD(size_len/2, size_height/2, size_width/2)
-    pro_screen_shape.SetColor(chrono.ChColor(0.4,0.4,0.5))
+    pro_screen_shape.SetColor(chrono.ChColor(255,255,255))
     pro_screen.GetAssets().push_back(pro_screen_shape)
     system.Add(pro_screen)
+    pro_screen_texture = chrono.ChTexture()
+    pro_screen_texture.SetTextureFilename(chrono.GetChronoDataFile('GroupLogo.png'))
+    pro_screen_texture.SetTextureScale(-4, -3)
+    pro_screen.GetAssets().push_back(pro_screen_texture)
 
     rot_x = chrono.ChVectorD(1,0,0)
     rot_y = chrono.ChVectorD(0,1,0)
@@ -267,3 +272,39 @@ def screen(system):
     qr_y = chrono.Q_from_AngAxis(beta, rot_y.GetNormalized())
     quaternion = qr_y* qr_x * pro_screen.GetRot()
     pro_screen.SetRot(quaternion)
+
+
+def back_stage(system):
+    coner_pos = chrono.ChVectorD(-7.5,1.25,-11) # Real coner -7.5,1.25,-11
+    length = 1.8
+    in_screen_pos = coner_pos + chrono.ChVectorD(1/np.sqrt(2),0, 1/np.sqrt(2))*length
+    in_screen = chrono.ChBody()
+    in_screen.SetBodyFixed(True)
+    in_screen.SetPos(in_screen_pos)
+
+    size_len = 1.8
+    size_width = 0.05
+    size_height = 2.9
+    # Collision shape
+    in_screen.GetCollisionModel().ClearModel()
+    in_screen.GetCollisionModel().AddBox((size_len)/2, (size_height)/2, size_width/2) # hemi sizes
+    in_screen.GetCollisionModel().BuildModel()
+    in_screen.SetCollide(True)
+    
+    # Visualization shape
+    in_screen_shape = chrono.ChBoxShape()
+    in_screen_shape.GetBoxGeometry().Size = chrono.ChVectorD((size_len)/2, (size_height)/2, size_width/2)
+    in_screen_shape.SetColor(chrono.ChColor(0.4,0.4,0.5))
+    in_screen.GetAssets().push_back(in_screen_shape)
+    system.Add(in_screen)
+    in_screen_texture = chrono.ChTexture()
+    in_screen_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/tf-logo.jpg'))
+    in_screen_texture.SetTextureScale(2, 1)
+    in_screen.GetAssets().push_back(in_screen_texture)
+
+    
+    rot_y = chrono.ChVectorD(0,1,0)
+    alpha = np.pi/4
+    qr_y = chrono.Q_from_AngAxis(alpha, rot_y.GetNormalized())
+    quaternion = qr_y * in_screen.GetRot() #rotates the inner screen
+    in_screen.SetRot(quaternion)
