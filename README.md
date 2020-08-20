@@ -9,8 +9,9 @@ To get this running:
     Download Git from:
     https://git-scm.com/downloads
 
-    Run
-    git clone "this repo"
+    Run Git Bash
+    
+    type: git clone "link to this repo"
 
 2) Install Anaconda:
     This is built using anaconda version 2019.10
@@ -27,3 +28,22 @@ To get this running:
 
     Run the command:
     conda install -c projectchrono pychrono
+
+4) Install VScode:
+    Recommended code editor:
+    https://code.visualstudio.com/download
+
+    For simplicity, mark the "Add to folder context" option
+
+5) Run the program:
+    Navigate to the directory where the repo was cloned.
+    There should be a folder called "MiroSimulint" in your default directory.
+
+    Right click the folder and click "Open with Code"
+
+    If this option is not available, launch VS code and click File -> Open Folder
+    to open the MiroSimulint folder.
+
+    When open, double click the Main.py file in the explorer menu on your left
+
+    When the file is open, click the green "Play Button" on the top right to run the code
