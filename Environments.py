@@ -142,13 +142,14 @@ def roof(system):
     h = 14.12
     dy = 2/3
     z = 5.06
+    dec = -0.1325
     xspan = [-7.44, 8.34]
 
     #sides
     p1 = chrono.ChVectorD(-0.06-1.5*dy, 0, 0)
     p2 = chrono.ChVectorD(+0.06+1.5*dy, 0, 0)
     d1 = chrono.ChVectorD(0, 0,-1)
-    d2 = chrono.ChVectorD(-0.135,0,-1)
+    d2 = chrono.ChVectorD(dec,0,-1)
     s = 0.98
     sideS = shp.step(p1,d1, p2,d2, 15.65, 0.2, [s,s,s])
     sideN = shp.step(p1,d1, p2,d2, 15.65, 0.2, [s,s,s])
@@ -165,23 +166,29 @@ def roof(system):
     for b in range(beams):
         p1 = chrono.ChVectorD(xspan[0] + dx*b - 0.06, h+0.8, z-0.06)
         p2 = chrono.ChVectorD(xspan[0] + dx*b + 0.06, h+0.8, z-0.06)
-        d1 = chrono.ChVectorD(0,-0.135,-1)
-        d2 = chrono.ChVectorD(0,-0.135,-1)
+        d1 = chrono.ChVectorD(0,dec,-1)
+        d2 = chrono.ChVectorD(0,dec,-1)
         system.Add(shp.step(p1,d1, p2,d2, 16.3-0.1, 0.2))
     
+
+    # Beam texture
+    beam_texture = chrono.ChTexture()
+    beam_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/white_smere.jpg'))
+    beam_texture.SetTextureScale(100, 1.5)
+
     beams = 10
     dx = (xspan[1] - xspan[0])/(beams-1)
     for b in range(beams):
         step_comp = chrono.ChBody()
         step_comp.SetBodyFixed(True)
         step_comp.SetCollide(False)
-        step_comp.SetPos(chrono.ChVectorD(xspan[0] + dx*b, h, z))
+        step_comp.SetPos(chrono.ChVectorD(xspan[0] + dx*b, h-0.025, z))
 
         # Visualization shape
         step_comp_shape = chrono.ChBoxShape()
-        step_comp_shape.GetBoxGeometry().Size = chrono.ChVectorD(0.06, 1, 0.06)
-        step_comp_shape.SetColor(chrono.ChColor(0.4,0.4,0.5))
+        step_comp_shape.GetBoxGeometry().Size = chrono.ChVectorD(0.05, 1, 0.05)
         step_comp.GetAssets().push_back(step_comp_shape)
+        step_comp.GetAssets().push_back(beam_texture)
         system.Add(step_comp)
 
     beams = 4
@@ -194,24 +201,24 @@ def roof(system):
         # Visualization shape
         step_comp_shape = chrono.ChBoxShape()
         step_comp_shape.GetBoxGeometry().Size = chrono.ChVectorD((xspan[1]-xspan[0])/2+0.06, 0.06, 0.06)
-        step_comp_shape.SetColor(chrono.ChColor(0.4,0.4,0.5))
         step_comp.GetAssets().push_back(step_comp_shape)
+        step_comp.GetAssets().push_back(beam_texture)
         system.Add(step_comp)
 
-    beams = 4
-    h_0 = h-1.06+dy*3-0.12*0.135
-    d = 4
+    beams = 5
+    h_0 = h-1.06+dy*3+0.12*dec
+    d = 3.97
     for b in range(beams):
         step_comp = chrono.ChBody()
         step_comp.SetBodyFixed(True)
         step_comp.SetCollide(False)
-        step_comp.SetPos(chrono.ChVectorD((xspan[0]+xspan[1])/2, h_0-0.135*d*b, z-0.12-d*b))
+        step_comp.SetPos(chrono.ChVectorD((xspan[0]+xspan[1])/2, h_0+dec*d*b, z-0.12-d*b))
 
         # Visualization shape
         step_comp_shape = chrono.ChBoxShape()
         step_comp_shape.GetBoxGeometry().Size = chrono.ChVectorD((xspan[1]-xspan[0])/2+0.06, 0.06, 0.06)
-        step_comp_shape.SetColor(chrono.ChColor(0.4,0.4,0.5))
         step_comp.GetAssets().push_back(step_comp_shape)
+        step_comp.GetAssets().push_back(beam_texture)
         system.Add(step_comp)
 
 
