@@ -1,5 +1,7 @@
 import pychrono.core as chrono
 import os
+import numpy as np
+
 import Shapes as shp 
 
 import Environments_Johan
@@ -7,7 +9,7 @@ import Environments_Marcus
 import Environments_Franz
 
 def MIT_place(system, SPEEDMODE = False):
-    target = [0,1,0]
+    target = [2,2.1,-3]
 
     # Create the room floor: a simple fixed rigid body with a collision shape
     # and a visualization shape
@@ -90,48 +92,90 @@ def MIT_place(system, SPEEDMODE = False):
 
 
     roof(system)
-    
-
-
-    step_comp = chrono.ChBody()
-    step_comp.SetBodyFixed(True)
-    step_comp.SetPos(chrono.ChVectorD(2,2.1,-3))
-    # Collision shape
-    step_comp.GetCollisionModel().ClearModel()
-    step_comp.GetCollisionModel().AddBox(1, 0.1, 1) # hemi sizes
-    step_comp.GetCollisionModel().BuildModel()
-    step_comp.SetCollide(True)
-    # Visualization shape
-    step_comp_shape = chrono.ChBoxShape()
-    step_comp_shape.GetBoxGeometry().Size = chrono.ChVectorD(1, 0.1, 1)
-    step_comp_shape.SetColor(chrono.ChColor(0.4,0.4,0.5))
-    step_comp.GetAssets().push_back(step_comp_shape)
-    step_comp_texture = chrono.ChTexture()
-    step_comp_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/test_texture.png'))
-    step_comp_texture.SetTextureScale(0.04, 0.04)
-    step_comp.GetAssets().push_back(step_comp_texture)
-
-
-    system.Add(step_comp)
+    target_box(system, target)
 
     return target
+
+
+def target_box(system, target):
+    h = 0.15
+    eps = 0.0025
+    size = 1
+    pos_a = chrono.ChVectorD(target[0], target[1]-eps, target[2])
+    pos_b = chrono.ChVectorD(target[0], target[1]-(h+2*eps)/2, target[2])
     
+    # Create dartboard layer
+    targetBox = chrono.ChBodyEasyCylinder(size, eps, 1000)
+    targetBox.SetBodyFixed(True)
+    targetBox.SetPos(chrono.ChVectorD(pos_a))
+    targetBox.SetCollide(False)
+    
+    # Body texture
+    targetBox_texture = chrono.ChTexture()
+    targetBox_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/target_dart.png'))
+    targetBox_texture.SetTextureScale(-1, 1)
+    targetBox.GetAssets().push_back(targetBox_texture)
+    
+    system.Add(targetBox)
+
+    # Create Hitbox
+    targetFrame = chrono.ChBodyEasyCylinder(size, h, 1000)
+    targetFrame.SetBodyFixed(True)
+
+    # Collision shape
+    targetFrame.SetCollide(True)
+    targetFrame.GetCollisionModel().ClearModel()
+    targetFrame.GetCollisionModel().AddCylinder(size, size, h/2)
+    targetFrame.GetCollisionModel().BuildModel()
+
+    # Frame texture
+    targetFrame_texture = chrono.ChTexture()
+    targetFrame_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/black_smere.jpg'))
+    targetFrame_texture.SetTextureScale(8, -1)
+    targetFrame.GetAssets().push_back(targetFrame_texture)
+
+    targetFrame.SetPos(chrono.ChVectorD(pos_b))
+
+    system.Add(targetFrame)
+
 def roof(system):
+    h = 14.12
+    dy = 2/3
+    z = 5.06
+    xspan = [-7.44, 8.34]
+
+    #sides
+    p1 = chrono.ChVectorD(-0.06-1.5*dy, 0, 0)
+    p2 = chrono.ChVectorD(+0.06+1.5*dy, 0, 0)
+    d1 = chrono.ChVectorD(0, 0,-1)
+    d2 = chrono.ChVectorD(-0.135,0,-1)
+    s = 0.98
+    sideS = shp.step(p1,d1, p2,d2, 15.65, 0.2, [s,s,s])
+    sideN = shp.step(p1,d1, p2,d2, 15.65, 0.2, [s,s,s])
+    qr = chrono.Q_from_AngAxis(np.pi/2, chrono.ChVectorD(0,0,1))
+    sideS.SetRot(qr)
+    sideN.SetRot(qr)
+    sideS.SetPos(chrono.ChVectorD(-7.5,h-0.06,5.1))
+    sideN.SetPos(chrono.ChVectorD(8.6,h-0.06,5.1))
+    system.Add(sideS)
+    system.Add(sideN)
 
     beams = 4
+    dx = (xspan[1] - xspan[0])/(beams-1)
     for b in range(beams):
-        p1 = chrono.ChVectorD(-5 + 4.2*b - 0.06, 13-0.2, 6-0.06)
-        p2 = chrono.ChVectorD(-5 + 4.2*b + 0.06, 13-0.2, 6-0.06)
-        d1 = chrono.ChVectorD(0,-0.08,-1)
-        d2 = chrono.ChVectorD(0,-0.08,-1)
-        system.Add(shp.step(p1,d1, p2,d2, 15, 0.2))
+        p1 = chrono.ChVectorD(xspan[0] + dx*b - 0.06, h+0.8, z-0.06)
+        p2 = chrono.ChVectorD(xspan[0] + dx*b + 0.06, h+0.8, z-0.06)
+        d1 = chrono.ChVectorD(0,-0.135,-1)
+        d2 = chrono.ChVectorD(0,-0.135,-1)
+        system.Add(shp.step(p1,d1, p2,d2, 16.3-0.1, 0.2))
     
     beams = 10
+    dx = (xspan[1] - xspan[0])/(beams-1)
     for b in range(beams):
         step_comp = chrono.ChBody()
         step_comp.SetBodyFixed(True)
         step_comp.SetCollide(False)
-        step_comp.SetPos(chrono.ChVectorD(-5 + 1.4*b, 12, 6))
+        step_comp.SetPos(chrono.ChVectorD(xspan[0] + dx*b, h, z))
 
         # Visualization shape
         step_comp_shape = chrono.ChBoxShape()
@@ -145,11 +189,152 @@ def roof(system):
         step_comp = chrono.ChBody()
         step_comp.SetBodyFixed(True)
         step_comp.SetCollide(False)
-        step_comp.SetPos(chrono.ChVectorD(-5 +6.3, 11-0.06+(2/3)*b, 6))
+        step_comp.SetPos(chrono.ChVectorD((xspan[0]+xspan[1])/2, h-1.06+dy*b, z))
 
         # Visualization shape
         step_comp_shape = chrono.ChBoxShape()
-        step_comp_shape.GetBoxGeometry().Size = chrono.ChVectorD(6.3+0.06, 0.06, 0.06)
+        step_comp_shape.GetBoxGeometry().Size = chrono.ChVectorD((xspan[1]-xspan[0])/2+0.06, 0.06, 0.06)
         step_comp_shape.SetColor(chrono.ChColor(0.4,0.4,0.5))
         step_comp.GetAssets().push_back(step_comp_shape)
         system.Add(step_comp)
+
+    beams = 4
+    h_0 = h-1.06+dy*3-0.12*0.135
+    d = 4
+    for b in range(beams):
+        step_comp = chrono.ChBody()
+        step_comp.SetBodyFixed(True)
+        step_comp.SetCollide(False)
+        step_comp.SetPos(chrono.ChVectorD((xspan[0]+xspan[1])/2, h_0-0.135*d*b, z-0.12-d*b))
+
+        # Visualization shape
+        step_comp_shape = chrono.ChBoxShape()
+        step_comp_shape.GetBoxGeometry().Size = chrono.ChVectorD((xspan[1]-xspan[0])/2+0.06, 0.06, 0.06)
+        step_comp_shape.SetColor(chrono.ChColor(0.4,0.4,0.5))
+        step_comp.GetAssets().push_back(step_comp_shape)
+        system.Add(step_comp)
+
+
+    # Roof frame
+    wall_texture = chrono.ChTexture()
+    wall_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/white concrete.jpg'))
+    wall_texture.SetTextureScale(40, 5) 
+
+    # West wall
+    wallW = chrono.ChBody()
+    wallW.SetBodyFixed(True)
+    wallW.SetPos(chrono.ChVectorD(0.5,12.5,5.1))
+    
+    # Collision shape
+    wallW.GetCollisionModel().ClearModel()
+    wallW.GetCollisionModel().AddBox(8.1, 0.5, 0.1) # hemi sizes
+    wallW.GetCollisionModel().BuildModel()
+    wallW.SetCollide(True)
+    
+    # Visualization shape
+    wallW_shape = chrono.ChBoxShape()
+    wallW_shape.GetBoxGeometry().Size = chrono.ChVectorD(8.1, 0.5, 0.1)
+    wallW.GetAssets().push_back(wallW_shape)
+    wallW.GetAssets().push_back(wall_texture)
+    
+    system.Add(wallW)
+
+    # South wall
+    wallS = chrono.ChBody()
+    wallS.SetBodyFixed(True)
+    wallS.SetPos(chrono.ChVectorD(-7.6,12.5,-3))
+    
+    # Collision shape
+    wallS.GetCollisionModel().ClearModel()
+    wallS.GetCollisionModel().AddBox(0.1, 0.5, 8) # hemi sizes
+    wallS.GetCollisionModel().BuildModel()
+    wallS.SetCollide(True)
+    
+    # Visualization shape
+    wallS_shape = chrono.ChBoxShape()
+    wallS_shape.GetBoxGeometry().Size = chrono.ChVectorD(0.1, 0.5, 8)
+    wallS.GetAssets().push_back(wallS_shape)
+    wallS.GetAssets().push_back(wall_texture)
+    
+    system.Add(wallS)
+
+    # East wall
+    wallE = chrono.ChBody()
+    wallE.SetBodyFixed(True)
+    wallE.SetPos(chrono.ChVectorD(0.5,12.5,-11.1))
+    
+    # Collision shape
+    wallE.GetCollisionModel().ClearModel()
+    wallE.GetCollisionModel().AddBox(8.1, 0.5, 0.1) # hemi sizes
+    wallE.GetCollisionModel().BuildModel()
+    wallE.SetCollide(True)
+    
+    # Visualization shape
+    wallE_shape = chrono.ChBoxShape()
+    wallE_shape.GetBoxGeometry().Size = chrono.ChVectorD(8.1, 0.5, 0.1)
+    wallE.GetAssets().push_back(wallE_shape)
+    wallE.GetAssets().push_back(wall_texture)
+    
+    system.Add(wallE)
+
+    # North wall
+    wallN = chrono.ChBody()
+    wallN.SetBodyFixed(True)
+    wallN.SetPos(chrono.ChVectorD(8.5,12.5,-3))
+    
+    # Collision shape
+    wallN.GetCollisionModel().ClearModel()
+    wallN.GetCollisionModel().AddBox(0.1, 0.5, 8) # hemi sizes
+    wallN.GetCollisionModel().BuildModel()
+    wallN.SetCollide(True)
+    
+    # Visualization shape
+    wallN_shape = chrono.ChBoxShape()
+    wallN_shape.GetBoxGeometry().Size = chrono.ChVectorD(0.1, 0.5, 8)
+    wallN.GetAssets().push_back(wallN_shape)
+    wallN.GetAssets().push_back(wall_texture)
+    
+    system.Add(wallN)
+
+    # MA roof
+    roofMA = chrono.ChBody()
+    roofMA.SetBodyFixed(True)
+    roofMA.SetPos(chrono.ChVectorD(10.56,12.098,-4))
+    
+    # Collision shape
+    roofMA.GetCollisionModel().ClearModel()
+    roofMA.GetCollisionModel().AddBox(2.145, 0.1, 13) # hemi sizes
+    roofMA.GetCollisionModel().BuildModel()
+    roofMA.SetCollide(True)
+    
+    # Visualization shape
+    roofMA_shape = chrono.ChBoxShape()
+    roofMA_shape.GetBoxGeometry().Size = chrono.ChVectorD(2.145, 0.1, 13)
+    roofMA.GetAssets().push_back(roofMA_shape)
+    roofMA_texture = chrono.ChTexture('textures/white concrete.jpg')
+    roofMA_texture.SetTextureScale(40, 80) 
+    roofMA.GetAssets().push_back(roofMA_texture)
+    
+    system.Add(roofMA)
+    
+    # MC roof
+    roofMC = chrono.ChBody()
+    roofMC.SetBodyFixed(True)
+    roofMC.SetPos(chrono.ChVectorD(0.416,12.098,7.1))
+    
+    # Collision shape
+    roofMC.GetCollisionModel().ClearModel()
+    roofMC.GetCollisionModel().AddBox(8, 0.1, 2.145) # hemi sizes
+    roofMC.GetCollisionModel().BuildModel()
+    roofMC.SetCollide(True)
+    
+    # Visualization shape
+    roofMC_shape = chrono.ChBoxShape()
+    roofMC_shape.GetBoxGeometry().Size = chrono.ChVectorD(8, 0.1, 1.9)
+    roofMC.GetAssets().push_back(roofMC_shape)
+    roofMC_texture = chrono.ChTexture('textures/white concrete.jpg')
+    roofMC_texture.SetTextureScale(80, 10) 
+    roofMC.GetAssets().push_back(roofMC_texture)
+    
+    system.Add(roofMC)
+    

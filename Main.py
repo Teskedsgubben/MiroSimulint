@@ -43,8 +43,8 @@ target = simulation_system.Get_Target()
 # COMPUTE THE ARGUMENTS YOU NEED FOR YOUR LAUNCHER AND LANDER HERE
 # You can pass any arguments you want to your launcher or lander
 # that you compute from the target coordinates
-aim = -23.4         # Example of direction to shoot
-pullback = 25   # Example of how much strength is needed
+aim = -10         # Example of direction to shoot
+pullback = 5   # Example of how much strength is needed
 
 # Add the Launcher to the system at the specified position
 simulation_system.Add_MiroModule(launchers.DemoLauncher([aim, pullback]), 'Launcher', [10, 8.05, -2.2])
