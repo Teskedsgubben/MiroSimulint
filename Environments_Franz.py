@@ -282,9 +282,9 @@ def back_stage(system):
     in_screen.SetBodyFixed(True)
     in_screen.SetPos(in_screen_pos)
 
-    size_len = 1.8
+    size_len = 2
     size_width = 0.05
-    size_height = 2.9
+    size_height = 2
     # Collision shape
     in_screen.GetCollisionModel().ClearModel()
     in_screen.GetCollisionModel().AddBox((size_len)/2, (size_height)/2, size_width/2) # hemi sizes
@@ -299,7 +299,7 @@ def back_stage(system):
     system.Add(in_screen)
     in_screen_texture = chrono.ChTexture()
     in_screen_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/tf-logo.jpg'))
-    in_screen_texture.SetTextureScale(2, 1)
+    in_screen_texture.SetTextureScale(-4, -3)
     in_screen.GetAssets().push_back(in_screen_texture)
 
     
