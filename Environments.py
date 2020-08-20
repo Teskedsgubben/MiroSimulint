@@ -15,7 +15,7 @@ def MIT_place(system, SPEEDMODE = False):
 
     Environments_Johan.Johan_Components(system, SPEEDMODE)
     Environments_Marcus.Marcus_Components(system, SPEEDMODE)
-    # Environments_Franz.Franz_Components(system, SPEEDMODE)
+    Environments_Franz.Franz_Components(system, SPEEDMODE)
 
     # Add MIT floor as a box
     MIT_floor_x = 8

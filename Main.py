@@ -26,7 +26,7 @@ import MiroSystem as ms
 simulation_system  = ms.MiroSystem()
 
 # Set the environment to MIT place
-simulation_system.Set_Environment(env.MIT_place, True)
+simulation_system.Set_Environment(env.MIT_place)
 
 # Set camera viewing perspective, options are:
 # 1: '2nd (ground) floor front view'
