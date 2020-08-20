@@ -269,7 +269,7 @@ def MIT_walls(system, H):
 
     # Add main walls as a box 
     wall_t = 0.1
-    wall_h = 2*H
+    wall_h = 3/2*H
     wall_l = 8
     texture_wall = 'textures/yellow_brick.jpg'
     office_wall = 'textures/MITwall_dark.jpg'
@@ -327,7 +327,7 @@ def add_boxShape(system, size_x, size_y, size_z, pos, texture, scale):
     
     body_box_texture = chrono.ChTexture()
     body_box_texture.SetTextureFilename(chrono.GetChronoDataFile(texture))
-    body_box_texture.SetTextureScale(scale, scale)
+    body_box_texture.SetTextureScale(4, 3)
     body_box.GetAssets().push_back(body_box_texture)
     
     system.Add(body_box)
