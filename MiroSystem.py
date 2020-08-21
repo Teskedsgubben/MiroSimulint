@@ -20,6 +20,8 @@ class MiroSystem():
         self.system = chrono.ChSystemNSC()
         self.modules = {}
         self.links = {}
+
+        self.SPEEDMODE = False
         
         self.camname = 'default'
         self.camviews = {
@@ -72,9 +74,11 @@ class MiroSystem():
         #self.system.SetSolverType(chrono.ChSolver.Type_BARZILAIBORWEIN) # precise, more slow
         self.system.SetSolverMaxIterations(70)
         
-        
-    def Set_Environment(self, Environment, SPEEDMODE = False):
-        self.target = Environment(self.system, SPEEDMODE)
+    def Set_Speedmode(self, SPEEDMODE = True):
+        self.SPEEDMODE = SPEEDMODE
+
+    def Set_Environment(self, Environment):
+        self.target = Environment(self.system, self.SPEEDMODE)
 
     def Get_Target(self):
         return self.target
@@ -151,7 +155,7 @@ class MiroSystem():
         self.simulation.BeginScene()
         self.simulation.DrawAll()
         self.simulation.EndScene()
-        time.sleep(0.25)
+        # time.sleep(0.25)
         
         while(self.simulation.GetDevice().run() and start + delay > time.time()):
             self.simulation.BeginScene()
@@ -163,10 +167,13 @@ class MiroSystem():
         for _, module in self.modules.items():
             module.Release()
 
+        print('\n-- Press SPACE to release! ---')
+        self.simulation.SetPaused(True)
+
         while(self.simulation.GetDevice().run()):
-            # for _, link in self.links.items():
-            #     if abs(link.Get_react_force().Length()) > 22000:
-            #         link.SetBroken(True)
+            for _, link in self.links.items():
+                if abs(link.Get_react_force().Length()) > 22000:
+                    link.SetBroken(True)
 
             self.simulation.BeginScene()
             self.simulation.DrawAll()

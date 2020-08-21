@@ -26,6 +26,7 @@ import MiroSystem as ms
 simulation_system  = ms.MiroSystem()
 
 # Set the environment to MIT place
+simulation_system.Set_Speedmode(False)
 simulation_system.Set_Environment(env.MIT_place)
 
 # Set camera viewing perspective, options are:
