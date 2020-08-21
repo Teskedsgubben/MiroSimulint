@@ -95,15 +95,15 @@ def MIT_place(system, SPEEDMODE = False):
     target_box(system, target)
     # can(system, [2.8,0.85,-9.8])
     if not SPEEDMODE:
-        can(system, [1.9,2.1,-3.5], 'redbull.png')
-        can(system, [1.98,2.1,-3.0], 'joltcola.jpg')
+        can(system, [1.9,2.1,-3.5], 'schrodbull.png')
+        can(system, [1.98,2.1,-3.3], 'joultcola.png')
 
     return target
 
 def can(system, target, text):
     h = 0.22
     r = 0.04
-    eps = 0.004
+    eps = 0.003
     pos_bot = chrono.ChVectorD(target[0], target[1]+eps/2, target[2])
     pos_can = chrono.ChVectorD(target[0], target[1]+eps+h/2, target[2])
     pos_lid = chrono.ChVectorD(target[0], target[1]+eps*3/2+h, target[2])
@@ -170,17 +170,18 @@ def can(system, target, text):
 
     system.Add(can)
     
-    epsvec = chrono.ChVectorD(0,eps,0)
+    epsvec = chrono.ChVectorD(0,eps/2,0)
     
-    rot = can.GetRot() * chrono.Q_from_AngAxis(np.pi/2,chrono.ChVectorD(1,0,0))
+    rot_lid = can.GetRot() * chrono.Q_from_AngAxis( np.pi/2,chrono.ChVectorD(1,0,0))
+    rot_bot = can.GetRot() * chrono.Q_from_AngAxis(-np.pi/2,chrono.ChVectorD(1,0,0))
 
     lidlink = chrono.ChLinkRevolute()
-    mframe = chrono.ChFrameD(pos_lid-epsvec, rot)
-    lidlink.Initialize(can, lid, mframe)
+    mframe_lid = chrono.ChFrameD(pos_lid-epsvec, rot_lid)
+    lidlink.Initialize(can, lid, mframe_lid)
 
     botlink = chrono.ChLinkRevolute()
-    mframe = chrono.ChFrameD(pos_bot+epsvec, rot)
-    botlink.Initialize(can, bot, mframe)
+    mframe_bot = chrono.ChFrameD(pos_bot+epsvec, rot_bot)
+    botlink.Initialize(can, bot, mframe_bot)
 
 
     # lidlink = chrono.ChLinkMateFix()
