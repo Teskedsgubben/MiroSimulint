@@ -28,7 +28,7 @@ def MIT_stair(system, center, H, SPEEDMODE):
     # Add center cylinder of stair
     add_cylinderShape(system, stair_r, stair_h, stair_d, pos_stair, texture, [10,10]) 
     # Add fake stair to base floor
-    add_cylinderShape(system, stair_r+1.7, 0.001, stair_d, center, 'textures/black.jpg')
+    add_cylinderShape(system, stair_r+1.7, 0.001, stair_d, center, 'textures/black.jpg', [1,1])
 
     # Add steps to 3rd floor
     for step in range(stepNum):
