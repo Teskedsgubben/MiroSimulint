@@ -20,6 +20,7 @@ class MiroSystem():
         self.system = chrono.ChSystemNSC()
         self.modules = {}
         self.links = {}
+        self.target = False
 
         self.SPEEDMODE = False
         
@@ -79,6 +80,13 @@ class MiroSystem():
 
     def Set_Environment(self, Environment):
         self.target = Environment(self.system, self.SPEEDMODE)
+        self.camviews.update({
+            'target': {
+                'pos': [self.target[0]-4, self.target[1]+3, self.target[2]],
+                'dir': [4,-3,0],
+                'lah': 5
+            }
+        })
 
     def Get_Target(self):
         return self.target

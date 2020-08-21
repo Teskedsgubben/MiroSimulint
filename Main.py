@@ -35,9 +35,10 @@ simulation_system.Set_Environment(env.MIT_place)
 # 3: '3rd floor staircase'
 # 4: '4th floor behind lander'
 # 5: '4th floor observing launcher'
+# 6: 'target' 
 # 0: 'default'
 # Use mouse, scroll wheel, arrow keys and pg up & pg down to move
-simulation_system.Set_Perspective('default')
+simulation_system.Set_Perspective('target')
 
 # Get the position of the target as [x, y, z]
 target = simulation_system.Get_Target()
