@@ -383,23 +383,19 @@ def MC007(rot = [0,0,0], pos = [0,0,0], Fixed = False):
 # Little rotation point
 def MC013(rot = [0,0,0], pos = [0,0,0], Fixed = False):
     size_brick_r = 0.045
-    size_brick_y = 0.04
-    density_brick = 1   # kg/m^3
-    mass_brick = density_brick * size_brick_r * size_brick_r * size_brick_y * 3.14
-    inertia_brick_xx = (size_brick_r**2 + size_brick_y**2)*mass_brick/3
-    inertia_brick_yy = (size_brick_r**2 + size_brick_y**2)*mass_brick/3
-    inertia_brick_zz = (size_brick_r**2 + size_brick_r**2)*mass_brick/3
+    size_brick_y = 0.025
+    density_brick = 1000   # kg/m^3
 
-    body_brick = chrono.ChBodyEasyCylinder(size_brick_r, size_brick_y, 0)
+    body_brick = chrono.ChBodyEasyCylinder(size_brick_r, size_brick_y, density_brick)
     body_brick.SetBodyFixed(Fixed)
     body_brick.SetCollide(True)
     # set mass properties
-    body_brick.SetMass(mass_brick)
-    body_brick.SetInertiaXX(chrono.ChVectorD(inertia_brick_xx,inertia_brick_yy,inertia_brick_zz))       
+    # body_brick.SetMass(mass_brick)
+    # body_brick.SetInertiaXX(chrono.ChVectorD(inertia_brick_xx,inertia_brick_yy,inertia_brick_zz))       
 
     # Collision shape
     body_brick.GetCollisionModel().ClearModel()
-    body_brick.GetCollisionModel().AddCylinder(size_brick_r, size_brick_y, 0) # hemi sizes
+    body_brick.GetCollisionModel().AddCylinder(size_brick_r, size_brick_r, size_brick_y/2) # hemi sizes
     body_brick.GetCollisionModel().BuildModel()
 
     # Apply texture

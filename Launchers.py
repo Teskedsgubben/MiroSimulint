@@ -18,7 +18,8 @@ def DemoLauncher(args):
     Launcher.AddComponent(mc.MC071([0,0,90-angle]), 'Main arm')
     Launcher.AddComponent(mc.MC004([0,90,-angle]), 'Launch plate')
     Launcher.AddComponent(mc.MC001([0,90,180-angle]), 'Stop plate')
-    Launcher.AddComponent(mc.MC013([90,0,0]), 'Rotation pole') # Appearance only
+    Launcher.AddComponent(mc.MC013([90,0,0]), 'Rotation pole out') # Appearance only
+    Launcher.AddComponent(mc.MC013([90,0,0]), 'Rotation pole in') # Appearance only
 
     # Example of how to find the reference point
     # by pulling arm back before aiming
@@ -40,7 +41,8 @@ def DemoLauncher(args):
     Launcher.ConnectComponents('Main arm', 'F', 'Launch plate', 'E')
     Launcher.ConnectComponents('Launch plate', 'A', 'Stop plate', 'A')
     Launcher.ConnectComponents('Launch plate', 'B', 'Stop plate', 'B')
-    Launcher.ConnectComponents('Main arm', 'A', 'Rotation pole', 'B')
+    Launcher.ConnectComponents('Main arm', 'A', 'Rotation pole out', 'B')
+    Launcher.ConnectComponents('Main arm', 'B', 'Rotation pole in', 'A')
 
     # To find the global coordinate of a link point, you can print it like this
     # print(Launcher.GetComponent('Main arm').GetLinkPointXYZ('B'))
