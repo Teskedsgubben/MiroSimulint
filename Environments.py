@@ -93,9 +93,90 @@ def MIT_place(system, SPEEDMODE = False):
 
     roof(system)
     target_box(system, target)
+    # can(system, [2.8,0.85,-9.8])
+    
+    can(system, [1.9,2.12,-3.5])
 
     return target
 
+def can(system, target):
+    h = 0.22
+    r = 0.04
+    eps = 0.0025
+    pos_bot = chrono.ChVectorD(target[0], target[1]+eps/2, target[2])
+    pos_lid = chrono.ChVectorD(target[0], target[1]+h+eps, target[2])
+    pos_can = chrono.ChVectorD(target[0], target[1]+h/2+eps/2, target[2])
+    
+    # Create top
+    lid = chrono.ChBodyEasyCylinder(r, eps, 100)
+    lid.SetPos(chrono.ChVectorD(pos_lid))
+    lid.SetBodyFixed(False)
+    lid.SetCollide(False)
+    
+    # Body texture
+    lid_texture = chrono.ChTexture()
+    lid_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/redbull_top.png'))
+    lid_texture.SetTextureScale(1, 1)
+    lid.GetAssets().push_back(lid_texture)
+    
+    system.Add(lid)
+
+    # Create bottom
+    bot = chrono.ChBodyEasyCylinder(r, eps, 100)
+    bot.SetPos(chrono.ChVectorD(pos_bot))
+    bot.SetBodyFixed(False)
+    bot.SetCollide(False)
+    
+    # Body texture
+    bot_texture = chrono.ChTexture()
+    bot_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/redbull_bot.png'))
+    bot_texture.SetTextureScale(1, 1)
+    bot.GetAssets().push_back(bot_texture)
+    
+    system.Add(bot)
+
+    # Create Can Hitbox
+    can = chrono.ChBodyEasyCylinder(r, h, 150)
+    can.SetBodyFixed(False)
+
+    # Collision shape
+    can.SetCollide(True)
+    can.GetCollisionModel().ClearModel()
+    can.GetCollisionModel().AddCylinder(r, r, h/2)
+    can.GetCollisionModel().BuildModel()
+
+    # Frame texture
+    can_texture = chrono.ChTexture()
+    can_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/redbull.png'))
+    can_texture.SetTextureScale(1, -1)
+    can.GetAssets().push_back(can_texture)
+
+    can.SetPos(chrono.ChVectorD(pos_can))
+
+    # can.SetPos_dt(chrono.ChVectorD(0,1,10))
+
+    system.Add(can)
+    
+    epsvec = chrono.ChVectorD(0,eps,0)
+    
+    rot = can.GetRot() * chrono.Q_from_AngAxis(np.pi/2,chrono.ChVectorD(1,0,0))
+
+    lidlink = chrono.ChLinkRevolute()
+    mframe = chrono.ChFrameD(pos_lid-epsvec, rot)
+    lidlink.Initialize(can, lid, mframe)
+
+    botlink = chrono.ChLinkRevolute()
+    mframe = chrono.ChFrameD(pos_bot+epsvec, rot)
+    botlink.Initialize(can, bot, mframe)
+
+
+    # lidlink = chrono.ChLinkMateFix()
+    # lidlink.Initialize(can, lid)
+    system.Add(lidlink)
+
+    # botlink = chrono.ChLinkMateFix()
+    # botlink.Initialize(can, bot)
+    system.Add(botlink)
 
 def target_box(system, target):
     h = 0.15
