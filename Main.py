@@ -1,15 +1,17 @@
 #------------------------------------------------------------------------------
 # Name:         Miro Simulint
 # 
-# Purpose:      Main script to run a lander simulation designed to temporarilty 
-#               replace the physically 3D-printed modules that are normally used
-#               in the course. This is a virtual adaption due to COVID-19.
+# Purpose:      Main script to run a launcher + lander simulation designed for
+#               Physics students at Umeå University
 # 
 # Usage:        Create a lander in the Landers.py file, or modify the DemoLander.
-#               This Main file will then insert that lander into the MIT place at
-#               the predetermined coordinates and throw it over the edge. 
+#               Likewise, create a launcher in Launchers.py. This Main file will
+#               then insert your modules into the MIT environment where you test
+#               them out. You can also compute and pass along input arguments to
+#               use when creating your modules.
 #
-# Authors:      Felix Djuphammar, William Nordberg, Marcus Lindbergh, Johan Jonsson, Franz Wikner
+# Authors:      Felix Djuphammar, William Nordberg, Marcus Lindbergh, 
+#               Johan Jonsson, Franz Wikner
 #
 #-------------------------------------------------------------------------------
 
