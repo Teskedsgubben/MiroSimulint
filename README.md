@@ -47,3 +47,5 @@ To get this running:
     When open, double click the Main.py file in the explorer menu on your left
 
     When the file is open, click the green "Play Button" on the top right to run the code
+
+    When (if) the program starts, press SPACE to release the launcher!
