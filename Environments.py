@@ -95,27 +95,34 @@ def MIT_place(system, SPEEDMODE = False):
     target_box(system, target)
     # can(system, [2.8,0.85,-9.8])
     if not SPEEDMODE:
-        can(system, [1.9,2.12,-3.5])
+        can(system, [1.9,2.1,-3.5], 'redbull.png')
+        can(system, [1.98,2.1,-3.0], 'joltcola.jpg')
 
     return target
 
-def can(system, target):
+def can(system, target, text):
     h = 0.22
     r = 0.04
-    eps = 0.0025
+    eps = 0.004
     pos_bot = chrono.ChVectorD(target[0], target[1]+eps/2, target[2])
-    pos_lid = chrono.ChVectorD(target[0], target[1]+h+eps, target[2])
-    pos_can = chrono.ChVectorD(target[0], target[1]+h/2+eps/2, target[2])
+    pos_can = chrono.ChVectorD(target[0], target[1]+eps+h/2, target[2])
+    pos_lid = chrono.ChVectorD(target[0], target[1]+eps*3/2+h, target[2])
     
     # Create top
     lid = chrono.ChBodyEasyCylinder(r, eps, 100)
     lid.SetPos(chrono.ChVectorD(pos_lid))
     lid.SetBodyFixed(False)
     lid.SetCollide(False)
+
+    # Collision shape
+    lid.SetCollide(True)
+    lid.GetCollisionModel().ClearModel()
+    lid.GetCollisionModel().AddCylinder(r, r, eps/2)
+    lid.GetCollisionModel().BuildModel()
     
     # Body texture
     lid_texture = chrono.ChTexture()
-    lid_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/redbull_top.png'))
+    lid_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/sodacan_lid.png'))
     lid_texture.SetTextureScale(1, 1)
     lid.GetAssets().push_back(lid_texture)
     
@@ -126,10 +133,16 @@ def can(system, target):
     bot.SetPos(chrono.ChVectorD(pos_bot))
     bot.SetBodyFixed(False)
     bot.SetCollide(False)
+
+    # Collision shape
+    bot.SetCollide(True)
+    bot.GetCollisionModel().ClearModel()
+    bot.GetCollisionModel().AddCylinder(r, r, eps/2)
+    bot.GetCollisionModel().BuildModel()
     
     # Body texture
     bot_texture = chrono.ChTexture()
-    bot_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/redbull_bot.png'))
+    bot_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/sodacan_bot.png'))
     bot_texture.SetTextureScale(1, 1)
     bot.GetAssets().push_back(bot_texture)
     
@@ -147,7 +160,7 @@ def can(system, target):
 
     # Frame texture
     can_texture = chrono.ChTexture()
-    can_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/redbull.png'))
+    can_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/'+text))
     can_texture.SetTextureScale(1, -1)
     can.GetAssets().push_back(can_texture)
 
