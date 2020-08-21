@@ -94,8 +94,8 @@ def MIT_place(system, SPEEDMODE = False):
     roof(system)
     target_box(system, target)
     # can(system, [2.8,0.85,-9.8])
-    
-    can(system, [1.9,2.12,-3.5])
+    if not SPEEDMODE:
+        can(system, [1.9,2.12,-3.5])
 
     return target
 
