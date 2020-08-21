@@ -97,6 +97,7 @@ def MIT_place(system, SPEEDMODE = False):
     if not SPEEDMODE:
         can(system, [1.9,2.1,-3.5], 'schrodbull.png')
         can(system, [1.98,2.1,-3.3], 'joultcola.png')
+        painting(system, [12.5,2.5,-4], np.pi/2)
 
     return target
 
@@ -191,6 +192,22 @@ def can(system, target, text):
     # botlink = chrono.ChLinkMateFix()
     # botlink.Initialize(can, bot)
     system.Add(botlink)
+
+def painting(system, pos, rot):
+    canvas = chrono.ChBody()
+    canvas.SetBodyFixed(True)
+    canvas.SetCollide(False)
+    canvas.SetPos(chrono.ChVectorD(pos[0], pos[1], pos[2]))
+    canvas.SetRot(chrono.Q_from_AngAxis(rot,chrono.ChVectorD(0,1,0)))
+
+    # Visualization shape
+    canvas_shape = chrono.ChBoxShape()
+    canvas_shape.GetBoxGeometry().Size = chrono.ChVectorD(1, 0.6, 0.05)
+    canvas.GetAssets().push_back(canvas_shape)
+    canvas_texture = chrono.ChTexture(chrono.GetChronoDataFile('textures/DemoBengan.png'))
+    canvas_texture.SetTextureScale(4, 3)
+    canvas.GetAssets().push_back(canvas_texture)
+    system.Add(canvas)
 
 def target_box(system, target):
     h = 0.15
