@@ -15,10 +15,6 @@
 #
 #-------------------------------------------------------------------------------
 
-
-import pychrono.core as chrono
-import pychrono.irrlicht as chronoirr
-
 import Environments as env
 import Landers as landers
 import Launchers as launchers
@@ -47,11 +43,12 @@ target = simulation_system.Get_Target()
 # COMPUTE THE ARGUMENTS YOU NEED FOR YOUR LAUNCHER AND LANDER HERE
 # You can pass any arguments you want to your launcher or lander
 # that you compute from the target coordinates
-aim = -10         # Example of direction to shoot
+aim = -10      # Example of direction to shoot
 pullback = 5   # Example of how much strength is needed
 
 # Add the Launcher to the system at the specified position
-simulation_system.Add_MiroModule(launchers.DemoLauncher([aim, pullback]), 'Launcher', [10, 8.05, -2.2])
+launcher_position = [10, 8.05, -2.2]
+simulation_system.Add_MiroModule(launchers.DemoLauncher([aim, pullback]), 'Launcher', launcher_position)
 
 # Add the Lander to the system
 simulation_system.Add_MiroModule(landers.DemoLander([aim, pullback]), 'Lander')
@@ -59,5 +56,6 @@ simulation_system.Add_MiroModule(landers.DemoLander([aim, pullback]), 'Lander')
 # Move the Lander to the point set by the Launcher
 simulation_system.MoveToReference('Lander', 'Launcher')
 
-# Run the system simulation
+# Run the system simulation an [w, h] resolution and X seconds delay to let
+# the lander settle in before pausing (which is then released by SPACEBAR)
 simulation_system.Run([1920, 1080], 3)
