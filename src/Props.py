@@ -151,3 +151,22 @@ def painting(system, pos, rot = 0):
     canvas_texture.SetTextureScale(4, 3)
     canvas.GetAssets().push_back(canvas_texture)
     system.Add(canvas)
+
+def pokeball(system, pos, rot = 0):
+    r = 0.05
+
+    ball = chrono.ChBodyEasySphere(r, 500)
+    ball.SetBodyFixed(False)
+    ball.SetPos(chrono.ChVectorD(pos[0], pos[1]+r, pos[2]))
+    ball.SetRot(chrono.Q_from_AngAxis(rot,chrono.ChVectorD(0,1,0)))
+
+    # Collision shape
+    ball.SetCollide(True)
+    ball.GetCollisionModel().ClearModel()
+    ball.GetCollisionModel().AddSphere(r)
+    ball.GetCollisionModel().BuildModel()
+
+    ball_texture = chrono.ChTexture(chrono.GetChronoDataFile('textures/pokeball.jpg'))
+    ball_texture.SetTextureScale(1, 1)
+    ball.GetAssets().push_back(ball_texture)
+    system.Add(ball)
