@@ -47,7 +47,7 @@ class MiroSystem():
                 'lah': 0.05
             },
             '2nd (ground) floor side view': {
-                'pos': [1,1.35,-10.15],
+                'pos': [-0.5,1.25,-10.15],
                 'dir': [0.25,0.3,1],
                 'lah': 0.05
             },
@@ -152,7 +152,7 @@ class MiroSystem():
         #  Run the simulation
         #
         
-        dt = 0.004 # per frame
+        dt = 0.005 # per frame
         substeps = 1
 
         self.simulation.SetTimestep(dt/substeps)
@@ -180,7 +180,7 @@ class MiroSystem():
 
         while(self.simulation.GetDevice().run()):
             for _, link in self.links.items():
-                if abs(link.Get_react_force().Length()) > 22000:
+                if abs(link.Get_react_force().Length()) > 30000:
                     link.SetBroken(True)
 
             self.simulation.BeginScene()

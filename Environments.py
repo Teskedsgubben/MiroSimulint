@@ -93,64 +93,22 @@ def MIT_place(system, SPEEDMODE = False):
 
     roof(system)
     target_box(system, target)
-    # can(system, [2.8,0.85,-9.8])
     if not SPEEDMODE:
-        can(system, [1.9,2.1,-3.5], 'schrodbull.png')
-        can(system, [1.98,2.1,-3.3], 'joultcola.png')
         painting(system, [12.5,2.5,-4], np.pi/2)
+        can(system, [-0.85,0.85,-9.35], 'schrodbull.png', 180)
+        can(system, [1.9,2.101,-3.5], 'schrodbull.png')
+        can(system, [1.98,2.101,-3.3], 'joultcola.png')
 
     return target
 
-def can(system, target, text):
+def can(system, target, text, angle = 0, SPEEDMODE = False):
     h = 0.22
     r = 0.04
-    eps = 0.003
-    pos_bot = chrono.ChVectorD(target[0], target[1]+eps/2, target[2])
-    pos_can = chrono.ChVectorD(target[0], target[1]+eps+h/2, target[2])
-    pos_lid = chrono.ChVectorD(target[0], target[1]+eps*3/2+h, target[2])
     
-    # Create top
-    lid = chrono.ChBodyEasyCylinder(r, eps, 100)
-    lid.SetPos(chrono.ChVectorD(pos_lid))
-    lid.SetBodyFixed(False)
-    lid.SetCollide(False)
-
-    # Collision shape
-    lid.SetCollide(True)
-    lid.GetCollisionModel().ClearModel()
-    lid.GetCollisionModel().AddCylinder(r, r, eps/2)
-    lid.GetCollisionModel().BuildModel()
-    
-    # Body texture
-    lid_texture = chrono.ChTexture()
-    lid_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/sodacan_lid.png'))
-    lid_texture.SetTextureScale(1, 1)
-    lid.GetAssets().push_back(lid_texture)
-    
-    system.Add(lid)
-
-    # Create bottom
-    bot = chrono.ChBodyEasyCylinder(r, eps, 100)
-    bot.SetPos(chrono.ChVectorD(pos_bot))
-    bot.SetBodyFixed(False)
-    bot.SetCollide(False)
-
-    # Collision shape
-    bot.SetCollide(True)
-    bot.GetCollisionModel().ClearModel()
-    bot.GetCollisionModel().AddCylinder(r, r, eps/2)
-    bot.GetCollisionModel().BuildModel()
-    
-    # Body texture
-    bot_texture = chrono.ChTexture()
-    bot_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/sodacan_bot.png'))
-    bot_texture.SetTextureScale(1, 1)
-    bot.GetAssets().push_back(bot_texture)
-    
-    system.Add(bot)
+    pos_can = chrono.ChVectorD(target[0], target[1]+h/2, target[2])
 
     # Create Can Hitbox
-    can = chrono.ChBodyEasyCylinder(r, h, 150)
+    can = chrono.ChBodyEasyCylinder(r, h, 50)
     can.SetBodyFixed(False)
 
     # Collision shape
@@ -167,31 +125,75 @@ def can(system, target, text):
 
     can.SetPos(chrono.ChVectorD(pos_can))
 
+    if angle != 0:
+        can.SetRot(chrono.Q_from_AngAxis(np.deg2rad(angle), chrono.ChVectorD(0,1,0)))
+
     # can.SetPos_dt(chrono.ChVectorD(0,1,10))
 
     system.Add(can)
-    
-    epsvec = chrono.ChVectorD(0,eps/2,0)
-    
-    rot_lid = can.GetRot() * chrono.Q_from_AngAxis( np.pi/2,chrono.ChVectorD(1,0,0))
-    rot_bot = can.GetRot() * chrono.Q_from_AngAxis(-np.pi/2,chrono.ChVectorD(1,0,0))
 
-    lidlink = chrono.ChLinkRevolute()
-    mframe_lid = chrono.ChFrameD(pos_lid-epsvec, rot_lid)
-    lidlink.Initialize(can, lid, mframe_lid)
+    if not SPEEDMODE:
+        eps = 0.003
+        epsvec = chrono.ChVectorD(0,eps/2,0)
+        can.Move(epsvec)
+        can.Move(epsvec)
+        pos_bot = chrono.ChVectorD(target[0], target[1]+eps/2, target[2])
+        pos_lid = chrono.ChVectorD(target[0], target[1]+eps*3/2+h, target[2])
+        
+        # Create top
+        lid = chrono.ChBodyEasyCylinder(r, eps, 150)
+        lid.SetPos(chrono.ChVectorD(pos_lid))
+        lid.SetBodyFixed(False)
+        lid.SetCollide(False)
 
-    botlink = chrono.ChLinkRevolute()
-    mframe_bot = chrono.ChFrameD(pos_bot+epsvec, rot_bot)
-    botlink.Initialize(can, bot, mframe_bot)
+        # Collision shape
+        lid.SetCollide(True)
+        lid.GetCollisionModel().ClearModel()
+        lid.GetCollisionModel().AddCylinder(r, r, eps/2)
+        lid.GetCollisionModel().BuildModel()
+        
+        # Body texture
+        lid_texture = chrono.ChTexture()
+        lid_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/sodacan_lid.png'))
+        lid_texture.SetTextureScale(1, 1)
+        lid.GetAssets().push_back(lid_texture)
+        
+        system.Add(lid)
 
+        # Create bottom
+        bot = chrono.ChBodyEasyCylinder(r, eps, 200)
+        bot.SetPos(chrono.ChVectorD(pos_bot))
+        bot.SetBodyFixed(False)
+        bot.SetCollide(False)
 
-    # lidlink = chrono.ChLinkMateFix()
-    # lidlink.Initialize(can, lid)
-    system.Add(lidlink)
+        # Collision shape
+        bot.SetCollide(True)
+        bot.GetCollisionModel().ClearModel()
+        bot.GetCollisionModel().AddCylinder(r, r, eps/2)
+        bot.GetCollisionModel().BuildModel()
+        
+        # Body texture
+        bot_texture = chrono.ChTexture()
+        bot_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/sodacan_bot.png'))
+        bot_texture.SetTextureScale(1, 1)
+        bot.GetAssets().push_back(bot_texture)
+        
+        system.Add(bot)
+        
+        
+        rot_lid = can.GetRot() * chrono.Q_from_AngAxis( np.pi/2,chrono.ChVectorD(1,0,0))
+        rot_bot = can.GetRot() * chrono.Q_from_AngAxis(-np.pi/2,chrono.ChVectorD(1,0,0))
 
-    # botlink = chrono.ChLinkMateFix()
-    # botlink.Initialize(can, bot)
-    system.Add(botlink)
+        lidlink = chrono.ChLinkRevolute()
+        mframe_lid = chrono.ChFrameD(pos_lid-epsvec, rot_lid)
+        lidlink.Initialize(can, lid, mframe_lid)
+
+        botlink = chrono.ChLinkRevolute()
+        mframe_bot = chrono.ChFrameD(pos_bot+epsvec, rot_bot)
+        botlink.Initialize(can, bot, mframe_bot)
+
+        system.Add(lidlink)
+        system.Add(botlink)
 
 def painting(system, pos, rot):
     canvas = chrono.ChBody()
