@@ -134,6 +134,7 @@ def tabletop(system, table_pos, size_table):
     else:
         tex = 'textures/MITbord.jpg'
     body_table_texture.SetTextureFilename(chrono.GetChronoDataFile(tex))
+    body_table_texture.SetTextureScale(4, 3)
     body_table.GetAssets().push_back(body_table_texture)
     
     system.Add(body_table)
@@ -154,7 +155,8 @@ def table_leg(system,leg_pos, size_leg_r, size_leg_h):
     
     # Visualization shape
     body_table_leg_texture = chrono.ChTexture()
-    body_table_leg_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/brushsteel.jpg'))
+    body_table_leg_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/brushsteel.png'))
+    body_table_leg_texture.SetTextureScale(1, 1)
     body_table_leg.GetAssets().push_back(body_table_leg_texture)
     
     system.Add(body_table_leg)

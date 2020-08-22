@@ -91,8 +91,12 @@ def build_MIT(system, SPEEDMODE = False):
         props.painting(system, [12.5,2.5,-4], np.pi/2)
         props.pokeball(system, [-0.35,0.85,-9.35], 0)
         props.sodacan(system, [-0.85,0.85,-9.35], 'schrodbull.png', 180)
+        
+        props.pokeball(system, [7.35,4.85,2.5], 0)
+        props.pokeball(system, [7.355,5.05,2.55], 0)
 
         # On the dartboard
+        props.coin(system, [-0.25,0.85,-9.65])
         props.pokeball(system, [1.85,2.101,-3.4], -45)
         props.sodacan(system, [1.9,2.101,-3.5], 'schrodbull.png')
         props.sodacan(system, [1.98,2.101,-3.3], 'joultcola.png')

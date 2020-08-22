@@ -170,3 +170,32 @@ def pokeball(system, pos, rot = 0):
     ball_texture.SetTextureScale(1, 1)
     ball.GetAssets().push_back(ball_texture)
     system.Add(ball)
+
+def coin(system, target, angle = 0):
+    h = 0.0012
+    r = 0.012
+    
+    pos_coin = chrono.ChVectorD(target[0], target[1]+h/2, target[2])
+
+    # Create Can Hitbox
+    coin = chrono.ChBodyEasyCylinder(r, h, 50)
+    coin.SetBodyFixed(False)
+
+    # Collision shape
+    coin.SetCollide(True)
+    coin.GetCollisionModel().ClearModel()
+    coin.GetCollisionModel().AddCylinder(r, r, h/2)
+    coin.GetCollisionModel().BuildModel()
+
+    # Frame texture
+    coin_texture = chrono.ChTexture()
+    coin_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/gammal5kr.png'))
+    coin_texture.SetTextureScale(1, -1)
+    coin.GetAssets().push_back(coin_texture)
+
+    coin.SetPos(chrono.ChVectorD(pos_coin))
+
+    if angle != 0:
+        coin.SetRot(chrono.Q_from_AngAxis(np.deg2rad(angle), chrono.ChVectorD(0,1,0)))
+
+    system.Add(coin)
