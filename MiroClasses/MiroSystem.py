@@ -1,9 +1,7 @@
 import pychrono.core as chrono
 import pychrono.irrlicht as chronoirr
 import time
-
-import Environments as env
-import Landers as landers
+import os
  
 class MiroSystem():
     def __init__(self): 
@@ -18,50 +16,13 @@ class MiroSystem():
         #
         
         self.system = chrono.ChSystemNSC()
+        chrono.SetChronoDataPath(os.getcwd() + "/")
         self.modules = {}
         self.links = {}
-        self.target = False
 
         self.SPEEDMODE = False
         
         self.camname = 'default'
-        self.camviews = {
-            'default': {
-                'pos': [-7.5, 4, -1],
-                'dir': [1,0,0],
-                'lah': 10
-            },
-            '3rd floor staircase': {
-                'pos': [2, 6, 7],
-                'dir': [0.2,-0.2,-1],
-                'lah': 0.05
-            },
-            '4th floor behind lander': {
-                'pos': [12,10.25,-2],
-                'dir': [-1,-0.4,0.1],
-                'lah': 0.05
-            },
-            '2nd (ground) floor front view': {
-                'pos': [-4,1.8,-2.5],
-                'dir': [1,0.1,0.05],
-                'lah': 0.05
-            },
-            '2nd (ground) floor side view': {
-                'pos': [-0.5,1.25,-10.15],
-                'dir': [0.25,0.3,1],
-                'lah': 0.05
-            },
-            'maccans': {
-                'pos': [1,15,-1.15],
-                'dir': [0,-1,0],
-                'lah': 0.05
-            },
-            '4th floor observing launcher': {
-                'pos': [10.5,9.5,0.75],
-                'dir': [-0.2,-0.1,-1],
-                'lah': 2.75
-            }
-        }
         
         # Set the default outward/inward shape margins for collision detection,
         # this is epecially important for very large or very small objects.
@@ -79,20 +40,24 @@ class MiroSystem():
         self.SPEEDMODE = SPEEDMODE
 
     def Set_Environment(self, Environment):
-        self.target = Environment(self.system, self.SPEEDMODE)
-        self.camviews.update({
-            'target': {
-                'pos': [self.target[0]-4, self.target[1]+3, self.target[2]],
-                'dir': [4,-3,0],
-                'lah': 5
-            }
-        })
+        
+        self.Environment = Environment
+        self.Environment.Initialize(self.system, self.SPEEDMODE)
+        self.camviews = self.Environment.Get_Camviews()
+        # self.target = Environment(self.system, self.SPEEDMODE)
+        # self.camviews.update({
+        #     'target': {
+        #         'pos': [self.target[0]-4, self.target[1]+3, self.target[2]],
+        #         'dir': [4,-3,0],
+        #         'lah': 5
+        #     }
+        # })
 
     def Get_Target(self):
-        return self.target
+        return self.Environment.Get_Target()
     
     def Set_Perspective(self, camname):
-        if camname in self.camviews:
+        if camname in self.Environment.Get_Camviews():
             self.camname = camname
         else:
             print('Error: "'+camname+'" is not a recognized camera position, using default')
@@ -115,7 +80,7 @@ class MiroSystem():
         self.system.Add(object)
     
     def Set_Camera(self):
-        cam = self.camviews[self.camname]
+        cam = self.Environment.Get_Camviews()[self.camname]
         position = chronoirr.vector3df(cam['pos'][0], cam['pos'][1], cam['pos'][2])
         looker = position + chronoirr.vector3df(cam['dir'][0], cam['dir'][1], cam['dir'][2]).setLength(cam['lah'])
         self.simulation.AddTypicalCamera(position, looker)
@@ -206,7 +171,7 @@ class MiroSystem():
                                         100,                 # radius (power)
                                         15,40,               # near, far
                                         40)                # angle of FOV
-        self.lightsource(lightpos)
+        # self.lightsource(lightpos)
         self.Set_Lights_Johan(ambients)
 
         

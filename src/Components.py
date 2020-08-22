@@ -1,9 +1,6 @@
 import pychrono.core as chrono
-import MiroComponent as mc
-import os
 
-# Margin to use in collision models to avoid friction statics
-chrono.SetChronoDataPath(os.getcwd() + "/")
+from MiroClasses import MiroComponent as mc
 
 # This is a sphere to help visualization of certain points
 def DUMMY(rot = [0,0,0], pos = [0,0,0], Fixed = False):

@@ -15,10 +15,12 @@
 #
 #-------------------------------------------------------------------------------
 
-import Environments as env
+import numpy as np
 import Landers as landers
 import Launchers as launchers
-import MiroSystem as ms
+
+from MiroClasses import MiroSystem as ms
+from src import Environments as env
 
 # Initialize a Miro System
 simulation_system  = ms.MiroSystem()
@@ -36,7 +38,7 @@ simulation_system.Set_Environment(env.MIT_place)
 # 6: 'target' 
 # 0: 'default'
 # Use mouse, scroll wheel, arrow keys and pg up & pg down to move
-simulation_system.Set_Perspective('target')
+simulation_system.Set_Perspective('2nd (ground) floor side view')
 
 # Get the position of the target as [x, y, z]
 target = simulation_system.Get_Target()

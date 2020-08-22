@@ -1,8 +1,9 @@
 import pychrono.core as chrono
 import numpy as np
 
-import MiroModule as mm
-import Components as mc
+from MiroClasses import MiroModule as mm
+
+from src import Components as mc
 
 def DemoLauncher(args):
     # Extract arguments into local variables

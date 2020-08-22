@@ -1,12 +1,12 @@
 import pychrono.core as chrono
-import os
 import numpy as np
 import random
-import Shapes as shp
+
+from src import Shapes as shp
+
 def Franz_Components(system, SPEEDMODE = False):
     # Create the room floor: a simple fixed rigid body with a collision shape
     # and a visualization shape
-    chrono.SetChronoDataPath(os.getcwd() + "/")
     stage(system)
     screen(system)
     back_stage(system)

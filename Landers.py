@@ -1,11 +1,9 @@
 import pychrono.core as chrono
 import pychrono.irrlicht as chronoirr
 
-import Environments as env
-import Landers as landers
-import MiroSystem as ms
-import MiroModule as mm
-import Components as mc
+from MiroClasses import MiroModule as mm
+
+from src import Components as mc
 
 def DemoLander(args):
     aim = args[0]

@@ -1,13 +1,12 @@
 import pychrono.core as chrono
-import os
 import numpy as np
-import Shapes as shp
+
+from src import Shapes as shp
 
 def Johan_Components(system, SPEEDMODE = False):
     # Create the room: simple fixed rigid bodys with a collision shape
     # and a visualization shape
     SPEEDMODE = False # Remove later
-    chrono.SetChronoDataPath(os.getcwd() + "/")
     Height = 4                                      # Height between each floor
     center = chrono.ChVectorD(6.5, 0, 3)            # Center position for the stair
     MIT_stair(system, center, Height, SPEEDMODE)    # Adds a spiral stair

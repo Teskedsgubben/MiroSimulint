@@ -1,10 +1,8 @@
 import pychrono.core as chrono
-import os
 
 def Marcus_Components(system, SPEEDMODE = False):
     # Create the room floor: a simple fixed rigid body with a collision shape
     # and a visualization shape
-    chrono.SetChronoDataPath(os.getcwd() + "/")
     
     # Create the shaking table, as a box
     
