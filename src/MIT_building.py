@@ -88,7 +88,8 @@ def build_MIT(system, SPEEDMODE = False):
 
     roof(system)
     if not SPEEDMODE:
-        props.painting(system, [12.5,2.5,-4], np.pi/2)
+        props.painting(system, [12.5,2.5,-4], 'DemoBengan.png', np.pi/2)
+        props.painting(system, [-6,2.5,5], 'walkplanck.png', 0, [0.8,0.6])
         props.pokeball(system, [-0.35,0.85,-9.35], 0)
         props.sodacan(system, [-0.85,0.85,-9.35], 'schrodbull.png', 180)
         

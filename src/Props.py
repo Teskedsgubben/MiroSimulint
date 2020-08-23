@@ -136,7 +136,7 @@ def sodacan(system, target, text = 'schrodbull.png', angle = 0, SPEEDMODE = Fals
         system.Add(lidlink)
         system.Add(botlink)
 
-def painting(system, pos, rot = 0):
+def painting(system, pos, text = 'DemoBengan.png', rot = 0, dims = [1, 0.6]):
     canvas = chrono.ChBody()
     canvas.SetBodyFixed(True)
     canvas.SetCollide(False)
@@ -145,9 +145,9 @@ def painting(system, pos, rot = 0):
 
     # Visualization shape
     canvas_shape = chrono.ChBoxShape()
-    canvas_shape.GetBoxGeometry().Size = chrono.ChVectorD(1, 0.6, 0.05)
+    canvas_shape.GetBoxGeometry().Size = chrono.ChVectorD(dims[0], dims[1], 0.05)
     canvas.GetAssets().push_back(canvas_shape)
-    canvas_texture = chrono.ChTexture(chrono.GetChronoDataFile('textures/DemoBengan.png'))
+    canvas_texture = chrono.ChTexture(chrono.GetChronoDataFile('textures/'+text))
     canvas_texture.SetTextureScale(4, 3)
     canvas.GetAssets().push_back(canvas_texture)
     system.Add(canvas)
