@@ -2,6 +2,7 @@ class MiroEnvironment():
     def __init__(self):
         self.init = False
         self.target = False
+        self.notifier = False
         self.camviews = {}
 
     def Add_Camview(self, camviews):
@@ -26,6 +27,18 @@ class MiroEnvironment():
     
     def Set_Initializer(self, init_function):
         self.init = init_function
+
+    def Set_Notifier(self, notifier):
+        self.notifier = notifier
+
+    def Get_Notifier(self):
+        return self.notifier
+
+    def Has_Notifier(self):
+        if self.notifier:
+            return True
+        else:
+            return False
 
     def Initialize(self, system, SPEEDMODE):
         if(self.init):

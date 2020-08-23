@@ -21,6 +21,7 @@ class MiroSystem():
         self.links = {}
 
         self.SPEEDMODE = False
+        self.notifier = False
         
         self.camname = 'default'
         
@@ -44,14 +45,11 @@ class MiroSystem():
         self.Environment = Environment
         self.Environment.Initialize(self.system, self.SPEEDMODE)
         self.camviews = self.Environment.Get_Camviews()
-        # self.target = Environment(self.system, self.SPEEDMODE)
-        # self.camviews.update({
-        #     'target': {
-        #         'pos': [self.target[0]-4, self.target[1]+3, self.target[2]],
-        #         'dir': [4,-3,0],
-        #         'lah': 5
-        #     }
-        # })
+
+        if self.Environment.Has_Notifier():
+            self.notifier = True
+            self.Environment.Get_Notifier().AddToSystem(self)
+            self.Environment.Get_Notifier().Set_Idle()
 
     def Get_Target(self):
         return self.Environment.Get_Target()
@@ -76,9 +74,9 @@ class MiroSystem():
         refMod = self.modules[ref_module]
         moveMod.SetPosition(refMod.GetReferencePoint())
 
-    def Add_Object(self, object):
-        self.system.Add(object)
-    
+    def Add_Object(self, Object):
+        self.system.Add(Object)
+
     def Set_Camera(self):
         cam = self.Environment.Get_Camviews()[self.camname]
         position = chronoirr.vector3df(cam['pos'][0], cam['pos'][1], cam['pos'][2])
@@ -125,11 +123,6 @@ class MiroSystem():
 
         start = time.time()
         
-        self.simulation.BeginScene()
-        self.simulation.DrawAll()
-        self.simulation.EndScene()
-        # time.sleep(0.25)
-        
         while(self.simulation.GetDevice().run() and start + delay > time.time()):
             self.simulation.BeginScene()
             self.simulation.DrawAll()
@@ -139,9 +132,14 @@ class MiroSystem():
         
         for _, module in self.modules.items():
             module.Release()
-
+        
+        if self.notifier:
+            print('Notifier rdy')
+            self.Environment.Get_Notifier().Set_Ready()
+        
         print('\n-- Press SPACE to release! ---')
         self.simulation.SetPaused(True)
+        paused = True
 
         while(self.simulation.GetDevice().run()):
             for _, link in self.links.items():
@@ -153,6 +151,14 @@ class MiroSystem():
             for _ in range(0,substeps):
                 self.simulation.DoStep()
             self.simulation.EndScene()
+
+            if self.notifier and not paused and self.simulation.GetPaused():
+                paused = True
+                self.Environment.Get_Notifier().Set_Ready()
+            if self.notifier and paused and not self.simulation.GetPaused():
+                paused = False
+                self.Environment.Get_Notifier().Set_Idle()
+
 
     def Set_Lights(self, ambients = True):
         lightpos = [5,25,20]

@@ -1,4 +1,5 @@
 from MiroClasses import MiroEnvironment as ME
+from MiroClasses import MiroNotifier as MN
 
 from src import MIT_building as MIT
 from src import Props as props
@@ -7,6 +8,8 @@ from src import Props as props
 MIT_place = ME.MiroEnvironment()
 
 MIT_place.Set_Initializer(MIT.build_MIT)
+
+MIT_place.Set_Notifier(MN.MiroNotifier([12.53, 6.5, -4], 90, 0))
 
 MIT_place.Set_Target([2, 2.1, -3], props.dartboard)
 
