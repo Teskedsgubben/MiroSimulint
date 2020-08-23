@@ -1,6 +1,8 @@
 import pychrono.core as chrono
 import numpy as np
 
+from MiroClasses import MiroNotifier as MN
+
 def dartboard(system, target):
     h = 0.15
     eps = 0.0025
@@ -199,3 +201,22 @@ def coin(system, target, angle = 0):
         coin.SetRot(chrono.Q_from_AngAxis(np.deg2rad(angle), chrono.ChVectorD(0,1,0)))
 
     system.Add(coin)
+
+def MIT_door(system, pos, rot = 0):
+    b = 1.2
+    h = 2.5
+
+    door = chrono.ChBody()
+    door.SetBodyFixed(True)
+    door.SetCollide(False)
+    door.SetPos(chrono.ChVectorD(pos[0], pos[1]+h/2, pos[2]))
+    door.SetRot(chrono.Q_from_AngAxis(np.deg2rad(rot),chrono.ChVectorD(0,1,0)))
+
+    # Visualization shape
+    door_shape = chrono.ChBoxShape()
+    door_shape.GetBoxGeometry().Size = chrono.ChVectorD(b/2, h/2, 0.08)
+    door.GetAssets().push_back(door_shape)
+    door_texture = chrono.ChTexture(chrono.GetChronoDataFile('textures/MIT_door.png'))
+    door_texture.SetTextureScale(4, 3)
+    door.GetAssets().push_back(door_texture)
+    system.Add(door)

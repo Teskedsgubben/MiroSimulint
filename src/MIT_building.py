@@ -88,12 +88,23 @@ def build_MIT(system, SPEEDMODE = False):
 
     roof(system)
     if not SPEEDMODE:
+        props.MIT_door(system, [-5, 4, 9.06])
+
+        props.MIT_door(system, [12.56, 4, 1.5], 90)
+        props.MIT_door(system, [12.56, 4, -8.5], 90)
+        
+        props.MIT_door(system, [12.56, 8, 1.5], 90)
+        props.MIT_door(system, [12.56, 8, -8.5], 90)
+
+        props.MIT_door(system, [9, 8, 9.06])
+
         props.painting(system, [12.5,2.5,-4], 'DemoBengan.png', np.pi/2)
         props.painting(system, [12.53,2.3,-5.35], 'bungeebengan_notes.png', np.pi/2, [0.2,0.27])
         props.painting(system, [-6,2.5,5], 'walkplanck.png', 0, [0.8,0.6])
         props.pokeball(system, [-0.35,0.85,-9.35], 0)
         props.sodacan(system, [-0.85,0.85,-9.35], 'schrodbull.png', 180)
         
+        # In the staircase
         props.pokeball(system, [7.35,4.85,2.5], 0)
         props.pokeball(system, [7.355,5.05,2.55], 0)
 
