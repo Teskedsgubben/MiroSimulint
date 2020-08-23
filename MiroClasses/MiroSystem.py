@@ -133,13 +133,13 @@ class MiroSystem():
         for _, module in self.modules.items():
             module.Release()
         
-        if self.notifier:
-            print('Notifier rdy')
-            self.Environment.Get_Notifier().Set_Ready()
+        
         
         print('\n-- Press SPACE to release! ---')
         self.simulation.SetPaused(True)
         paused = True
+        if self.notifier:
+            self.Environment.Get_Notifier().Set_Ready()
 
         while(self.simulation.GetDevice().run()):
             for _, link in self.links.items():
