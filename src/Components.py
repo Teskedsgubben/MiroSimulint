@@ -19,29 +19,25 @@ def DUMMY(rot = [0,0,0], pos = [0,0,0], Fixed = False):
 
     # Generate MiroComponent with above ChBody
     COMPONENT = mc.MiroComponent(body_ball)
-
     COMPONENT.AddLinkPoint('A', [ 0, 1, 0], chrono.ChVectorD(0, 0, 0))
-    
     COMPONENT.Rotate(rot)
     COMPONENT.MoveToPosition(pos)
 
     return COMPONENT
 
+def MC001(rot = [0,0,0], pos = [0,0,0], Fixed = False):
+    return MC0XX(0.25, 0.03, 0.16, rot, pos, Fixed)
+def MC004(rot = [0,0,0], pos = [0,0,0], Fixed = False):
+    return MC0XX(0.25, 0.03, 0.25, rot, pos, Fixed)
 
 # Plate with mounting sockets in corners on one side
-def MC001(rot = [0,0,0], pos = [0,0,0], Fixed = False):
-    size_brick_x = 0.25
-    size_brick_y = 0.03
-    size_brick_z = 0.16
+def MC0XX(size_x, size_y, size_z, rot, pos, Fixed):
     density_brick = 1000   # kg/m^3
-    mass_brick = density_brick * size_brick_x * size_brick_y * size_brick_z
-    # inertia_brick_xx = 2/5*(pow(size_brick_x,2))*mass_brick
-    # inertia_brick_yy = 2/5*(pow(size_brick_y,2))*mass_brick
-    # inertia_brick_zz = 2/5*(pow(size_brick_z,2))*mass_brick
+    mass_brick = density_brick * size_x * size_y * size_z
 
-    inertia_brick_xx = (size_brick_y**2 + size_brick_z**2)*mass_brick/3
-    inertia_brick_yy = (size_brick_x**2 + size_brick_z**2)*mass_brick/3
-    inertia_brick_zz = (size_brick_x**2 + size_brick_y**2)*mass_brick/3
+    inertia_brick_xx = (size_y**2 + size_z**2)*mass_brick/3
+    inertia_brick_yy = (size_x**2 + size_z**2)*mass_brick/3
+    inertia_brick_zz = (size_x**2 + size_y**2)*mass_brick/3
 
     body_brick = chrono.ChBody()
     body_brick.SetBodyFixed(Fixed)
@@ -52,12 +48,12 @@ def MC001(rot = [0,0,0], pos = [0,0,0], Fixed = False):
 
     # Collision shape
     body_brick.GetCollisionModel().ClearModel()
-    body_brick.GetCollisionModel().AddBox(size_brick_x/2, size_brick_y/2, size_brick_z/2) # must set half sizes
+    body_brick.GetCollisionModel().AddBox(size_x/2, size_y/2, size_z/2) # must set half sizes
     body_brick.GetCollisionModel().BuildModel()
 
     # Visualization shape, for rendering animation
     body_brick_shape = chrono.ChBoxShape()
-    body_brick_shape.GetBoxGeometry().Size = chrono.ChVectorD(size_brick_x/2, size_brick_y/2, size_brick_z/2)
+    body_brick_shape.GetBoxGeometry().Size = chrono.ChVectorD(size_x/2, size_y/2, size_z/2)
     
     body_brick_shape.SetColor(chrono.ChColor(0.65, 0.65, 0.6)) # set gray color 
     body_brick.AddAsset(body_brick_shape)
@@ -71,70 +67,17 @@ def MC001(rot = [0,0,0], pos = [0,0,0], Fixed = False):
     # Generate MiroComponent with above ChBody
     COMPONENT = mc.MiroComponent(body_brick)
 
-    COMPONENT.AddLinkPoint('A', [0, 1, 0], chrono.ChVectorD( 3*size_brick_x/8,  size_brick_y/2,  3*size_brick_z/8))
-    COMPONENT.AddLinkPoint('B', [0, 1, 0], chrono.ChVectorD(-3*size_brick_x/8,  size_brick_y/2,  3*size_brick_z/8))
-    COMPONENT.AddLinkPoint('C', [0, 1, 0], chrono.ChVectorD( 3*size_brick_x/8,  size_brick_y/2, -3*size_brick_z/8))
-    COMPONENT.AddLinkPoint('D', [0, 1, 0], chrono.ChVectorD(-3*size_brick_x/8,  size_brick_y/2, -3*size_brick_z/8))
-    COMPONENT.AddLinkPoint('E', [0,-1, 0], chrono.ChVectorD(                0, -size_brick_y/2,                0))
+    COMPONENT.AddLinkPoint('A', [0, 1, 0], chrono.ChVectorD( 3*size_x/8,  size_y/2,  3*size_z/8))
+    COMPONENT.AddLinkPoint('B', [0, 1, 0], chrono.ChVectorD(-3*size_x/8,  size_y/2,  3*size_z/8))
+    COMPONENT.AddLinkPoint('C', [0, 1, 0], chrono.ChVectorD( 3*size_x/8,  size_y/2, -3*size_z/8))
+    COMPONENT.AddLinkPoint('D', [0, 1, 0], chrono.ChVectorD(-3*size_x/8,  size_y/2, -3*size_z/8))
+    COMPONENT.AddLinkPoint('E', [0,-1, 0], chrono.ChVectorD(          0, -size_y/2,           0))
     
     COMPONENT.Rotate(rot)
     COMPONENT.MoveToPosition(pos)
 
     return COMPONENT
 
-# Square plate with mounting sockets in corners on one side
-def MC004(rot = [0,0,0], pos = [0,0,0], Fixed = False):
-    size_brick_x = 0.25
-    size_brick_y = 0.03
-    size_brick_z = 0.25
-    density_brick = 1000   # kg/m^3
-    mass_brick = density_brick * size_brick_x * size_brick_y * size_brick_z
-    # inertia_brick_xx = 2/5*(pow(size_brick_x,2))*mass_brick
-    # inertia_brick_yy = 2/5*(pow(size_brick_y,2))*mass_brick
-    # inertia_brick_zz = 2/5*(pow(size_brick_z,2))*mass_brick
-
-    inertia_brick_xx = (size_brick_y**2 + size_brick_z**2)*mass_brick/3
-    inertia_brick_yy = (size_brick_x**2 + size_brick_z**2)*mass_brick/3
-    inertia_brick_zz = (size_brick_x**2 + size_brick_y**2)*mass_brick/3
-
-    body_brick = chrono.ChBody()
-    body_brick.SetBodyFixed(Fixed)
-    body_brick.SetCollide(True)
-    # set mass properties
-    body_brick.SetMass(mass_brick)
-    body_brick.SetInertiaXX(chrono.ChVectorD(inertia_brick_xx, inertia_brick_yy, inertia_brick_zz))     
-
-    # Collision shape
-    body_brick.GetCollisionModel().ClearModel()
-    body_brick.GetCollisionModel().AddBox(size_brick_x/2, size_brick_y/2, size_brick_z/2) # must set half sizes
-    body_brick.GetCollisionModel().BuildModel()
-
-    # Visualization shape, for rendering animation
-    body_brick_shape = chrono.ChBoxShape()
-    body_brick_shape.GetBoxGeometry().Size = chrono.ChVectorD(size_brick_x/2, size_brick_y/2, size_brick_z/2)
-    
-    body_brick_shape.SetColor(chrono.ChColor(0.65, 0.65, 0.6)) # set gray color 
-    body_brick.AddAsset(body_brick_shape)
-
-    # Apply texture
-    texture = chrono.ChTexture()
-    texture.SetTextureFilename(chrono.GetChronoDataFile('textures/MITstol.jpg'))
-    texture.SetTextureScale(1, 1)
-    body_brick.AddAsset(texture)
-
-    # Generate MiroComponent with above ChBody
-    COMPONENT = mc.MiroComponent(body_brick)
-
-    COMPONENT.AddLinkPoint('A', [0, 1, 0], chrono.ChVectorD( 3*size_brick_x/8,  size_brick_y/2,  3*size_brick_z/8))
-    COMPONENT.AddLinkPoint('B', [0, 1, 0], chrono.ChVectorD(-3*size_brick_x/8,  size_brick_y/2,  3*size_brick_z/8))
-    COMPONENT.AddLinkPoint('C', [0, 1, 0], chrono.ChVectorD( 3*size_brick_x/8,  size_brick_y/2, -3*size_brick_z/8))
-    COMPONENT.AddLinkPoint('D', [0, 1, 0], chrono.ChVectorD(-3*size_brick_x/8,  size_brick_y/2, -3*size_brick_z/8))
-    COMPONENT.AddLinkPoint('E', [0,-1, 0], chrono.ChVectorD(                0, -size_brick_y/2,                 0))
-    
-    COMPONENT.Rotate(rot)
-    COMPONENT.MoveToPosition(pos)
-
-    return COMPONENT
 
 # Mounting rod
 def MC002(rot = [0,0,0], pos = [0,0,0], Fixed = False):
