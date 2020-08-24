@@ -38,7 +38,7 @@ To get this running:
 
     For simplicity, mark the option:
 
-    [ ] Add ”Open with Code” action to Windows Explorer file context menu
+    [ ] Add ”Open with Code” action to Windows Explorer directory context menu
     
     in the "Select Additional Tasks" step.
 
