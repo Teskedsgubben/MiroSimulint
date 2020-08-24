@@ -15,17 +15,18 @@
 #
 #-------------------------------------------------------------------------------
 
-import numpy as np
-import Landers as landers
-import Launchers as launchers
-
 from MiroClasses import MiroSystem as ms
 from src import Environments as env
+import numpy as np
+
+import Landers as landers
+import Launchers as launchers
 
 # Initialize a Miro System
 simulation_system  = ms.MiroSystem()
 
-# Set the environment to MIT place
+# Set the environment to MIT place.
+# If the simulation is too slow, set Speedmode to True.
 simulation_system.Set_Speedmode(False)
 simulation_system.Set_Environment(env.MIT_place)
 
@@ -38,6 +39,7 @@ simulation_system.Set_Environment(env.MIT_place)
 # 6: 'target' 
 # 0: 'default'
 # Use mouse, scroll wheel, arrow keys and pg up & pg down to move
+# Press I and see the help section for a full list of controls
 simulation_system.Set_Perspective('target')
 
 # Get the position of the target as [x, y, z]
@@ -58,6 +60,6 @@ simulation_system.Add_MiroModule(landers.DemoLander([aim, pullback]), 'Lander')
 # Move the Lander to the point set by the Launcher
 simulation_system.MoveToReference('Lander', 'Launcher')
 
-# Run the system simulation an [w, h] resolution and X seconds delay to let
+# Run the system simulation at [w, h] resolution and X seconds delay to let
 # the lander settle in before pausing (which is then released by SPACEBAR)
 simulation_system.Run([1920, 1080], 3)
