@@ -18,30 +18,29 @@ To get this running:
     Download the installer for this version from:
     https://repo.anaconda.com/archive/
     
-    Run the installer, use the "Just for me" option
-    and select the ADD TO PATH option, even though it
-    is not recommended by the installer
+    Run the installer, using the "Just for me" option.
 
 3) Install PyChrono:
     Run Anaconda Prompt from the start menu or the 
     Anaconda Navigator page.
 
-    The pychrono library is built in Python 3.7 
-    Check the python version you have by command:
-    python --version
+    To ensure compatibility, start by typing:
 
-    If this is Python 3.8.X, you may have to 
-    downgrade your Python version first by:
-    conda install python=3.7.4
+    conda create -n MiroSim python=3.7 numpy pylint
 
-    Then, you can run the command:
-    conda install -c projectchrono pychrono
+    Press ENTER, accept by typing "y". When the process finishes, you can install PyChrono by:
+
+    conda install -n MiroSim -c projectchrono pychrono
 
 4) Install VScode:
     Recommended code editor:
     https://code.visualstudio.com/download
 
-    For simplicity, mark the "Add to folder context" option
+    For simplicity, mark the option:
+
+    [ ] Add ”Open with Code” action to Windows Explorer file context menu
+    
+    in the "Select Additional Tasks" step.
 
 5) Run the program:
     Navigate to the directory where the repo was cloned.
@@ -52,8 +51,8 @@ To get this running:
     If this option is not available, launch VS code and click File -> Open Folder
     to open the MiroSimulint folder.
 
-    When open, double click the Main.py file in the explorer menu on your left
+    When VS code is open, click View -> Command Palette... and type "Python: Select Interpreter" and click it. You can then select the ('MiroSim': conda) option. Clicking this will create a file telling VS code to use the MiroSim environment for this project.
 
-    When the file is open, click the green "Play Button" on the top right to run the code
+    Then, double click the Main.py file in the explorer menu on your left. When the file is open, click the green "Play Button" on the top right to run the code.
 
     When (if) the program starts, press SPACE to release the launcher!
