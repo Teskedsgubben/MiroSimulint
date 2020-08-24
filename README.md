@@ -26,7 +26,15 @@ To get this running:
     Run Anaconda Prompt from the start menu or the 
     Anaconda Navigator page.
 
-    Run the command:
+    The pychrono library is built in Python 3.7 
+    Check the python version you have by command:
+    python --version
+
+    If this is Python 3.8.X, you may have to 
+    downgrade your Python version first by:
+    conda install python=3.7.4
+
+    Then, you can run the command:
     conda install -c projectchrono pychrono
 
 4) Install VScode:
