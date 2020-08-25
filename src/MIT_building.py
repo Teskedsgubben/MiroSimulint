@@ -6,6 +6,7 @@ from src import Props as props
 from src import Environments_Johan
 from src import Environments_Marcus
 from src import Environments_Franz
+from src import MIT_Entrance
 
 def build_MIT(system, SPEEDMODE = False):
     # Create the room floor: a simple fixed rigid body with a collision shape
@@ -13,6 +14,7 @@ def build_MIT(system, SPEEDMODE = False):
     Environments_Johan.Johan_Components(system, SPEEDMODE)
     Environments_Marcus.Marcus_Components(system, SPEEDMODE)
     Environments_Franz.Franz_Components(system, SPEEDMODE)
+    MIT_Entrance.MIT_Entrance(system, SPEEDMODE)
 
     # Add MIT floor as a box
     MIT_floor_x = 8
