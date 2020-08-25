@@ -161,54 +161,11 @@ class MiroSystem():
 
 
     def Set_Lights(self, ambients = True):
-        lightpos = [5,25,20]
-        # lightpos[0], lightpos[1], lightpos[2]
-
-        # Sky lighting
-        # self.simulation.AddLightWithShadow(chronoirr.vector3df(2,25,-1),    # point
-        #                                 chronoirr.vector3df(2,0,-1),    # aimpoint
-        #                                 100,                 # radius (power)
-        #                                 7,30,               # near, far
-        #                                 50)                # angle of FOV
-
-        # Sun lighting
-        self.simulation.AddLightWithShadow(chronoirr.vector3df(lightpos[0], lightpos[1], lightpos[2]),    # point
-                                        chronoirr.vector3df(3,0,-5),    # aimpoint
-                                        100,                 # radius (power)
-                                        15,40,               # near, far
-                                        40)                # angle of FOV
-        # self.lightsource(lightpos)
-        self.Set_Lights_Johan(ambients)
-
-        
-        # Ambient from sides
-        if(ambients):
-            self.simulation.AddLightWithShadow(chronoirr.vector3df(-20,1,0),    # point
-                                        chronoirr.vector3df(0,0,0),    # aimpoint
-                                        24,                 # radius (power)
-                                        7,40,               # near, far
-                                        70)                # angle of FOV
-            self.simulation.AddLightWithShadow(chronoirr.vector3df(0,1,-20),    # point
-                                        chronoirr.vector3df(0,0,0),    # aimpoint
-                                        24,                 # radius (power)
-                                        7,40,               # near, far
-                                        70)                # angle of FOV
-
-    def Set_Lights_Johan(self, ambients = True):
-        return
-
-
-    def lightsource(self, pos):
-        sun = chrono.ChBody()
-        sun.SetBodyFixed(True)
-        sun.SetCollide(False)
-        sun.SetPos(chrono.ChVectorD(pos[0], pos[1], pos[2]))
-
-        # Visualization shape
-        sun_box = chrono.ChBoxShape()
-        sun_box.GetBoxGeometry().Size = chrono.ChVectorD(0.2,0.2,0.2)
-        sun_box.SetColor(chrono.ChColor(1,1,0.1))
-        sun.GetAssets().push_back(sun_box)
-        self.system.Add(sun)
-
-
+        for light in self.Environment.Get_Lightsources():
+            add_light = True
+            if light[6] and not ambients: # if light is Ambient but ambients are off
+                add_light = False
+            if add_light:
+                pos = chronoirr.vector3df(light[0][0], light[0][1], light[0][2])
+                aim = chronoirr.vector3df(light[1][0], light[1][1], light[1][2])
+                self.simulation.AddLightWithShadow(pos, aim, light[2], light[3], light[4], light[5])

@@ -4,6 +4,7 @@ class MiroEnvironment():
         self.target = False
         self.notifier = False
         self.camviews = {}
+        self.lights = []
 
     def Add_Camview(self, camviews):
         self.camviews.update(camviews)
@@ -39,6 +40,12 @@ class MiroEnvironment():
             return True
         else:
             return False
+
+    def Add_Lightsource(self, point, target, power, near, far, angle, isAmbient = True):
+        self.lights.append([point, target, power, near, far, angle, isAmbient])
+
+    def Get_Lightsources(self):
+        return self.lights
 
     def Initialize(self, system, SPEEDMODE):
         if(self.init):

@@ -2,10 +2,10 @@ import pychrono.core as chrono
 import numpy as np
 
 def MIT_Entrance(system, SPEEDMODE = False):
-    QuickEntrance(system)
-    # if(SPEEDMODE):
-    #     QuickEntrance(system)
-    #     return
+    if(SPEEDMODE):
+        QuickEntrance(system)
+    else:
+        FullEntrance(system)
     
 def QuickEntrance(system):
     pos_south = [2, 0, 13]
@@ -15,11 +15,11 @@ def QuickEntrance(system):
     center = chrono.ChVectorD((pos_south[0]+pos_north[0])/2, (pos_south[1]+pos_north[1])/2 + h/2, (pos_south[2]+pos_north[2])/2)
     wid = np.abs(pos_south[0]-pos_north[0])
 
-
     door = chrono.ChBody()
     door.SetBodyFixed(True)
     door.SetCollide(True)
     door.SetPos(center)
+    # compute rot from v=pn-ps -> dot(v, nx) = |v|cos(rot) if rot is needed
     # door.SetRot(chrono.Q_from_AngAxis(rot,chrono.ChVectorD(0,1,0)))
     
     # Collision shape
@@ -36,3 +36,6 @@ def QuickEntrance(system):
     door.GetAssets().push_back(door_texture)
     
     system.Add(door)
+
+def FullEntrance(system):
+    QuickEntrance(system)

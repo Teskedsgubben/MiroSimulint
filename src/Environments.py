@@ -7,11 +7,16 @@ from src import Props as props
 # MIT Environment
 MIT_place = ME.MiroEnvironment()
 
+MIT_place.Set_Target([2, 2.1, -3], props.dartboard)
+
 MIT_place.Set_Initializer(MIT.build_MIT)
 
 MIT_place.Set_Notifier(MN.MiroNotifier([12.53, 6.5, -4], 90, 0))
 
-MIT_place.Set_Target([2, 2.1, -3], props.dartboard)
+MIT_place.Add_Lightsource([  5, 25,  20], [3, 0, -5], 100, 15, 40, 40, False)
+MIT_place.Add_Lightsource([-20,  1,   0], [0, 2,  0],  24,  7, 40, 70, False)
+MIT_place.Add_Lightsource([  0,  1, -20], [0, 2,  0],  24,  7, 40, 70, False)
+MIT_place.Add_Lightsource([ 10,  2,  -9], [9, 3,  4],  24,  2, 40, 50, False)
 
 MIT_place.Add_Camview({
             'default': {
