@@ -6,7 +6,6 @@ from src import Shapes as shp
 def Johan_Components(system, SPEEDMODE = False):
     # Create the room: simple fixed rigid bodys with a collision shape
     # and a visualization shape
-    SPEEDMODE = False # Remove later
     Height = 4                                      # Height between each floor
     center = chrono.ChVectorD(6.5, 0, 3)            # Center position for the stair
     MIT_stair(system, center, Height, SPEEDMODE)    # Adds a spiral stair
@@ -264,6 +263,15 @@ def MIT_floors(system, H, SPEEDMODE):
 
         add_boxShape(system, length, floor_t, width, pos, texture_floor, scale_floor)
 
+    # Add MIT entrence
+    pos = chrono.ChVectorD(9.5, 0-floor_t, 11)
+    add_boxShape(system, 3, floor_t, 2, pos, texture_floor, scale_floor)
+
+    # Add MIT top floor roof over entrence
+    pos = chrono.ChVectorD(9.5, 0+3*H+floor_t, 11)
+    add_boxShape(system, 3, floor_t, 2, pos, 'textures/white concrete.jpg')
+
+
 def MIT_walls(system, H):
 
     # Add main walls as a box 
@@ -300,7 +308,7 @@ def MIT_walls(system, H):
     # Add top floor door wall
     topDoor_height = 2
     topDoor_length = 2
-    topDoor_pos = chrono.ChVectorD(6.5, 2*H+topWall_height, 7)
+    topDoor_pos = chrono.ChVectorD(6.5-wall_t, 2*H+topWall_height, 7)
     texture_door = 'textures/glass_door.jpg'
     add_boxShape(system, wall_t, topDoor_height, topDoor_length, topDoor_pos, texture_door, [5,5])
 
@@ -308,13 +316,28 @@ def MIT_walls(system, H):
     beam_h = 3/2*H
     beam_w = 0.1
     beam_l = 0.1
-    beam_pos_1 = chrono.ChVectorD(2.5, 0+2/3*beam_h, 5)     # Left of stair
-    beam_pos_2 = chrono.ChVectorD(8.5, 0+beam_h, -1)        # Close right of stair
-    beam_pos_3 = chrono.ChVectorD(8.5, 0+beam_h, -8)        # Right of stair
+    beam_pos_1 = chrono.ChVectorD(2.5, 0+2/3*beam_h, 5)     # Close left of stair
+    beam_pos_2 = chrono.ChVectorD(-4.5, 0+beam_h, 5)     # Left of stair
+    beam_pos_3 = chrono.ChVectorD(8.5, 0+beam_h, -1)        # Close right of stair
+    beam_pos_4 = chrono.ChVectorD(8.5, 0+beam_h, -8)        # Right of stair
 
     add_boxShape(system, beam_l, 2/3*beam_h, beam_w, beam_pos_1, 'textures/white concreate.jpg', scale)
-    add_boxShape(system, beam_l, beam_h, beam_w, beam_pos_2, 'textures/white concreate.jpg', scale)
+    add_boxShape(system, beam_l, 2/6*beam_h, beam_w, beam_pos_2, 'textures/white concreate.jpg', scale)
     add_boxShape(system, beam_l, beam_h, beam_w, beam_pos_3, 'textures/white concreate.jpg', scale)
+    add_boxShape(system, beam_l, beam_h, beam_w, beam_pos_4, 'textures/white concreate.jpg', scale)
+
+    # Add entrence wall (negative x direction)
+    pos = chrono.ChVectorD(6.5-wall_t, 0+3/2*H , 11)
+    add_boxShape(system, wall_t, 3/2*H, 2, pos, 'textures/yellow_brick.jpg', [5,5])
+
+    # Add entrence wall (positive x direction)
+    pos = chrono.ChVectorD(12.5+wall_t, 0+H/2-0.1 , 11)
+    add_boxShape(system, wall_t, H/2-0.1, 2, pos, 'textures/yellow_brick.jpg', [5,5])
+
+    # Add top floor wall (positive x direction)
+    pos = chrono.ChVectorD(12.5+wall_t, 0+3*H-2 , 11)
+    add_boxShape(system, wall_t, H/2, 2, pos, 'textures/yellow_brick.jpg', [2,2])
+
 
 def add_boxShape(system, size_x, size_y, size_z, pos, texture, scale = [5,5]):
 
