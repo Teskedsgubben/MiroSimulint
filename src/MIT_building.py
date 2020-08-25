@@ -98,7 +98,7 @@ def build_MIT(system, SPEEDMODE = False):
         props.MIT_door(system, [12.56, 8, 1.5], 90)
         props.MIT_door(system, [12.56, 8, -8.5], 90)
 
-        props.MIT_door(system, [9, 8, 9.06])
+        props.MIT_door(system, [9, 8, 13.06])
 
         props.painting(system, [12.5,2.5,-4], 'DemoBengan.png', np.pi/2)
         props.painting(system, [12.53,2.3,-5.35], 'bungeebengan_notes.png', np.pi/2, [0.2,0.27])
