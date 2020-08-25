@@ -228,11 +228,11 @@ def chair_back(system, pos_back, size_back_x,size_back_y, size_back_z):
 
 #coner position (-7.5,0,-11)
 def stage(system): 
-    theta_f = np.pi/5
-    theta_b = np.pi/3
-    pos_f = chrono.ChVectorD(-5.5, 0, -11)
+    theta_f = 0 
+    theta_b = np.pi/2
+    pos_f = chrono.ChVectorD(-6.5, 0, -11)
     dir_f = chrono.ChVectorD(np.cos(theta_f), 0, np.sin(theta_f)) 
-    pos_b = chrono.ChVectorD(-7.5, 0, -9)
+    pos_b = chrono.ChVectorD(-7.5, 0, -10)
     dir_b = chrono.ChVectorD(np.cos(theta_b), 0, np.sin(theta_b))
     step = shp.step(pos_f, dir_f, pos_b, dir_b, 3, 0.2, [0.1,0.1,0.1])
     system.Add(step)
