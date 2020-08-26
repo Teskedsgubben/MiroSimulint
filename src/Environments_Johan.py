@@ -14,12 +14,12 @@ def Johan_Components(system, SPEEDMODE = False):
 
 def MIT_stair(system, center, H, SPEEDMODE):
         
-    stair_r =  0.3       # Radius
-    stair_h = 9          # Hight
-    stair_d = 1          # Density
-    stepNum = 15         # Number of steps
-    dh = H/stepNum       # Heigth between each step
-    rad = 1/360*2*np.pi  # Degrees to radians
+    stair_r =  0.3          # Radius
+    stair_h = 9             # Hight
+    stair_d = 1             # Density
+    stepNum = 15            # Number of steps
+    dh = (H-0.1)/stepNum    # Heigth between each step
+    rad = 1/360*2*np.pi     # Degrees to radians
     texture = 'textures/white concrete.jpg' 
     pos_stair = center + chrono.ChVectorD(0, stair_h/2, 0)  # Correction for stair position
 
@@ -63,13 +63,13 @@ def add_stairStep(system, center, stair_r, h, theta_f, theta_b, dh, i, stepNum, 
     
     # Create upper half of stair step
     dir_f = chrono.ChVectorD(np.cos(theta_f), 0, np.sin(theta_f))       # Direction front
-    pos_f = center + dir_f*stair_r + chrono.ChVectorD(0, h+height/2, 0) # Start postiton front of step
+    pos_f = center + dir_f*stair_r + chrono.ChVectorD(0, h+3/4*height, 0) # Start postiton front of step
 
     dir_b = chrono.ChVectorD(np.cos(theta_b), 0, np.sin(theta_b))       # Direction back
-    pos_b = center + dir_b*stair_r + chrono.ChVectorD(0, h+height/2, 0) # Start postiton back of step 
+    pos_b = center + dir_b*stair_r + chrono.ChVectorD(0, h+3/4*height, 0) # Start postiton back of step 
 
     if steps == True:
-        step_t = shp.step(pos_f, dir_f, pos_b, dir_b, width, height/2, [0.05,0.03,0.03])
+        step_t = shp.step(pos_f, dir_f, pos_b, dir_b, width, 1/4*height, [0.05,0.03,0.03])
         system.Add(step_t)
 
     # Create lower half of stair step
@@ -80,7 +80,7 @@ def add_stairStep(system, center, stair_r, h, theta_f, theta_b, dh, i, stepNum, 
     pos_b = center + dir_b*stair_r + chrono.ChVectorD(0, h, 0)      # Start postiton back of step
     
     if steps == True:
-        step = shp.step(pos_f, dir_f, pos_b, dir_b, width, height/2, [1, 1, 1])
+        step = shp.step(pos_f, dir_f, pos_b, dir_b, width, 3/4*height, [1, 1, 1])
         system.Add(step)
 
     if SPEEDMODE == False:
@@ -166,10 +166,12 @@ def MIT_floors(system, H, SPEEDMODE):
     floorsNum = 3               # Number of floors
     postNum = 7                 # Number of fence post on each side of floors center position
     floor_l = 12                # Floor length
-    floor_t = 0.1               # Floor thickness
+    floor_t = 0.05               # Floor thickness
     floor_w = 2                 # Floor width
     texture_floor = 'textures/stone_floor.jpg'
+    texture_roof = 'textures/white concrete.jpg'
     scale_floor = [12,12] # Texture scale
+    scale_roof = [80,10]
 
     # Add fence post, as a cylinder
     fence_r =  0.02         # Radius
@@ -204,6 +206,15 @@ def MIT_floors(system, H, SPEEDMODE):
                     add_cylinderShape(system, fence_r, fence_h, fence_d ,fence_pos_3, texture)
                     add_cylinderShape(system, fence_r, fence_h, fence_d ,fence_pos_4, texture)
     
+    for roof in range(floorsNum):
+        # Add roof 
+        y_pos = roof*H - 3*floor_t                              
+        floor_pos_1 = chrono.ChVectorD(-3.5, y_pos, 7)       # Add roof left side stair
+        floor_pos_2 = chrono.ChVectorD(10.5, y_pos, -3)       # Add roof right side stair
+
+        add_boxShape(system, floor_l, floor_t, floor_w, floor_pos_1, texture_roof, scale_roof)
+        add_boxShape(system, floor_w, floor_t, floor_l, floor_pos_2, texture_roof, scale_roof)
+
     if SPEEDMODE == False:
         # Add handle for each floor
         handle_r = 0.05         # Radius
@@ -253,6 +264,13 @@ def MIT_floors(system, H, SPEEDMODE):
         floor_pos = chrono.ChVectorD(7.5, y_pos+0.002, 4) 
         
         add_boxShape(system, floor_x, floor_t, floor_z, floor_pos, texture_floor, scale_piece)
+    
+    for piece in range(floorsNum):
+        if piece > 0:
+            y_pos = piece*H - 3*floor_t
+            floor_pos = chrono.ChVectorD(7.5, y_pos+0.002, 4) 
+            
+            add_boxShape(system, floor_x, floor_t, floor_z, floor_pos, texture_roof, scale_roof)
 
     # Add walkway towards umu library
     length = 10
@@ -262,6 +280,12 @@ def MIT_floors(system, H, SPEEDMODE):
         pos = chrono.ChVectorD(16.5, y, 11)
 
         add_boxShape(system, length, floor_t, width, pos, texture_floor, scale_floor)
+    
+    for i in range(2):
+        y = i*H + H - 3*floor_t
+        pos = chrono.ChVectorD(16.5, y, 11)
+
+        add_boxShape(system, length, floor_t, width, pos, texture_roof, scale_roof)
 
     # Add MIT entrence floor
     pos = chrono.ChVectorD(7.25, 0-floor_t, 11)
@@ -269,12 +293,11 @@ def MIT_floors(system, H, SPEEDMODE):
 
     # Add MIT top floor roof over entrence
     pos = chrono.ChVectorD(9.5, 0+3*H+floor_t, 11)
-    add_boxShape(system, 3, floor_t, 2, pos, 'textures/white concrete.jpg')
+    add_boxShape(system, 3, floor_t, 2, pos, texture_roof, scale_roof)
 
     # Add MIT roof over entrence
-    pos = chrono.ChVectorD(4.25, 0+H-floor_t, 11)
-    add_boxShape(system, 2.25, floor_t, 2, pos, 'textures/white concrete.jpg')
-
+    pos = chrono.ChVectorD(4.25, 0+H-2*floor_t, 11)
+    add_boxShape(system, 2.25, 2*floor_t, 2, pos, texture_roof, scale_roof)
 
 def MIT_walls(system, H):
 
@@ -345,7 +368,6 @@ def MIT_walls(system, H):
     # Add top floor wall (positive x direction)
     pos = chrono.ChVectorD(12.5+wall_t, 0+3*H-2 , 11)
     add_boxShape(system, wall_t, H/2, 2, pos, 'textures/yellow_brick.jpg', [2,2])
-
 
 def add_boxShape(system, size_x, size_y, size_z, pos, texture, scale = [5,5]):
 
