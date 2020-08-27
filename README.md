@@ -6,30 +6,36 @@ This lib requires pychrono installed to function
 To get this running:
 
 **Step 1)** Install Git:
-    >Download Git from: https://git-scm.com/downloads
+
+>Download Git from: 
+
+>>https://git-scm.com/downloads
 
 **Step 2)** Install Anaconda:
-    > This is built using anaconda version 2019.10
-    Download the installer for this version from:
-    https://repo.anaconda.com/archive/
+
+> This is built using anaconda version 2019.10
+Download the installer for this version from:
+
+>>https://repo.anaconda.com/archive/
     
-    >Run the installer, using the "Just for me" option.
+>Run the installer, using the "Just for me" option.
 
 **Step 3)** Install PyChrono and MiroSimulint:
-Run Anaconda Prompt from the start menu or the 
+
+>Run Anaconda Prompt from the start menu or the 
 Anaconda Navigator page. Type the following commands
 
->a) Download the MiroSimulint code by:
+>>a) Download the MiroSimulint code by:
 
     git clone "link to this repo"
 
->b) Create an environment and install PyChrono by:
+>>b) Create an environment and install PyChrono by:
 
     conda create -n MiroSim python=3.7 numpy pylint
 
     conda install -n MiroSim -c projectchrono pychrono
     
->c) Optional. You should be able to run the program now. If you are familiar with code editing, you can just use this if you prefer. If you are new to coding, it is recommended you complete Step 4) and you do not have to do this part, unless you want to try it!
+>>c) Optional. You should be able to run the program now. If you are familiar with code editing, you can just use this if you prefer. If you are new to coding, it is recommended you complete Step 4) and you do not have to do this part, unless you want to try it!
 
     cd MiroSimulint
 
