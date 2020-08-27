@@ -49,9 +49,9 @@ Anaconda Navigator page. Type the following commands
 
 > For simplicity, mark the options:
 
->> [ ] Add ”Open with Code” action to Windows Explorer file context menu
+>> -[x] Add ”Open with Code” action to Windows Explorer file context menu
 
->> [ ] Add ”Open with Code” action to Windows Explorer directory context menu
+>> -[x] Add ”Open with Code” action to Windows Explorer directory context menu
     
 > in the "Select Additional Tasks" step.
 
