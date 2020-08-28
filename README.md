@@ -78,7 +78,7 @@ To rotate the camera, use the mouse with left-click to drag the view. You can us
 
 You have three code files to work with: _Main.py_, _Landers.py_ and _Launchers.py_. Any code in the subfolders are free to read if you are curious, but do not change them. You will only submit the three files. 
 
-_Main.py_ is the file that starts the program. Here you can change camera views, rendering resolution and initial start delay. You can also compute any arguments you want to pass along to your Lander och Launcher.
+_Main.py_ is the file that starts the program. Here you can change camera views, rendering resolution and initial start delay. You can also compute any arguments you want to pass along to your Lander or Launcher. An important feature here is __Speedmode__ which you find is set to __False__. Setting this to __True__ will remove many details in the program, speeding up the simulation. This is most likely more conviniet to use when running tests and so on.
 
 _Landers.py_ is where you can define you Lander. You have a demo where a simple lander is built by adding a bottom and top plate and connecting them with rods. Note how the top plate is rotated 180 degrees so the connection points are at the bottom, and the order of the components being connected. Start by modifying this lander, try to add more components etc.
 
