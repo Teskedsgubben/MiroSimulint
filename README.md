@@ -33,7 +33,7 @@ __a)__ Download the MiroSimulint code by:
 
 __b)__ Create an environment and install PyChrono by:
 
-    conda create -n MiroSim python=3.7 numpy pylint
+    conda create -n MiroSim python=3.7 numpy pylint ffmpeg
 
     conda install -n MiroSim -c projectchrono pychrono
     
@@ -89,3 +89,13 @@ Your Lander and Launcher are both built as MiroModules using MiroComponents. Thi
 ### The Goal
 
 The challenge is to create a compact, portable launcher, that can hit a specified target. The ultimate goal is that the lander is automatically calibrated by knowing its own position and the position of the target, adjusting aim and power to hit the target without manual tweaking.
+
+### Create a Video File
+
+We installed ffmpeg into the MiroSim environment to enable creating a video file from the simulation. This is not something you have to do, but if you want to use the video, here is how it works.
+
+First, start the simulation as usual. When you press PrintScreen the program will start saving images into a directory called video_capture. Press PrtSc to start recording, then close the window to stop. To then convert these images into a video file, we use ffmpeg. From the terminal window in VS Code (or from the Anaconda Prompt in the MiroSimulint directory) you can run the command:
+
+    ffmpeg -framerate 60 -i video_capture/screenshot%05d.bmp -b:v 100M video_capture/MiroSim.avi
+
+This will put the screenshot files into a video file called MiroSim.avi in the video_capture folder. The framerate of 60 can be changed to alter the speed of the video. A value of 300 is full speed, so using 60 renders the video in slow motion, but this is more suitable for seeing details.

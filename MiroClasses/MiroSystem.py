@@ -115,7 +115,7 @@ class MiroSystem():
         #  Run the simulation
         #
         
-        dt = 0.005 # per frame
+        dt = 1/300 # per frame
         substeps = 1
 
         self.simulation.SetTimestep(dt/substeps)
@@ -142,9 +142,9 @@ class MiroSystem():
             self.Environment.Get_Notifier().Set_Ready()
 
         while(self.simulation.GetDevice().run()):
-            for _, link in self.links.items():
-                if abs(link.Get_react_force().Length()) > 30000:
-                    link.SetBroken(True)
+            # for _, link in self.links.items():
+            #     if abs(link.Get_react_force().Length()) > 30000:
+            #         link.SetBroken(True)
 
             self.simulation.BeginScene()
             self.simulation.DrawAll()
