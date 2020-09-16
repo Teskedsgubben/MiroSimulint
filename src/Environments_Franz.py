@@ -50,7 +50,7 @@ def second_floor(system):
 
 
 def third_floor(system):
-    start_table_pos = chrono.ChVectorD(9.05,4,5.55)
+    start_table_pos = chrono.ChVectorD(9.05,3.32,5.55)
     num_table_x = 2     # Tabels in the x direction
     num_table_z = 2 
     #The table size and position in y direction.                              
@@ -82,7 +82,7 @@ def third_floor(system):
             MIT_chair(system, pos_chair,chair_i)  
 
 def fourth_floor(system):
-    table_pos = chrono.ChVectorD(9.05,8,-8.5)
+    table_pos = chrono.ChVectorD(9.05,6.64,-8.5)
     size_table_x = 1
     size_table_y = 0.1
     size_table_z = 1
@@ -95,7 +95,6 @@ def fourth_floor(system):
         theta = chair_i*0.5*np.pi
         n = chrono.ChVectorD(-length_rand*np.cos(theta), 0, length_rand*np.sin(theta))
         pos_chair = table_pos + n
-        pos_chair.y = 8
         MIT_chair(system, pos_chair,chair_i)  
 
 def MIT_table(system, table_pos, size_table_x, size_table_y, size_table_z,size_leg_h, size_leg_r):    
