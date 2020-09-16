@@ -4,6 +4,7 @@ import pychrono.irrlicht as chronoirr
 from MiroClasses import MiroModule as mm
 
 from src import Components as Comp
+from src import Sensors as Sensors
 
 def DemoLander(args):
     aim = args[0]
@@ -21,7 +22,9 @@ def DemoLander(args):
     Lander.AddComponent(Comp.MC113([0, 0, 90]), 'Rod B')
     Lander.AddComponent(Comp.MC113([0, 0, 90]), 'Rod C')
     Lander.AddComponent(Comp.MC113([0, 0, 90]), 'Rod D')
-
+    
+    Lander.AddSensor(Sensors.MSA02([180,0,0]), 'Force Sensor')
+    
     Lander.RotateComponentsZ(tilt)
     Lander.RotateComponentsY(aim)
 
@@ -39,9 +42,7 @@ def DemoLander(args):
     Lander.ConnectComponents('Rod C', 'B', 'Top plate', 'A')
     Lander.ConnectComponents('Rod D', 'B', 'Top plate', 'B')
 
-    # DemoLander.Fixate('Bottom plate')
-    # DemoLander.AddComponent(mc.MC044([0,deg,0]), 'Chute')
-    # DemoLander.ChuteUp('Top plate', 'E', 'Chute')
+    Lander.ConnectComponents('Top plate', 'E', 'Force Sensor', 'Linkpoint')
 
     return Lander
 

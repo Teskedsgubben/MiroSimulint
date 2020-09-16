@@ -40,7 +40,7 @@ simulation_system.Set_Environment(env.MIT_place)
 # 0: 'default'
 # Use mouse, scroll wheel, arrow keys and pg up & pg down to move
 # Press I and see the help section for a full list of controls
-simulation_system.Set_Perspective('default')
+simulation_system.Set_Perspective('4th floor observing launcher')
 
 # Get the position of the target as [x, y, z]
 target = simulation_system.Get_Target()
@@ -51,7 +51,7 @@ aim = -10      # Example of direction to shoot
 pullback = 5   # Example of how much strength is needed
 
 # Add the Launcher to the system at the specified position
-launcher_position = [10, 8.05, -2.2]
+launcher_position = [10, 6.69, -2.2]
 simulation_system.Add_MiroModule(launchers.DemoLauncher([aim, pullback]), 'Launcher', launcher_position)
 
 # Add the Lander to the system
@@ -62,4 +62,9 @@ simulation_system.MoveToReference('Lander', 'Launcher')
 
 # Run the system simulation at [w, h] resolution and X seconds delay to let
 # the lander settle in before pausing (which is then released by SPACEBAR)
-simulation_system.Run([1920, 1080], 3)
+config = {
+    'resolution': [1920, 1080],
+    'delay': 3,
+    'datalog': False
+}
+simulation_system.Run(config)

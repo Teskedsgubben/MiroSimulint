@@ -9,3 +9,7 @@ progress
 video_capture
 # local settings
 .vscode
+# sensor-plotten
+plotscript.py
+# datavärden
+*.txt

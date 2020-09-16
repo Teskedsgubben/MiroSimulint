@@ -72,3 +72,22 @@ class MiroComponent():
 
         self.body.SetPos_dt(chrono.ChVectorD(vel_x, vel_y, vel_z))
 
+
+# Sensor class extends component class
+class MiroSensor(MiroComponent):
+    def Initialize(self, output_file_name):
+        self.printed = False
+        self.filename = output_file_name
+        self.filestream = open(self.filename, "w")
+        self.filestream.truncate(0)
+    def LogData(self):
+        return
+
+
+class MiroSensor_Accelerometer(MiroSensor):
+    def LogData(self):
+        if not self.printed:
+            acc = self.GetBody().GetPos_dtdt()
+            data = str(acc.x)+' '+str(acc.y)+' '+str(acc.z)+'\n'
+            self.filestream.write(data)
+

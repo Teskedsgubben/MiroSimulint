@@ -18,6 +18,7 @@ class MiroSystem():
         self.system = chrono.ChSystemNSC()
         chrono.SetChronoDataPath(os.getcwd() + "/")
         self.modules = {}
+        self.sensors = {}
         self.links = {}
 
         self.SPEEDMODE = False
@@ -68,6 +69,9 @@ class MiroSystem():
         module.AddToSystem(self)
         self.links.update(module.GetLinks())
         self.modules.update({name: module})
+        for s_name, sensor in module.GetSensorList().items():
+            sensor_ID = name+'_'+s_name
+            self.sensors.update({sensor_ID: sensor})
 
     def MoveToReference(self, move_module, ref_module):
         moveMod = self.modules[move_module]
@@ -82,14 +86,41 @@ class MiroSystem():
         position = chronoirr.vector3df(cam['pos'][0], cam['pos'][1], cam['pos'][2])
         looker = position + chronoirr.vector3df(cam['dir'][0], cam['dir'][1], cam['dir'][2]).setLength(cam['lah'])
         self.simulation.AddTypicalCamera(position, looker)
+
+    def Initialize_Config(self, config):
+        if "resolution" in config:
+            self.res = config['resolution']
+        else:
+            self.res = [1280, 720]
+
+        if "delay" in config:
+            self.delay = config['delay']
+        else:
+            self.delay = 4
+
+        if "fps" in config:
+            self.fps = config['fps']
+        else:
+            self.fps = 300
+
+        if "subframes" in config:
+            self.subframes = config['subframes']
+        else:
+            self.subframes = 1
+
+        if "datalog" in config:
+            self.log = config['datalog']
+        else:
+            self.log = False
     
-    def Run(self, resolution = [1280, 720], delay = 5):
+    def Run(self, config):
         # ---------------------------------------------------------------------
         #
         #  Create an Irrlicht application to visualize the system
         #
+        self.Initialize_Config(config)
         
-        self.simulation = chronoirr.ChIrrApp(self.system, 'MiroSimulation', chronoirr.dimension2du(resolution[0], resolution[1]))
+        self.simulation = chronoirr.ChIrrApp(self.system, 'MiroSimulation', chronoirr.dimension2du(self.res[0], self.res[1]))
         
         self.simulation.AddTypicalSky()
         self.Set_Camera()
@@ -115,15 +146,19 @@ class MiroSystem():
         #  Run the simulation
         #
         
-        dt = 1/300 # per frame
-        substeps = 1
+        dt = 1/self.fps # per frame
+        substeps = self.subframes
 
         self.simulation.SetTimestep(dt/substeps)
         self.simulation.SetTryRealtime(True)
 
+        if self.log:
+            for sensor_ID, sensor in self.sensors.items():
+                sensor.Initialize(sensor_ID+'.txt')
+
         start = time.time()
         
-        while(self.simulation.GetDevice().run() and start + delay > time.time()):
+        while(self.simulation.GetDevice().run() and start + self.delay > time.time()):
             self.simulation.BeginScene()
             self.simulation.DrawAll()
             for _ in range(0,substeps):
@@ -151,6 +186,10 @@ class MiroSystem():
             for _ in range(0,substeps):
                 self.simulation.DoStep()
             self.simulation.EndScene()
+
+            if self.log and not paused:
+                for _, sensor in self.sensors.items():
+                    sensor.LogData()
 
             if self.notifier and not paused and self.simulation.GetPaused():
                 paused = True

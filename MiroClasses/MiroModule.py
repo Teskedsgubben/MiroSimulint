@@ -4,8 +4,10 @@ import numpy as np
 class Module():
     def __init__(self):
         self.components = {}
+        self.sensors = {}
         self.links = {}
-        self.nonames = 0
+        self.nonames_comp = 0
+        self.nonames_sens = 0
         self.fixed = []
         self.refpoint = False
         self.base = False
@@ -14,12 +16,24 @@ class Module():
         if not self.base:
             self.base = comp
         if(name == 'unnamed'):
-            self.nonames = self.nonames + 1
-            name = 'unnamed'+str(self.nonames)
+            self.nonames_comp = self.nonames_comp + 1
+            name = 'unnamed'+str(self.nonames_comp)
         self.components.update({name: comp})
-
+    
     def GetComponent(self, name='unnamed'):
         return self.components[name]
+    
+    def AddSensor(self, sensor, name='unnamed'):
+        if(name == 'unnamed'):
+            self.nonames_sens = self.nonames_sens + 1
+            name = 'unnamed_sensor'+str(self.nonames_sens)
+        self.sensors.update({name: sensor})
+        self.components.update({name: sensor})
+
+    def GetSensor(self, name='unnamed'):
+        return self.sensors[name]
+    def GetSensorList(self):
+        return self.sensors
 
     def GetLinks(self):
         return self.links
@@ -82,28 +96,6 @@ class Module():
         mlink.SetSpringCoefficient(K)
         mlink.SetDampingCoefficient(K/200)
         mlink.SetRestLength(L)
-
-        self.links.update({name: mlink})
-
-    def ChuteUp(self, name_A, point_A, name_chute):
-        comp_A = self.components[name_A]
-        comp_chute = self.components[name_chute]
-
-        name = name_A+"_"+point_A + "_TO_" + name_chute
-
-        self.GetComponent(name_chute).MoveToMatch('A', self.GetComponent(name_A), point_A)
-        
-        mlink = chrono.ChLinkTSDA()
-        # the coordinate system of the constraint reference in abs. space:
-        # mframe = chrono.ChFrameD(comp_B.GetLinkPoint(point_B), comp_B.GetBody().GetRot())
-        # mframe = chrono.ChCoordsysD(comp_B.GetLinkPoint(point_B), comp_B.GetBody().GetRot())
-        # initialize the constraint telling which part must be connected, and where:
-        mlink.Initialize(comp_A.GetBody(), comp_chute.GetBody(), False, comp_A.GetLinkPoint(point_A), comp_chute.GetLinkPoint('B'))
-        # mlink.RegisterForceFunctor()
-        # chrono.ForceFunctor()
-        mlink.SetSpringCoefficient(0.02)
-        mlink.SetDampingCoefficient(0.001)
-        mlink.SetRestLength(1)
 
         self.links.update({name: mlink})
 

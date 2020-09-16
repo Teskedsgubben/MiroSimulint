@@ -33,7 +33,7 @@ __a)__ Download the MiroSimulint code by:
 
 __b)__ Create an environment and install PyChrono by:
 
-    conda create -n MiroSim python=3.7 numpy pylint ffmpeg
+    conda create -n MiroSim python=3.7 numpy matplotlib pylint ffmpeg
 
     conda install -n MiroSim -c projectchrono pychrono
     
