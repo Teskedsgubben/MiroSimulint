@@ -23,7 +23,7 @@ def DemoLander(args):
     Lander.AddComponent(Comp.MC113([0, 0, 90]), 'Rod C')
     Lander.AddComponent(Comp.MC113([0, 0, 90]), 'Rod D')
     
-    Lander.AddSensor(Sensors.MSA02([180,0,0]), 'Force Sensor')
+    Lander.AddSensor(Sensors.MSA02([180,0,0]), 'Accelerometer')
     
     Lander.RotateComponentsZ(tilt)
     Lander.RotateComponentsY(aim)
@@ -42,7 +42,6 @@ def DemoLander(args):
     Lander.ConnectComponents('Rod C', 'B', 'Top plate', 'A')
     Lander.ConnectComponents('Rod D', 'B', 'Top plate', 'B')
 
-    Lander.ConnectComponents('Top plate', 'E', 'Force Sensor', 'Linkpoint')
+    Lander.ConnectComponents('Top plate', 'E', 'Accelerometer', 'Linkpoint')
 
     return Lander
-
