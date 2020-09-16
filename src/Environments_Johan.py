@@ -367,7 +367,7 @@ def MIT_walls(system, H):
     for floor in range(3):
         y_pos = H*floor + H/2
         pos = chrono.ChVectorD(10.5, y_pos, 12.16)
-        add_boxShape(system, 3.34, H/2, wall_t, pos, 'textures/elevator.png', [4,3])
+        add_boxShape(system, 2.034, H/2, wall_t, pos, 'textures/elevator.png', [4,3])
 
     # Add end wall, towards mitum
     texture = ['textures/mit_2nd.jpg', 'textures/mit_3rd.jpg', 'textures/mit_4th.jpg']

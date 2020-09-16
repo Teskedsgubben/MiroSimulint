@@ -11,7 +11,7 @@ def AddProps(system):
     props.MIT_door(system, [12.56, 6.6, 1.5], 90)
     props.MIT_door(system, [12.56, 6.6, -8.5], 90)
 
-    props.MIT_door(system, [7, 6.6, 12.06])
+    props.MIT_door(system, [7.25, 6.6, 12.1])
 
     props.painting(system, [12.5,2.0,-4], 'DemoBengan.png', np.pi/2)
     props.painting(system, [12.53,1.8,-5.35], 'bungeebengan_notes.png', np.pi/2, [0.2,0.27])
