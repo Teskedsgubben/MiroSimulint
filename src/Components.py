@@ -369,7 +369,7 @@ def MC265(rot = [0,0,0], pos = [0,0,0], Fixed = False):
 # Big fat thunk
 def MC106(rot = [0,0,0], pos = [0,0,0], Fixed = False):
     size_brick_x = 0.8
-    size_brick_y = 1.2
+    size_brick_y = 0.8
     size_brick_z = 0.6
     density_brick = 5000   # kg/m^3
     mass_brick = density_brick * size_brick_x * size_brick_y * size_brick_z
