@@ -18,7 +18,6 @@ def DemoLauncher(args):
     Launcher.AddComponent(Comp.MC106([0,0,0]), 'Pillar')
     Launcher.AddComponent(Comp.MC143([0,0,-angle]), 'Main arm')
     Launcher.AddComponent(Comp.MC095([0,90,-angle]), 'Launch plate')
-    # Launcher.AddComponent(Comp.MC015([0,90,180-angle]), 'Stop plate')
     
     Launcher.AddComponent(Comp.MC115([0,90,180-angle]), 'Stop holder')
     Launcher.AddComponent(Comp.MC221([90,0,0]), 'Rotation pole out') # Appearance only
