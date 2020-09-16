@@ -295,8 +295,8 @@ def MIT_walls(system, H):
     add_boxShape(system, beam_w, beam_h, beam_w, beam_pos_7, 'textures/white concrete.jpg', scale)
 
     # Add wall, 4th floor towards MIT place
-    topWall_pos = chrono.ChVectorD(-0.5-wall_t, 5/2*H, 5.1)
-    add_boxShape(system, 7-wall_t, H/2, wall_t, topWall_pos, office_wall, [2,1])
+    topWall_pos = chrono.ChVectorD(-0.5, 5/2*H, 5.1)
+    add_boxShape(system, 7, H/2, wall_t, topWall_pos, office_wall, [2,1])
 
     # Add wall, 2nd floor towards MIT place
     bWall_height = H/2-wall_t
@@ -304,7 +304,7 @@ def MIT_walls(system, H):
     add_boxShape(system, 5-3*wall_t, bWall_height, wall_t, pos, 'textures/wwp.png', scale)
 
     # Add wall, 4th floor flower pot (Negative x direction)
-    pos = chrono.ChVectorD(6.5-wall_t, 5/2*H, 7.08+wall_t)
+    pos = chrono.ChVectorD(6.5-wall_t+0.015, 5/2*H, 7.08+wall_t+0.015)
     add_boxShape(system, wall_t, H/2, 2.08+wall_t, pos, 'textures/white concrete.jpg', [5,5])
 
     # Add wall, 4th floor data cooridor (negative x direction) 
