@@ -16,7 +16,7 @@ def Johan_Components(system, SPEEDMODE = False):
 def MIT_stair(system, center, H):
         
     stair_r =  0.3          # Radius
-    stair_h = 2*H+0.8       # Hight
+    stair_h = 2*H+1         # Hight
     stair_d = 1             # Density
     stepNum = 21            # Number of steps
     dh = (H-0.1)/stepNum    # Heigth between each step
@@ -179,10 +179,11 @@ def MIT_floors(system, H, SPEEDMODE):
         # Add floors
         y_pos = floor*H - floor_t                              
         floor_pos_1 = chrono.ChVectorD(-3.5, y_pos, 6.58)       # Add floors towards NA
-        floor_pos_2 = chrono.ChVectorD(10.45, y_pos, -4-0.42)    # Add floors towards technology house
+        # ta bort mini corr +0.05
+        floor_pos_2 = chrono.ChVectorD(10.45+0.05, y_pos, -4-0.42)    # Add floors towards technology house
 
         add_boxShape(system, floor_l, floor_t, floor_w, floor_pos_1, texture_floor, [20,10])
-        add_boxShape(system, floor_w_2, floor_t, floor_l+0.58, floor_pos_2, texture_floor, [10,20])
+        add_boxShape(system, floor_w_2+0.05, floor_t, floor_l+0.58, floor_pos_2, texture_floor, [10,20])
 
         if floor > 0 and SPEEDMODE == False:
             add_fence(system, H, postNum, floor_w, floor_w_2, floor, floor_t, handle_l)
@@ -296,7 +297,7 @@ def MIT_walls(system, H):
 
     # Add wall, 4th floor towards MIT place
     topWall_pos = chrono.ChVectorD(-0.5, 5/2*H, 5.1)
-    add_boxShape(system, 7, H/2, wall_t, topWall_pos, office_wall, [2,1])
+    add_boxShape(system, 7, H/2, wall_t, topWall_pos, office_wall, [4,1])
 
     # Add wall, 2nd floor towards MIT place
     bWall_height = H/2-wall_t
@@ -304,7 +305,7 @@ def MIT_walls(system, H):
     add_boxShape(system, 5-3*wall_t, bWall_height, wall_t, pos, 'textures/wwp.png', scale)
 
     # Add wall, 4th floor flower pot (Negative x direction)
-    pos = chrono.ChVectorD(6.5-wall_t+0.015, 5/2*H, 7.08+wall_t+0.015)
+    pos = chrono.ChVectorD(6.5-wall_t+0.01, 5/2*H, 7.08+wall_t+0.01)
     add_boxShape(system, wall_t, H/2, 2.08+wall_t, pos, 'textures/white concrete.jpg', [5,5])
 
     # Add wall, 4th floor data cooridor (negative x direction) 
@@ -438,15 +439,15 @@ def add_fence(system, H, postNum, floor_w, floor_w_2, floor, floor_t, handle_l):
     n_x = chrono.ChVectorD(1, 0, 0)     # Normalvector in x direction
     n_z = chrono.ChVectorD(0, 0, 1)     # Normalvector in z direction
     # Handle
-    pos_rail_1 = chrono.ChVectorD(-0.75, H+fence_h*0.99, 6.58-floor_w)         # Fence 3rd floor left of stair
-    pos_rail_2 = chrono.ChVectorD(10.45-floor_w_2, H+fence_h*0.99, -4.4)       # Fence 3rd floor
-    pos_rail_3 = chrono.ChVectorD(10.45-floor_w_2, 2*H+fence_h*0.99, -4.4)     # Fence 4th floor
-    pos_rail_4 = chrono.ChVectorD(6.5, 2*H+fence_h*0.99, 4.2)               # Fence by the stair 4th floor
+    pos_rail_1 = chrono.ChVectorD(-0.75, H+fence_h*0.925, 6.58-floor_w)         # Fence 3rd floor left of stair
+    pos_rail_2 = chrono.ChVectorD(10.45-floor_w_2, H+fence_h*0.925, -4.4)       # Fence 3rd floor
+    pos_rail_3 = chrono.ChVectorD(10.45-floor_w_2, 2*H+fence_h*0.925, -4.4)     # Fence 4th floor
+    pos_rail_4 = chrono.ChVectorD(6.5, 2*H+fence_h*0.925, 4.2)                  # Fence by the stair 4th floor
     # Rail
-    pos_rail_5 = chrono.ChVectorD(-0.75, H+3/4*fence_h, 6.58-floor_w)         # Fence 3rd floor left of stair
-    pos_rail_6 = chrono.ChVectorD(10.45-floor_w_2, H+3/4*fence_h, -4.4)       # Fence 3rd floor
-    pos_rail_7 = chrono.ChVectorD(10.45-floor_w_2, 2*H+3/4*fence_h, -4.4)     # Fence 4th floor
-    pos_rail_8 = chrono.ChVectorD(6.5, 2*H+3/4*fence_h, 4.2)               # Fence by the stair 4th floor
+    pos_rail_5 = chrono.ChVectorD(-0.75, H+3/4*fence_h, 6.58-floor_w)           # Fence 3rd floor left of stair
+    pos_rail_6 = chrono.ChVectorD(10.45-floor_w_2, H+3/4*fence_h, -4.4)         # Fence 3rd floor
+    pos_rail_7 = chrono.ChVectorD(10.45-floor_w_2, 2*H+3/4*fence_h, -4.4)       # Fence 4th floor
+    pos_rail_8 = chrono.ChVectorD(6.5, 2*H+3/4*fence_h, 4.2)                    # Fence by the stair 4th floor
 
     pos_h = [pos_rail_1, pos_rail_2, pos_rail_3, pos_rail_4]
     pos_r = [pos_rail_5, pos_rail_6, pos_rail_7, pos_rail_8]
