@@ -54,6 +54,9 @@ class MiroSystem():
 
     def Get_Target(self):
         return self.Environment.Get_Target()
+
+    def Get_ChSystem(self):
+        return self.system
     
     def Set_Perspective(self, camname):
         if camname in self.Environment.Get_Camviews():
@@ -157,7 +160,7 @@ class MiroSystem():
                 sensor.Initialize(sensor_ID+'.txt')
 
         start = time.time()
-        
+
         while(self.simulation.GetDevice().run() and start + self.delay > time.time()):
             self.simulation.BeginScene()
             self.simulation.DrawAll()
