@@ -214,7 +214,7 @@ def roof(system):
     # MA roof
     roofMA = chrono.ChBody()
     roofMA.SetBodyFixed(True)
-    roofMA.SetPos(chrono.ChVectorD(10.56,h+0.98,-4))
+    roofMA.SetPos(chrono.ChVectorD(10.56,h+0.098,-4))
     
     # Collision shape
     roofMA.GetCollisionModel().ClearModel()
