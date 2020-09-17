@@ -242,13 +242,13 @@ def MIT_floors(system, H, SPEEDMODE):
     add_boxShape(system, 2.25, 2*floor_t, 2, pos, texture_roof, scale_roof)
 
     # Add horizontal beam along floors
-    beam_length = 6.9
+    beam_length = 7.2
     for floor in range(floorsNum):
         beam_corr_2 = floor_w_2+0.99*floor_t/2      # Technology
         beam_corr = floor_w+0.99*floor_t/2      # Na
         if floor > 0:
             y_pos = floor*H - 2*floor_t                             
-            floor_pos_1 = chrono.ChVectorD(0, y_pos, 6.58-beam_corr)       # Add beam left side stair
+            floor_pos_1 = chrono.ChVectorD(-0.4, y_pos, 6.58-beam_corr)       # Add beam left side stair
             floor_pos_2 = chrono.ChVectorD(10.45-beam_corr_2, y_pos, -4)   # Add beam right side stair
 
             add_boxShape(system, beam_length, 2*floor_t, floor_t/2, floor_pos_1, 'textures/white concrete.jpg')
