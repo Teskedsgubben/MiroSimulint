@@ -8,7 +8,7 @@ def AddProps(system):
     props.MIT_door(system, [12.56, 3.3, 1.5], 90)
     props.MIT_door(system, [12.56, 3.3, -8.5], 90)
     
-    props.MIT_door(system, [12.56, 6.6, 1.5], 90)
+    props.MIT_door(system, [12.56, 6.6, 3.5], 90)
     props.MIT_door(system, [12.56, 6.6, -8.5], 90)
 
     props.MIT_door(system, [7.25, 6.6, 12.1])
@@ -25,6 +25,6 @@ def AddProps(system):
     # props.pokeball(system, [7.355,5.05,2.55], 0)
 
     # On the dartboard
-    props.pokeball(system, [2.25,1.501,-3.4], -45)
-    props.sodacan(system, [2.32,1.501,-3.5], 'schrodbull.png')
-    props.sodacan(system, [2.4,1.501,-3.3], 'joultcola.png')
+    props.pokeball(system, [1.95,1.501,-3.4], -45)
+    props.sodacan(system, [2.02,1.501,-3.5], 'schrodbull.png')
+    props.sodacan(system, [1.7,1.501,-3.3], 'joultcola.png')

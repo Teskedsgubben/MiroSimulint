@@ -11,6 +11,20 @@ class Module():
         self.fixed = []
         self.refpoint = False
         self.base = False
+
+    def PrintInfo(self):
+        print('  Sensors')
+        if len(self.sensors.items()) == 0:
+            print('    (No Sensors)')
+        else:
+            for sensor_name in self.sensors.keys():
+                print('    - '+sensor_name)
+        M = 0
+        for _, comp in self.components.items():
+            M = M + comp.GetMass()
+        print('  Mass: %.3f kg' % (round(M,2)))
+        print('  Components: '+str(len(self.components.keys()) - len(self.sensors.keys())))
+        print('  Connections: '+str(len(self.links.keys())))
     
     def AddComponent(self, comp, name='unnamed'):
         if not self.base:

@@ -329,8 +329,8 @@ def MIT_walls(system, H):
     add_boxShape(system, wall_t, H/2-0.1, 2, pos, 'textures/yellow_brick.jpg', [5,5])
 
     # Add 2nd entrence wall (negative x direction)
-    pos = chrono.ChVectorD(2-wall_t, 0+H/2-0.1, 7+wall_t)
-    add_boxShape(system, wall_t, H/2-0.1, 2-wall_t, pos, 'textures/yellow_brick.jpg', [5,5])
+    pos = chrono.ChVectorD(2-wall_t-0.01, 0+H/2-0.1, 6.5+wall_t+0.01)
+    add_boxShape(system, wall_t, H/2-0.1, 1.5+wall_t, pos, 'textures/yellow_brick.jpg', [5,5])
 
     # Add 1st entrence wall (negative x direction)
     pos = chrono.ChVectorD(2-wall_t, 0+H/2-0.1, 10.16)

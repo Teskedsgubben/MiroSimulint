@@ -5,7 +5,7 @@ from MiroClasses import MiroComponent as mc
 
 def MSA01(rot = [0,0,0]):
     size_x = 0.025
-    size_y = 0.02
+    size_y = 0.025
     size_z = 0.025
     density_brick = 1500   # kg/m^3
     mass_brick = density_brick * size_x * size_y * size_z

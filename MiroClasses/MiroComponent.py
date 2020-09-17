@@ -7,6 +7,9 @@ class MiroComponent():
         self.linkdirs = {}
         self.body = body
 
+    def GetMass(self):
+        return self.body.GetMass()
+        
     def AddToSystem(self, system):
         system.Add_Object(self.body)
 

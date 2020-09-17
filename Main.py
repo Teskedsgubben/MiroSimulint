@@ -65,6 +65,7 @@ simulation_system.MoveToReference('Lander', 'Launcher')
 config = {
     'resolution': [1920, 1080],
     'delay': 3,
-    'datalog': False
+    'datalog': False,
+    'print module info': True,
 }
 simulation_system.Run(config)

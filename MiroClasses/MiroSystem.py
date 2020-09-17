@@ -75,6 +75,12 @@ class MiroSystem():
         for s_name, sensor in module.GetSensorList().items():
             sensor_ID = name+'_'+s_name
             self.sensors.update({sensor_ID: sensor})
+    
+    def PrintModuleInfo(self):
+        print('\n--- Module Information ---')
+        for name, module in self.modules.items():
+            print('Module '+name+':')
+            module.PrintInfo()
 
     def MoveToReference(self, move_module, ref_module):
         moveMod = self.modules[move_module]
@@ -115,6 +121,11 @@ class MiroSystem():
             self.log = config['datalog']
         else:
             self.log = False
+
+        if "print module info" in config:
+            self.print = config['print module info']
+        else:
+            self.print = False
     
     def Run(self, config):
         # ---------------------------------------------------------------------
@@ -159,8 +170,17 @@ class MiroSystem():
             for sensor_ID, sensor in self.sensors.items():
                 sensor.Initialize(sensor_ID+'.txt')
 
-        start = time.time()
+        self.simulation.GetDevice().run()
+        self.simulation.BeginScene()
+        self.simulation.DrawAll()
+        self.simulation.DoStep()
+        self.simulation.EndScene()
 
+        if self.print:
+            self.PrintModuleInfo()
+        
+        start = time.time()
+        
         while(self.simulation.GetDevice().run() and start + self.delay > time.time()):
             self.simulation.BeginScene()
             self.simulation.DrawAll()
@@ -173,7 +193,7 @@ class MiroSystem():
         
         
         
-        print('\n-- Press SPACE to release! ---')
+        print('\n--- Press SPACE to release! ---')
         self.simulation.SetPaused(True)
         paused = True
         if self.notifier:
