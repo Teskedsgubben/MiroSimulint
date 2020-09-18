@@ -98,4 +98,14 @@ First, start the simulation as usual. When you press PrintScreen the program wil
 
     ffmpeg -framerate 60 -i video_capture/screenshot%05d.bmp -b:v 100M video_capture/MiroSim.avi
 
-This will put the screenshot files into a video file called MiroSim.avi in the video_capture folder. The framerate of 60 can be changed to alter the speed of the video. A value of 300 is full speed, so using 60 renders the video in slow motion, but this is more suitable for seeing details.
+This will put the screenshot files into a video file called MiroSim.avi in the video_capture folder. The framerate of 60 can be changed to alter the speed of the video. A value of 300 is full speed, so using 60 renders the video in slow motion, but this is more suitable for seeing details. 
+
+You can also add audio by supplying an audio file as input after the .bmp like below. If the audio file is too short and the video cuts too early, remove the -shortest command.
+
+    ...screenshot%05d.bmp -i audiofile.mp3 -shortest -b:v...
+
+__Mac users:__ If you are using Mac OS and do not have VLC or similar installed, you may not me able to play the .avi file. In that case, try using the command below to produce a playable file.
+
+    ffmpeg -i video_capture/MiroSim.avi -preset slow -codec:v libx264 -pix_fmt yuv420p -b:v 100M video_capture/MiroSimMAC.mp4
+
+Then open the MiroSimMAC.mp4 file in the video_capture directory.
