@@ -13,18 +13,13 @@ class Module():
         self.base = False
 
     def PrintInfo(self):
-        print('  Sensors')
-        if len(self.sensors.items()) == 0:
-            print('    (No Sensors)')
-        else:
+        print('  Sensors: '+str(len(self.sensors.keys())))
+        if len(self.sensors.keys()) > 0:
             for sensor_name in self.sensors.keys():
                 print('    - '+sensor_name)
-        M = 0
-        for _, comp in self.components.items():
-            M = M + comp.GetMass()
-        print('  Mass: %.3f kg' % (round(M,2)))
         print('  Components: '+str(len(self.components.keys()) - len(self.sensors.keys())))
         print('  Connections: '+str(len(self.links.keys())))
+        print('  Mass: %.3f kg' % (round(self.GetMass(),2)))
     
     def AddComponent(self, comp, name='unnamed'):
         if not self.base:
@@ -39,6 +34,12 @@ class Module():
             return self.base.GetPosition()
         else:
             return chrono.ChVectorD(0,0,0)
+
+    def GetMass(self):
+        M = 0
+        for _, comp in self.components.items():
+            M = M + comp.GetMass()
+        return M
     
     def GetComponent(self, name='unnamed'):
         return self.components[name]
@@ -74,6 +75,13 @@ class Module():
         for name in self.fixed:
             self.components[name].GetBody().SetBodyFixed(False)
         self.fixed = []
+    
+    def MarkComponent(self, component_name, color = 'red'):
+        '''Change the color of a component to identify it during simulation. \nUse 'red', 'blue' or 'green'.'''
+        texture = chrono.ChTexture()
+        texture.SetTextureFilename(chrono.GetChronoDataFile('textures/markpattern_'+color+'.png'))
+        texture.SetTextureScale(4, 3)
+        self.components[component_name].GetBody().AddAsset(texture)
     
     def ConnectComponents(self, name_A, point_A, name_B, point_B, dist = 0, move = True):
         comp_A = self.components[name_A]
