@@ -79,6 +79,8 @@ class Module():
     def MarkComponent(self, component_name, color = 'red'):
         '''Change the color of a component to identify it during simulation. \nUse 'red', 'blue' or 'green'.'''
         texture = chrono.ChTexture()
+        if color != 'blue' and color != 'green':
+            color = 'red'
         texture.SetTextureFilename(chrono.GetChronoDataFile('textures/markpattern_'+color+'.png'))
         texture.SetTextureScale(4, 3)
         self.components[component_name].GetBody().AddAsset(texture)
