@@ -25,6 +25,7 @@ class MiroSystem():
         self.notifier = False
         
         self.camname = 'default'
+        self.follow = False
         
         # Set the default outward/inward shape margins for collision detection,
         # this is epecially important for very large or very small objects.
@@ -58,11 +59,21 @@ class MiroSystem():
     def Get_ChSystem(self):
         return self.system
     
-    def Set_Perspective(self, camname):
-        if camname in self.Environment.Get_Camviews():
+    def Set_Perspective(self, camname, module_name = False, follow_position = [1.5, 0.75, 0]):
+        if camname == 'follow':
+            if not module_name:
+                print('Camera Error: Input a module name to use follow perspective, using default')
+            else:
+                if module_name in self.modules:
+                    self.follow = True
+                    self.followmod = self.modules[module_name]
+                    self.followpos = chronoirr.vector3df(follow_position[0], follow_position[1], follow_position[2])
+                else:
+                    print('Camera Error: "'+module_name+'" is not a recognized module and cannot be followed, using default')
+        elif camname in self.Environment.Get_Camviews():
             self.camname = camname
         else:
-            print('Error: "'+camname+'" is not a recognized camera position, using default')
+            print('Camera Error: "'+camname+'" is not a recognized camera position, using default')
     
     def Add_MiroModule(self, module, name, position = False, vel = False):
         if(position):
@@ -91,10 +102,15 @@ class MiroSystem():
         self.system.Add(Object)
 
     def Set_Camera(self):
-        cam = self.Environment.Get_Camviews()[self.camname]
-        position = chronoirr.vector3df(cam['pos'][0], cam['pos'][1], cam['pos'][2])
-        looker = position + chronoirr.vector3df(cam['dir'][0], cam['dir'][1], cam['dir'][2]).setLength(cam['lah'])
-        self.simulation.AddTypicalCamera(position, looker)
+        if self.follow:
+            pos = self.followmod.GetBasePosition()
+            looker = chronoirr.vector3df(pos.x, pos.y, pos.z)
+            self.simulation.AddTypicalCamera(looker + self.followpos, looker)
+        else:
+            cam = self.Environment.Get_Camviews()[self.camname]
+            position = chronoirr.vector3df(cam['pos'][0], cam['pos'][1], cam['pos'][2])
+            looker = position + chronoirr.vector3df(cam['dir'][0], cam['dir'][1], cam['dir'][2]).setLength(cam['lah'])
+            self.simulation.AddTypicalCamera(position, looker)
 
     def Initialize_Config(self, config):
         if "resolution" in config:
@@ -214,6 +230,9 @@ class MiroSystem():
                 for _, sensor in self.sensors.items():
                     sensor.LogData()
 
+            if self.follow:
+                self.Set_Camera()
+        
             if self.notifier and not paused and self.simulation.GetPaused():
                 paused = True
                 self.Environment.Get_Notifier().Set_Ready()
