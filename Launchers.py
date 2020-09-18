@@ -1,9 +1,10 @@
 import pychrono.core as chrono
 import numpy as np
 
-from MiroClasses import MiroModule as mm
+from MiroClasses import MiroModule as MM
 
-from src import Components as Comp
+from src import Components
+from src import Sensors
 
 def DemoLauncher(args):
     # Extract arguments into local variables
@@ -11,17 +12,17 @@ def DemoLauncher(args):
     angle = args[1]
 
     # Start by creating a new module
-    Launcher = mm.Module()
+    Launcher = MM.Module()
 
     # Add some components
-    Launcher.AddComponent(Comp.MC007([0,0,0]), 'Base')
-    Launcher.AddComponent(Comp.MC106([0,0,0]), 'Pillar')
-    Launcher.AddComponent(Comp.MC143([0,0,-angle]), 'Main arm')
-    Launcher.AddComponent(Comp.MC095([0,90,-angle]), 'Launch plate')
+    Launcher.AddComponent(Components.MC007([0,0,0]), 'Base')
+    Launcher.AddComponent(Components.MC106([0,0,0]), 'Pillar')
+    Launcher.AddComponent(Components.MC143([0,0,-angle]), 'Main arm')
+    Launcher.AddComponent(Components.MC095([0,90,-angle]), 'Launch plate')
     
-    Launcher.AddComponent(Comp.MC115([0,90,180-angle]), 'Stop holder')
-    Launcher.AddComponent(Comp.MC221([90,0,0]), 'Rotation pole out') # Appearance only
-    Launcher.AddComponent(Comp.MC221([90,0,0]), 'Rotation pole in') # Appearance only
+    Launcher.AddComponent(Components.MC115([0,90,180-angle]), 'Stop holder')
+    Launcher.AddComponent(Components.MC221([90,0,0]), 'Rotation pole out') # Appearance only
+    Launcher.AddComponent(Components.MC221([90,0,0]), 'Rotation pole in') # Appearance only
 
     # Example of how to find the reference point
     # by pulling arm back before aiming
@@ -50,7 +51,7 @@ def DemoLauncher(args):
     # print(Launcher.GetComponent('Main arm').GetLinkPointXYZ('B'))
 
     # To visualize where a link point is, you can use the DUMMY component
-    Launcher.AddComponent(Comp.DUMMY(), 'Dummy')
+    Launcher.AddComponent(Components.DUMMY(), 'Dummy')
     Launcher.ConnectComponents('Base', 'A', 'Dummy', 'A')
     
     # You can also identify a component by marking it in a certain color

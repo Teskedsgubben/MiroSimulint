@@ -1,27 +1,27 @@
 import pychrono.core as chrono
 import pychrono.irrlicht as chronoirr
 
-from MiroClasses import MiroModule as mm
+from MiroClasses import MiroModule as MM
 
-from src import Components as Comp
-from src import Sensors as Sensors
+from src import Components
+from src import Sensors
 
 def DemoLander(args):
     aim = args[0]
     tilt = -args[1]
-    Lander = mm.Module()
+    Lander = MM.Module()
 
     # Add top and bottom plates
     # MC component arguments are rotation, position and fixed (true/false)
     # Defaults to [0,0,0], [0,0,0], False if arguments are not provided
-    Lander.AddComponent(Comp.MC035([  0,90,0], [0,0,0], False), 'Bottom plate')
-    Lander.AddComponent(Comp.MC035([180,90,0]), 'Top plate')
+    Lander.AddComponent(Components.MC035([  0,90,0], [0,0,0], False), 'Bottom plate')
+    Lander.AddComponent(Components.MC035([180,90,0]), 'Top plate')
 
     # Add vertical rods
-    Lander.AddComponent(Comp.MC113([0, 0, 90]), 'Rod A')
-    Lander.AddComponent(Comp.MC113([0, 0, 90]), 'Rod B')
-    Lander.AddComponent(Comp.MC113([0, 0, 90]), 'Rod C')
-    Lander.AddComponent(Comp.MC113([0, 0, 90]), 'Rod D')
+    Lander.AddComponent(Components.MC113([0, 0, 90]), 'Rod A')
+    Lander.AddComponent(Components.MC113([0, 0, 90]), 'Rod B')
+    Lander.AddComponent(Components.MC113([0, 0, 90]), 'Rod C')
+    Lander.AddComponent(Components.MC113([0, 0, 90]), 'Rod D')
     
     Lander.AddSensor(Sensors.MSA02([180,0,0]), 'Accelerometer')
     
