@@ -34,6 +34,12 @@ class Module():
             name = 'unnamed'+str(self.nonames_comp)
         self.components.update({name: comp})
     
+    def GetBasePosition(self):
+        if self.base:
+            return self.base.GetPosition()
+        else:
+            return chrono.ChVectorD(0,0,0)
+    
     def GetComponent(self, name='unnamed'):
         return self.components[name]
     
