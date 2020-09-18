@@ -29,8 +29,8 @@ class MiroSystem():
         
         # Set the default outward/inward shape margins for collision detection,
         # this is epecially important for very large or very small objects.
-        chrono.ChCollisionModel.SetDefaultSuggestedEnvelope(0.00001)
-        chrono.ChCollisionModel.SetDefaultSuggestedMargin(0.00001)
+        chrono.ChCollisionModel.SetDefaultSuggestedEnvelope(0.0000001)
+        chrono.ChCollisionModel.SetDefaultSuggestedMargin(0.0001)
         
         # Maybe you want to change some settings for the solver. For example you
         # might want to use SetSolverMaxIterations to set the number of iterations
@@ -230,7 +230,7 @@ class MiroSystem():
                 for _, sensor in self.sensors.items():
                     sensor.LogData()
 
-            if self.follow:
+            if self.follow and not paused:
                 self.Set_Camera()
         
             if self.notifier and not paused and self.simulation.GetPaused():
