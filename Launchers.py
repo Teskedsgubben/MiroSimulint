@@ -52,6 +52,9 @@ def DemoLauncher(args):
     # To visualize where a link point is, you can use the DUMMY component
     Launcher.AddComponent(Comp.DUMMY(), 'Dummy')
     Launcher.ConnectComponents('Base', 'A', 'Dummy', 'A')
+    
+    # You can also identify a component by marking it in a certain color
+    Launcher.MarkComponent('Dummy', 'blue')
 
     # Set a spring to make the catapult launch. You can use any values, but they must be fixed 
     # (i.e. not computed from input arguments)
