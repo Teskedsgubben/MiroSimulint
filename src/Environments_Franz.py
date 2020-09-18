@@ -148,7 +148,7 @@ def table_leg(system,leg_pos, size_leg_r, size_leg_h):
     body_table_leg.SetPos(leg_pos)
     # Collision shape
     body_table_leg.GetCollisionModel().ClearModel()
-    body_table_leg.GetCollisionModel().AddCylinder(size_leg_r, size_leg_h, size_leg_d) # hemi sizes
+    body_table_leg.GetCollisionModel().AddCylinder(size_leg_r, size_leg_r, size_leg_h/2) # hemi sizes
     body_table_leg.GetCollisionModel().BuildModel()
     body_table_leg.SetCollide(True)
     
