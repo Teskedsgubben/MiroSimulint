@@ -79,7 +79,6 @@ class MiroComponent():
 # Sensor class extends component class
 class MiroSensor(MiroComponent):
     def Initialize(self, output_file_name):
-        self.printed = False
         self.filename = output_file_name
         self.filestream = open(self.filename, "w")
         self.filestream.truncate(0)
@@ -89,8 +88,7 @@ class MiroSensor(MiroComponent):
 
 class MiroSensor_Accelerometer(MiroSensor):
     def LogData(self):
-        if not self.printed:
-            acc = self.GetBody().GetPos_dtdt()
-            data = str(acc.x)+' '+str(acc.y + 9.8)+' '+str(acc.z)+'\n'
-            self.filestream.write(data)
+        acc = self.GetBody().GetPos_dtdt()
+        data = str(acc.x)+' '+str(acc.y + 9.8)+' '+str(acc.z)+'\n'
+        self.filestream.write(data)
 
