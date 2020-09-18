@@ -91,6 +91,6 @@ class MiroSensor_Accelerometer(MiroSensor):
     def LogData(self):
         if not self.printed:
             acc = self.GetBody().GetPos_dtdt()
-            data = str(acc.x)+' '+str(acc.y - 9.8)+' '+str(acc.z)+'\n'
+            data = str(acc.x)+' '+str(acc.y + 9.8)+' '+str(acc.z)+'\n'
             self.filestream.write(data)
 
