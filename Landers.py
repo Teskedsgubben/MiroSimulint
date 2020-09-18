@@ -42,6 +42,7 @@ def DemoLander(args):
     Lander.ConnectComponents('Rod C', 'B', 'Top plate', 'A')
     Lander.ConnectComponents('Rod D', 'B', 'Top plate', 'B')
 
+    # Connect sensor to the module, behave just like a component
     Lander.ConnectComponents('Top plate', 'E', 'Accelerometer', 'Linkpoint')
 
     return Lander
