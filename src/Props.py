@@ -2,8 +2,9 @@ import pychrono.core as chrono
 import numpy as np
 
 from MiroClasses import MiroNotifier as MN
+from MiroClasses import MiroComponent as MC
 
-def dartboard(system, target):
+def dartboard(ChSystem, target):
     h = 0.15
     eps = 0.0025
     size = 1
@@ -22,7 +23,7 @@ def dartboard(system, target):
     targetBox_texture.SetTextureScale(-1, 1)
     targetBox.GetAssets().push_back(targetBox_texture)
     
-    system.Add(targetBox)
+    ChSystem.Add(targetBox)
 
     # Create Hitbox
     targetFrame = chrono.ChBodyEasyCylinder(size, h, 1000)
@@ -42,9 +43,9 @@ def dartboard(system, target):
 
     targetFrame.SetPos(chrono.ChVectorD(pos_b))
 
-    system.Add(targetFrame)
+    ChSystem.Add(targetFrame)
 
-def sodacan(system, target, text = 'schrodbull.png', angle = 0, SPEEDMODE = False):
+def sodacan(ChSystem, target, text = 'schrodbull.png', angle = 0, SPEEDMODE = False):
     h = 0.22
     r = 0.04
     
@@ -73,7 +74,7 @@ def sodacan(system, target, text = 'schrodbull.png', angle = 0, SPEEDMODE = Fals
 
     # can.SetPos_dt(chrono.ChVectorD(0,1,10))
 
-    system.Add(can)
+    ChSystem.Add(can)
 
     if not SPEEDMODE:
         eps = 0.003
@@ -101,7 +102,7 @@ def sodacan(system, target, text = 'schrodbull.png', angle = 0, SPEEDMODE = Fals
         lid_texture.SetTextureScale(1, 1)
         lid.GetAssets().push_back(lid_texture)
         
-        system.Add(lid)
+        ChSystem.Add(lid)
 
         # Create bottom
         bot = chrono.ChBodyEasyCylinder(r, eps, 200)
@@ -121,7 +122,7 @@ def sodacan(system, target, text = 'schrodbull.png', angle = 0, SPEEDMODE = Fals
         bot_texture.SetTextureScale(1, 1)
         bot.GetAssets().push_back(bot_texture)
         
-        system.Add(bot)
+        ChSystem.Add(bot)
         
         
         rot_lid = can.GetRot() * chrono.Q_from_AngAxis( np.pi/2,chrono.ChVectorD(1,0,0))
@@ -135,10 +136,10 @@ def sodacan(system, target, text = 'schrodbull.png', angle = 0, SPEEDMODE = Fals
         mframe_bot = chrono.ChFrameD(pos_bot+epsvec, rot_bot)
         botlink.Initialize(can, bot, mframe_bot)
 
-        system.Add(lidlink)
-        system.Add(botlink)
+        ChSystem.Add(lidlink)
+        ChSystem.Add(botlink)
 
-def painting(system, pos, text = 'DemoBengan.png', rot = 0, dims = [1, 0.6]):
+def painting(ChSystem, pos, text = 'DemoBengan.png', rot = 0, dims = [1, 0.6]):
     canvas = chrono.ChBody()
     canvas.SetBodyFixed(True)
     canvas.SetCollide(False)
@@ -152,9 +153,9 @@ def painting(system, pos, text = 'DemoBengan.png', rot = 0, dims = [1, 0.6]):
     canvas_texture = chrono.ChTexture(chrono.GetChronoDataFile('textures/'+text))
     canvas_texture.SetTextureScale(4, 3)
     canvas.GetAssets().push_back(canvas_texture)
-    system.Add(canvas)
+    ChSystem.Add(canvas)
 
-def pokeball(system, pos, rot = 0):
+def pokeball(ChSystem, pos, rot = 0):
     r = 0.05
 
     ball = chrono.ChBodyEasySphere(r, 500)
@@ -171,9 +172,9 @@ def pokeball(system, pos, rot = 0):
     ball_texture = chrono.ChTexture(chrono.GetChronoDataFile('textures/pokeball.jpg'))
     ball_texture.SetTextureScale(1, 1)
     ball.GetAssets().push_back(ball_texture)
-    system.Add(ball)
+    ChSystem.Add(ball)
 
-def coin(system, target, angle = 0):
+def coin(ChSystem, target, angle = 0):
     h = 0.0012
     r = 0.012
     
@@ -200,9 +201,9 @@ def coin(system, target, angle = 0):
     if angle != 0:
         coin.SetRot(chrono.Q_from_AngAxis(np.deg2rad(angle), chrono.ChVectorD(0,1,0)))
 
-    system.Add(coin)
+    ChSystem.Add(coin)
 
-def MIT_door(system, pos, rot = 0):
+def MIT_door(ChSystem, pos, rot = 0):
     b = 1.2
     h = 2.5
 
@@ -219,4 +220,39 @@ def MIT_door(system, pos, rot = 0):
     door_texture = chrono.ChTexture(chrono.GetChronoDataFile('textures/MIT_door.png'))
     door_texture.SetTextureScale(4, 3)
     door.GetAssets().push_back(door_texture)
-    system.Add(door)
+    ChSystem.Add(door)
+
+def dino(ChSystem, pos, rot = 0, scale = 0.1):
+    dino_comp = MC.MiroComponent()
+    dino_comp.SetImportDir('src/')
+    dino_comp.ImportObj('tyra.obj',[0.4,0.2,0.6], scale)
+    dino = dino_comp.GetBody()
+    dino.SetBodyFixed(True)
+    dino.SetCollide(False)
+    dino.SetPos(chrono.ChVectorD(pos[0], pos[1]+1.35*scale, pos[2]))
+    # dino.SetPos_dt(chrono.ChVectorD(0, 2, 5))
+    dino.SetRot(chrono.Q_from_AngAxis(np.deg2rad(rot),chrono.ChVectorD(0,1,0))*dino.GetRot())
+    
+    # dino.SetBodyFixed(False)
+    # dino.SetCollide(True)
+    # dino.GetCollisionModel().ClearModel()
+    # # colmod = chrono.ChCollisionModel()
+    # # colmod.AddSphere()
+    # # Right leg
+    # dino.GetCollisionModel().AddCylinder(0.2*scale, 0.25*scale, 0.5*scale, chrono.ChVectorD(-0.5*scale,-0.8*scale,-0.8*scale))
+    # # Left leg
+    # dino.GetCollisionModel().AddCylinder(0.2*scale, 0.25*scale, 0.5*scale, chrono.ChVectorD(0.5*scale,-0.8*scale,0.0*scale))
+    # # Body
+    # rot = 1.4
+    # bodmat = chrono.ChMatrix33D(
+    #     chrono.ChVectorD( 1,           0, np.sin(rot)),
+    #     chrono.ChVectorD( 0, np.cos(rot),-np.sin(rot)),
+    #     chrono.ChVectorD( 0, np.sin(rot), np.cos(rot))
+    # )
+    # dino.GetCollisionModel().AddCylinder(0.4*scale, 0.65*scale, 1*scale, chrono.ChVectorD(-0.1*scale,0.1*scale,-0.25*scale),bodmat)
+    # # Head
+    # dino.GetCollisionModel().AddSphere(0.4*scale, chrono.ChVectorD(-0.2*scale,0.9*scale,-1.35*scale))
+    # dino.GetCollisionModel().BuildModel()
+    # dino.SetShowCollisionMesh(True)
+
+    ChSystem.Add(dino)

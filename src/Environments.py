@@ -44,15 +44,15 @@ MIT_place.Add_Camview({
                 'dir': [0.25,0.3,1],
                 'lah': 0.05
             },
-            'maccans': {
-                'pos': [1,15,-1.15],
-                'dir': [0,-1,0],
-                'lah': 0.05
-            },
             '4th floor observing launcher': {
                 'pos': [10.5,8.3,-4.5],
                 'dir': [-0.2,-0.2, 1],
                 'lah': 2.5
+            },
+            'testpos': {
+                'pos': [4.25,1.35,-9.45],
+                'dir': [1,0,0],
+                'lah': 1
             }
         })
 

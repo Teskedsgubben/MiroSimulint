@@ -28,3 +28,5 @@ def AddProps(system):
     props.pokeball(system, [1.95,1.501,-3.4], -45)
     props.sodacan(system, [2.02,1.501,-3.5], 'schrodbull.png')
     props.sodacan(system, [1.7,1.501,-3.3], 'joultcola.png')
+
+    # props.dino(system, [5.75,0.85,-9.75], 210, .15)

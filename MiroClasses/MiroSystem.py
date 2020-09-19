@@ -15,7 +15,7 @@ class MiroSystem():
         #  Create the simulation system and add items
         #
         
-        self.system = chrono.ChSystemNSC()
+        self.ChSystem = chrono.ChSystemNSC()
         chrono.SetChronoDataPath(os.getcwd() + "/")
         self.modules = {}
         self.sensors = {}
@@ -36,8 +36,8 @@ class MiroSystem():
         # might want to use SetSolverMaxIterations to set the number of iterations
         # per timestep, etc.
         
-        #self.system.SetSolverType(chrono.ChSolver.Type_BARZILAIBORWEIN) # precise, more slow
-        self.system.SetSolverMaxIterations(70)
+        #self.ChSystem.SetSolverType(chrono.ChSolver.Type_BARZILAIBORWEIN) # precise, more slow
+        self.ChSystem.SetSolverMaxIterations(70)
         
     def Set_Speedmode(self, SPEEDMODE = True):
         self.SPEEDMODE = SPEEDMODE
@@ -45,7 +45,7 @@ class MiroSystem():
     def Set_Environment(self, Environment):
         
         self.Environment = Environment
-        self.Environment.Initialize(self.system, self.SPEEDMODE)
+        self.Environment.Initialize(self.ChSystem, self.SPEEDMODE)
         self.camviews = self.Environment.Get_Camviews()
 
         if self.Environment.Has_Notifier():
@@ -57,7 +57,7 @@ class MiroSystem():
         return self.Environment.Get_Target()
 
     def Get_ChSystem(self):
-        return self.system
+        return self.ChSystem
     
     def Set_Perspective(self, camname, module_name = False, follow_position = [1.5, 0.75, 0]):
         if camname == 'follow':
@@ -99,7 +99,7 @@ class MiroSystem():
         moveMod.SetPosition(refMod.GetReferencePoint())
 
     def Add_Object(self, Object):
-        self.system.Add(Object)
+        self.ChSystem.Add(Object)
 
     def Set_Camera(self):
         if self.follow:
@@ -150,7 +150,7 @@ class MiroSystem():
         #
         self.Initialize_Config(config)
         
-        self.simulation = chronoirr.ChIrrApp(self.system, 'MiroSimulation', chronoirr.dimension2du(self.res[0], self.res[1]))
+        self.simulation = chronoirr.ChIrrApp(self.ChSystem, 'MiroSimulation', chronoirr.dimension2du(self.res[0], self.res[1]))
         
         self.simulation.AddTypicalSky()
         self.Set_Camera()

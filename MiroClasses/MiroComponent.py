@@ -6,11 +6,15 @@ class MiroComponent():
     def __init__(self, body = False):
         self.linkpoints = {}
         self.linkdirs = {}
+        self.importdir = 'object_files/'
         if body:
             self.body = body
 
+    def SetImportDir(self, dirname):
+        self.importdir = dirname
+
     def ImportObj(self, filename, color = [0.8, 0.8, 0.8], scale = 0.001):
-        filename = 'object_files/'+filename
+        filename = self.importdir+filename
         if not os.path.isfile(filename):
             print('Could not locate file: '+filename)
             return
@@ -36,7 +40,7 @@ class MiroComponent():
         zdim = {'min': float('inf'), 'max': float('-inf')}
         
         for i in range(iend):
-            if text[i][0] == 'v' and text[i][1] != 'n':
+            if text[i][0] == 'v' and text[i][1] == ' ':
                 v = text[i].split()
                 x = float(v[1])*scale
                 y = float(v[2])*scale

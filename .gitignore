@@ -3,8 +3,6 @@ test_main_local.py
 # python compiler filer
 __pycache__
 *.pyc
-# min progress mapp
-progress
 # fram capture mappen
 video_capture
 # local settings
@@ -13,3 +11,7 @@ video_capture
 plotscript.py
 # datavärden
 *.txt
+# sparade lokala filer
+ignored_storage
+# scaled .obj files
+*scale*.obj

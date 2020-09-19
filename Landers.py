@@ -66,7 +66,7 @@ def KristersLandare(args):
     return Lander
 
 # Custom Component Example
-def KristerK(rot = [0,0,0], pos = [0,0,0], Fixed = False):
+def KristerK(rot = [0,0,0], pos = [0,0,0], Fixed = False): 
     # Create blank MiroComponent
     CustomComponent = MC.MiroComponent()
     
