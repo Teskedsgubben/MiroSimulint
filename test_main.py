@@ -15,19 +15,39 @@
 #
 #-------------------------------------------------------------------------------
 
-import numpy as np
-import Landers as landers
-import Launchers as launchers
-
 from MiroClasses import MiroSystem as ms
 from src import Environments as env
+import numpy as np
+
+import Landers
+import Launchers
 
 # Initialize a Miro System
 simulation_system  = ms.MiroSystem()
 
-# Set the environment to MIT place
+# Set the environment to MIT place.
+# If the simulation is too slow, set Speedmode to True.
 simulation_system.Set_Speedmode(False)
 simulation_system.Set_Environment(env.MIT_place)
+
+# Get the position of the target as [x, y, z]
+target = simulation_system.Get_Target()
+
+# COMPUTE THE ARGUMENTS YOU NEED FOR YOUR LAUNCHER AND LANDER HERE
+# You can pass any arguments you want to your launcher or lander
+# that you compute from the target coordinates
+aim = -10      # Example of direction to shoot
+pullback = 5   # Example of how much strength is needed
+
+# Add the Launcher to the system at the specified position
+launcher_position = [10, 6.69, -2.2]
+simulation_system.Add_MiroModule(Launchers.DemoLauncher([aim, pullback]), 'Launcher', launcher_position)
+
+# Add the Lander to the system
+simulation_system.Add_MiroModule(Landers.DemoLander([aim, pullback]), 'Lander')
+
+# Move the Lander to the point set by the Launcher
+simulation_system.MoveToReference('Lander', 'Launcher')
 
 # Set camera viewing perspective, options are:
 # 1: '2nd (ground) floor front view'
@@ -37,28 +57,17 @@ simulation_system.Set_Environment(env.MIT_place)
 # 5: '4th floor observing launcher'
 # 6: 'target' 
 # 0: 'default'
+# Special: 'follow', 'Module Name', [x, y, z]
 # Use mouse, scroll wheel, arrow keys and pg up & pg down to move
-simulation_system.Set_Perspective('2nd (ground) floor side view')
+# Press I and see the help section for a full list of controls
+simulation_system.Set_Perspective('4th floor observing launcher')
 
-# Get the position of the target as [x, y, z]
-target = simulation_system.Get_Target()
-# COMPUTE THE ARGUMENTS YOU NEED FOR YOUR LAUNCHER AND LANDER HERE
-# You can pass any arguments you want to your launcher or lander
-# that you compute from the target coordinates
-aim = -10      # Example of direction to shoot
-pullback = 5   # Example of how much strength is needed
-
-# Add the Launcher to the system at the specified position
-launcher_position = [10, 8.05, -2.2]
-simulation_system.Add_MiroModule(launchers.DemoLauncher([aim, pullback]), 'Launcher', launcher_position)
-
-# Add the Lander to the system
-simulation_system.Add_MiroModule(landers.DemoLander([aim, pullback]), 'Lander')
-
-# Move the Lander to the point set by the Launcher
-simulation_system.MoveToReference('Lander', 'Launcher')
-
-# Run the system simulation an [w, h] resolution and X seconds delay to let
+# Run the system simulation at [w, h] resolution and X seconds delay to let
 # the lander settle in before pausing (which is then released by SPACEBAR)
-simulation_system.Run([1920, 1080], 3)
-
+config = {
+    'resolution': [1920, 1080],
+    'delay': 3,
+    'datalog': False,
+    'print module info': True,
+}
+simulation_system.Run(config)

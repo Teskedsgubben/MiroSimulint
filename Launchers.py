@@ -1,7 +1,9 @@
 import pychrono.core as chrono
+import pychrono.irrlicht as chronoirr
 import numpy as np
 
 from MiroClasses import MiroModule as MM
+from MiroClasses import MiroComponent as MC
 
 from src import Components
 from src import Sensors
@@ -35,6 +37,7 @@ def DemoLauncher(args):
     ]
     Launcher.SetReferencePoint([rc[0]+armrot[0], rc[1]+armrot[1], rc[2]+armrot[2]])
 
+
     # Reference point rotates when ALL components rotate
     Launcher.RotateComponentsY(aim)
 
@@ -46,6 +49,8 @@ def DemoLauncher(args):
     Launcher.ConnectComponents('Launch plate', 'B', 'Stop holder', 'G')
     Launcher.ConnectComponents('Main arm', 'D', 'Rotation pole out', 'B')
     Launcher.ConnectComponents('Main arm', 'C', 'Rotation pole in', 'A')
+
+    # Launcher.ConnectComponents('Pillar', 'E', 'Custom K', 'A', 0.5)
 
     # To find the global coordinate of a link point, you can print it like this
     # print(Launcher.GetComponent('Main arm').GetLinkPointXYZ('B'))

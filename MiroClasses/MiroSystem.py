@@ -203,6 +203,9 @@ class MiroSystem():
             for _ in range(0,substeps):
                 self.simulation.DoStep()
             self.simulation.EndScene()
+
+            if self.follow:
+                self.Set_Camera()
         
         for _, module in self.modules.items():
             module.Release()

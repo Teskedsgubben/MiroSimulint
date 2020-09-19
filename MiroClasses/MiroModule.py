@@ -49,7 +49,7 @@ class Module():
             self.nonames_sens = self.nonames_sens + 1
             name = 'unnamed_sensor'+str(self.nonames_sens)
         self.sensors.update({name: sensor})
-        self.components.update({name: sensor})
+        self.AddComponent(sensor, name)
 
     def GetSensor(self, name='unnamed'):
         return self.sensors[name]
@@ -60,12 +60,14 @@ class Module():
         return self.links
     
     def SetReferencePoint(self, position):
+        '''Stores a coordinate relative the module.'''
         self.refpoint = chrono.ChVectorD(position[0], position[1], position[2])
     def GetReferencePoint(self):
         return self.refpoint
 
     
     def Fixate(self, name, permanent = False):
+        ''' Locks a component in place. Component is then set loose upon calling Release on the modulem, unless True is passed for permanent fixation.'''
         if name in self.components:
             self.components[name].GetBody().SetBodyFixed(True)
             if not permanent:

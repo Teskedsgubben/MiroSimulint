@@ -664,8 +664,12 @@ def MC106(rot = [0,0,0], pos = [0,0,0], Fixed = False):
     COMPONENT.AddLinkPoint('B', [0, 0,-1], chrono.ChVectorD(0, 0.9*size_brick_y/2, -size_brick_z/2))
     
     # Bottom mounting sockets
-    COMPONENT.AddLinkPoint('C', [0,-1, 0], chrono.ChVectorD(0, -size_brick_y/2,  size_brick_z/4))
-    COMPONENT.AddLinkPoint('D', [0,-1, 0], chrono.ChVectorD(0, -size_brick_y/2, -size_brick_z/4))
+    COMPONENT.AddLinkPoint('C', [0,-1, 0], chrono.ChVectorD(0,-size_brick_y/2,  size_brick_z/4))
+    COMPONENT.AddLinkPoint('D', [0,-1, 0], chrono.ChVectorD(0,-size_brick_y/2, -size_brick_z/4))
+    
+    # Top mounting sockets
+    COMPONENT.AddLinkPoint('E', [0, 1, 0], chrono.ChVectorD(0, size_brick_y/2,  size_brick_z/4))
+    COMPONENT.AddLinkPoint('F', [0, 1, 0], chrono.ChVectorD(0, size_brick_y/2, -size_brick_z/4))
     
     COMPONENT.Rotate(rot)
     COMPONENT.MoveToPosition(pos)
@@ -721,4 +725,3 @@ def MC007(rot = [0,0,0], pos = [0,0,0], Fixed = False):
     COMPONENT.MoveToPosition(pos)
 
     return COMPONENT
-

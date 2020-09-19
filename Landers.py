@@ -1,7 +1,9 @@
 import pychrono.core as chrono
 import pychrono.irrlicht as chronoirr
+import numpy as np
 
 from MiroClasses import MiroModule as MM
+from MiroClasses import MiroComponent as MC
 
 from src import Components
 from src import Sensors
@@ -46,3 +48,36 @@ def DemoLander(args):
     Lander.ConnectComponents('Top plate', 'E', 'Accelerometer', 'Linkpoint')
 
     return Lander
+
+def KristersObj(args):
+    aim = args[0]
+    tilt = -args[1]
+    Lander = MM.Module()
+
+    Lander.AddComponent(KristerK([0, 0, 0]), 'Custom K')
+    
+    # Lander.AddSensor(Sensors.MSA02([180,0,0]), 'Kristerometer')
+    
+    # Lander.ConnectComponents('Custom K', 'A', 'Kristerometer', 'Linkpoint')
+
+    Lander.RotateComponentsZ(tilt)
+    Lander.RotateComponentsY(aim)
+
+    return Lander
+
+# Custom Component Example
+def KristerK(rot = [0,0,0], pos = [0,0,0], Fixed = False):
+    # Create blank MiroComponent
+    CustomComponent = MC.MiroComponent()
+    
+    # Import .obj file from object_files directory and set color [R, G, B]
+    CustomComponent.ImportObj('K.obj', color = [1, 0.2, 0.6], scale = 1)
+    
+    # Add linkpoints to enable connecting with other components
+    CustomComponent.AddLinkPoint('A', [0, 1, 0], [0, 0.0235/2, 0])
+    CustomComponent.AddLinkPoint('B', [0, 1, 0], [0,-0.0235/2, 0])
+    
+    CustomComponent.Rotate(rot)
+    CustomComponent.MoveToPosition(pos)
+
+    return CustomComponent

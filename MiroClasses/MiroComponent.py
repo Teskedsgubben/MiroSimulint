@@ -1,11 +1,63 @@
 import pychrono.core as chrono
 import numpy as np
+import os.path
 
 class MiroComponent():
-    def __init__(self, body):
+    def __init__(self, body = False):
         self.linkpoints = {}
         self.linkdirs = {}
-        self.body = body
+        if body:
+            self.body = body
+
+    def ImportObj(self, filename, color = [0.8, 0.8, 0.8], scale = 0.001):
+        filename = 'object_files/'+filename
+        if not os.path.isfile(filename):
+            print('Could not locate file: '+filename)
+            return
+        loadfile = filename[0:filename.find('.obj')]+'_scale'+str(scale)+'.obj'
+        if not os.path.isfile(loadfile):
+            self.ScaleObjFile(filename, loadfile, scale)
+        self.body = chrono.ChBodyEasyMesh(loadfile, 1000, True, True)
+        self.body.AddAsset(chrono.ChColorAsset(chrono.ChColor(color[0], color[1], color[2])))
+
+    def ScaleObjFile(self, filename_to_scale, output_name, scale = 0.001):
+        '''Rescales a .obj, default is from mm to m'''
+
+        print('Rescaling '+filename_to_scale+' into '+output_name+'...')
+        filereader = open(filename_to_scale, "r")
+        text = filereader.readlines()
+        iend = len(text) - 1
+
+        filestream = open(output_name, "w")
+        filestream.truncate(0)
+
+        xdim = {'min': float('inf'), 'max': float('-inf')}
+        ydim = {'min': float('inf'), 'max': float('-inf')}
+        zdim = {'min': float('inf'), 'max': float('-inf')}
+        
+        for i in range(iend):
+            if text[i][0] == 'v' and text[i][1] != 'n':
+                v = text[i].split()
+                x = float(v[1])*scale
+                y = float(v[2])*scale
+                z = float(v[3])*scale
+                if x < xdim['min']:
+                    xdim['min'] = x
+                if x > xdim['max']:
+                    xdim['max'] = x
+                if y < ydim['min']:
+                    ydim['min'] = y
+                if y > ydim['max']:
+                    ydim['max'] = y
+                if z < zdim['min']:
+                    zdim['min'] = z
+                if z > zdim['max']:
+                    zdim['max'] = z
+                data = str(v[0])+' '+format(x,'.6f')+' '+format(y,'.6f')+' '+format(z,'.6f')+'\n'
+                filestream.write(data)
+            else:
+                filestream.write(text[i])
+        print('Object scaled, sizes:\n   x: '+str(xdim['max']-xdim['min'])+', y: '+str(ydim['max']-ydim['min'])+', z: '+str(zdim['max']-zdim['min']))
 
     def GetMass(self):
         return self.body.GetMass()
@@ -14,6 +66,8 @@ class MiroComponent():
         system.Add_Object(self.body)
 
     def AddLinkPoint(self, name, normal, coord):
+        if type(coord) == type([]):
+            coord = chrono.ChVectorD(coord[0], coord[1], coord[2])
         self.linkpoints.update({name: coord})
         self.linkdirs.update({name: chrono.ChVectorD(normal[0], normal[1], normal[2]).GetNormalized()})
 
@@ -55,6 +109,7 @@ class MiroComponent():
         self.body.Move(other_component.GetLinkPoint(other_pointname) - self.GetLinkPoint(pointname) + marg)
 
     def Rotate(self, rotation, quaternion = False):
+        '''Rotates from Euler angles or provided quaterion. The functions RotateX, RotateY, RotateZ or RotateAxis are easier to use.'''
         if not quaternion:
             rot_x = np.pi/180 * rotation[0]
             rot_y = np.pi/180 * rotation[1]
@@ -67,6 +122,20 @@ class MiroComponent():
 
         for name, link in self.linkpoints.items():
             self.linkpoints.update({name: quaternion.Rotate(link)})
+    
+    def RotateAxis(self, theta, axis):
+        '''Rotates the component an angle theta degrees around axis in global coordinates.'''
+        angle = theta/180*np.pi
+        ax = chrono.ChVectorD(axis[0], axis[1], axis[2])
+        qr = chrono.Q_from_AngAxis(angle, ax.GetNormalized())
+        self.Rotate(False, qr)
+
+    def RotateX(self, theta):
+        self.RotateAxis(theta, [1,0,0])
+    def RotateY(self, theta):
+        self.RotateAxis(theta, [0,1,0])
+    def RotateZ(self, theta):
+        self.RotateAxis(theta, [0,0,1])
 
     def SetVelocity(self, vel):
         vel_x = vel[0]
