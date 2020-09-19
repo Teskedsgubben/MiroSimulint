@@ -49,7 +49,7 @@ def DemoLander(args):
 
     return Lander
 
-def KristersObj(args):
+def KristersLandare(args):
     aim = args[0]
     tilt = -args[1]
     Lander = MM.Module()
