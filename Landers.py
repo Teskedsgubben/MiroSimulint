@@ -71,7 +71,7 @@ def KristerK(rot = [0,0,0], pos = [0,0,0], Fixed = False):
     CustomComponent = MC.MiroComponent()
     
     # Import .obj file from object_files directory and set color [R, G, B]
-    CustomComponent.ImportObj('K.obj', color = [1, 0.2, 0.6], scale = 1)
+    CustomComponent.ImportObj('K.obj', color = [1, 0.2, 0.6])
     
     # Add linkpoints to enable connecting with other components
     CustomComponent.AddLinkPoint('A', [0, 1, 0], [0, 0.0235/2, 0])
