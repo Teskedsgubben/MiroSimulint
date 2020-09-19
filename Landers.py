@@ -75,7 +75,7 @@ def KristerK(rot = [0,0,0], pos = [0,0,0], Fixed = False):
     
     # Add linkpoints to enable connecting with other components
     CustomComponent.AddLinkPoint('A', [0, 1, 0], [0, 0.0235/2, 0])
-    CustomComponent.AddLinkPoint('B', [0, 1, 0], [0,-0.0235/2, 0])
+    CustomComponent.AddLinkPoint('B', [0,-1, 0], [0,-0.0235/2, 0])
     
     CustomComponent.Rotate(rot)
     CustomComponent.MoveToPosition(pos)
