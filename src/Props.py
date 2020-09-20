@@ -144,7 +144,7 @@ def painting(ChSystem, pos, text = 'DemoBengan.png', rot = 0, dims = [1, 0.6]):
     canvas.SetBodyFixed(True)
     canvas.SetCollide(False)
     canvas.SetPos(chrono.ChVectorD(pos[0], pos[1], pos[2]))
-    canvas.SetRot(chrono.Q_from_AngAxis(rot,chrono.ChVectorD(0,1,0)))
+    canvas.SetRot(chrono.Q_from_AngAxis(np.deg2rad(rot),chrono.ChVectorD(0,1,0)))
 
     # Visualization shape
     canvas_shape = chrono.ChBoxShape()

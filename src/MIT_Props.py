@@ -3,22 +3,24 @@ import numpy as np
 
 
 def AddProps(system):
+    wall_angle = 90 + np.rad2deg(-np.arctan(211/1380-0.05))
+
     props.MIT_door(system, [-5, 3.3, 8.22])
 
-    props.MIT_door(system, [12.56, 3.3, 1.5], 90)
-    props.MIT_door(system, [12.56, 3.3, -8.5], 90)
+    props.MIT_door(system, [13.04, 3.3, 5.5], wall_angle)
+    props.MIT_door(system, [14.48, 3.3, -8.5], wall_angle)
     
-    props.MIT_door(system, [12.56, 6.6, 3.5], 90)
-    props.MIT_door(system, [12.56, 6.6, -8.5], 90)
+    props.MIT_door(system, [13.04, 6.6, 5.5], wall_angle)
+    props.MIT_door(system, [14.48, 6.6, -8.5], wall_angle)
 
     props.MIT_door(system, [7.25, 6.6, 12.1])
 
-    props.painting(system, [12.5,2.0,-4], 'DemoBengan.png', np.pi/2)
-    props.painting(system, [12.53,1.8,-5.35], 'bungeebengan_notes.png', np.pi/2, [0.2,0.27])
-    props.painting(system, [-6,2.1,5], 'walkplanck.png', 0, [0.8,0.6])
-    props.pokeball(system, [-0.35,0.85,-9.35], 0)
-    props.sodacan(system, [-0.85,0.85,-9.35], 'schrodbull.png', 180)
-    props.coin(system, [-0.25,0.85,-9.65])
+    props.painting(system, [13.98,2.0,-4], 'DemoBengan.png', wall_angle)
+    props.painting(system, [14.12,1.8,-5.35], 'bungeebengan_notes.png', wall_angle, [0.2,0.27])
+    props.painting(system, [-3.5,2.1,5], 'walkplanck.png', 0, [0.8,0.6])
+    props.pokeball(system, [1.75,0.85,-7.15], 0)
+    props.sodacan(system, [1.25,0.85,-7.05], 'schrodbull.png', 180)
+    props.coin(system, [1.65,0.85,-7.25])
 
     # In the staircase
     # props.pokeball(system, [7.35,4.85,2.5], 0)
