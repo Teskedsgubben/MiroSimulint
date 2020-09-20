@@ -229,34 +229,37 @@ def chair_back(system, pos_back, size_back_x,size_back_y, size_back_z):
 def stage(system): 
     theta_f = 0 
     theta_b = np.pi/2
-    pos_f = chrono.ChVectorD(-6.5, 0, -11)
+    pos_f = chrono.ChVectorD(-4.3, 0, -8.8)
     dir_f = chrono.ChVectorD(np.cos(theta_f), 0, np.sin(theta_f)) 
-    pos_b = chrono.ChVectorD(-7.5, 0, -10)
+    pos_b = chrono.ChVectorD(-5.3, 0, -7.8)
     dir_b = chrono.ChVectorD(np.cos(theta_b), 0, np.sin(theta_b))
-    step = shp.step(pos_f, dir_f, pos_b, dir_b, 3, 0.2, [0.1,0.1,0.1])
+    step = shp.step(pos_f, dir_f, pos_b, dir_b, 3, 0.3, [0.1,0.1,0.1])
     system.Add(step)
 
 
 def screen(system):
-    coner_pos = chrono.ChVectorD(-7.5,5,-11)
-    length = 3.3
-    screen_pos = coner_pos + chrono.ChVectorD(1/np.sqrt(2),0, 1/np.sqrt(2))*length
+    corner_pos = chrono.ChVectorD(-5.3,5,-8.8)
+    size_length = 4
+    size_width = 0.01
+    size_height = size_length/(4/3)
+
+
+    size_length = 4
+    alpha = np.pi/10
+    screen_pos = corner_pos + chrono.ChVectorD(1/2,0, 1/2)*size_length
     pro_screen = chrono.ChBody()
     pro_screen.SetBodyFixed(True)
     pro_screen.SetPos(screen_pos)
 
-    size_len = 5
-    size_width = 0.01
-    size_height = 4
     # Collision shape
     pro_screen.GetCollisionModel().ClearModel()
-    pro_screen.GetCollisionModel().AddBox(size_len/2, size_height/2, size_width/2) # hemi sizes
+    pro_screen.GetCollisionModel().AddBox(size_length/2, size_height/2, size_width/2) # hemi sizes
     pro_screen.GetCollisionModel().BuildModel()
     pro_screen.SetCollide(True)
     
     # Visualization shape
     pro_screen_shape = chrono.ChBoxShape()
-    pro_screen_shape.GetBoxGeometry().Size = chrono.ChVectorD(size_len/2, size_height/2, size_width/2)
+    pro_screen_shape.GetBoxGeometry().Size = chrono.ChVectorD(size_length/2, size_height/2, size_width/2)
     pro_screen_shape.SetColor(chrono.ChColor(255,255,255))
     pro_screen.GetAssets().push_back(pro_screen_shape)
     system.Add(pro_screen)
@@ -267,7 +270,6 @@ def screen(system):
 
     rot_x = chrono.ChVectorD(1,0,0)
     rot_y = chrono.ChVectorD(0,1,0)
-    alpha = np.pi/10
     beta = np.pi/4
     qr_x = chrono.Q_from_AngAxis(alpha, rot_x.GetNormalized())    # Rotate the screen
     qr_y = chrono.Q_from_AngAxis(beta, rot_y.GetNormalized())
@@ -276,7 +278,7 @@ def screen(system):
 
 
 def back_stage(system):
-    coner_pos = chrono.ChVectorD(-7.5,1.45,-11) # Real coner -7.5,1.25,-11
+    coner_pos = chrono.ChVectorD(-5.3,1.55,-8.8) # Real coner -5.3,1.25,-8.8
     length = 1.8
     in_screen_pos = coner_pos + chrono.ChVectorD(1/np.sqrt(2),0, 1/np.sqrt(2))*length
     in_screen = chrono.ChBody()
