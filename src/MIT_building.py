@@ -47,7 +47,6 @@ def build_MIT(system, SPEEDMODE = False):
         MIT_Props.AddProps(system)
 
 def roof(system):
-    h = 9.96 
     frame_h = 1.0
     dy = 2/3
     xspan = [-5.25, 8.35]
@@ -58,7 +57,7 @@ def roof(system):
     dy = yspan[1]-yspan[0]-frame_h
     #sides
     p1 = chrono.ChVectorD(-dy/2, 0, 0)
-    p2 = chrono.ChVectorD(+0.06+dy/2, 0, 0)
+    p2 = chrono.ChVectorD(0.16+dy/2, 0, 0)
     d1 = chrono.ChVectorD(0, 0,-1)
     d2 = chrono.ChVectorD(dec,0,-1)
     s = 0.98
@@ -67,8 +66,8 @@ def roof(system):
     qr = chrono.Q_from_AngAxis(np.pi/2, chrono.ChVectorD(0,0,1))
     sideS.SetRot(qr)
     sideN.SetRot(qr)
-    sideS.SetPos(chrono.ChVectorD(xspan[0]-0.05,  yspan[0]+frame_h + (yspan[1]-yspan[0]-frame_h)/2, 5.1))
-    sideN.SetPos(chrono.ChVectorD(xspan[1]+0.25,  yspan[0]+frame_h + (yspan[1]-yspan[0]-frame_h)/2, 5.1))
+    sideS.SetPos(chrono.ChVectorD(xspan[0]-0.05,  yspan[0]+frame_h + (yspan[1]-yspan[0]-frame_h)/2, zspan[1]+0.1))
+    sideN.SetPos(chrono.ChVectorD(xspan[1]+0.25,  yspan[0]+frame_h + (yspan[1]-yspan[0]-frame_h)/2, zspan[1]+0.1))
     system.Add(sideS)
     system.Add(sideN)
 
@@ -162,49 +161,31 @@ def roof(system):
     # East wall
     wallE = wallW.Clone()
     wallE.SetPos(chrono.ChVectorD((xspan[0]+xspan[1])/2, yspan[0]+frame_h/2, zspan[0]))
-    
     system.Add(wallE)
 
 
     # South wall
     wallS = chrono.ChBody()
     wallS.SetBodyFixed(True)
-    wallS.SetPos(chrono.ChVectorD(xspan[0]-0.16,h+0.5,-3))
+    wallS.SetPos(chrono.ChVectorD(xspan[0]-0.15,yspan[0]+frame_h/2,(zspan[1]+zspan[0])/2))
     
-
     # Collision shape
     wallS.GetCollisionModel().ClearModel()
-    wallS.GetCollisionModel().AddBox(0.1, 0.5, 8) # hemi sizes
+    wallS.GetCollisionModel().AddBox(0.1, frame_h/2, (zspan[1]-zspan[0])/2-0.1) # hemi sizes
     wallS.GetCollisionModel().BuildModel()
     wallS.SetCollide(True)
     
     # Visualization shape
     wallS_shape = chrono.ChBoxShape()
-    wallS_shape.GetBoxGeometry().Size = chrono.ChVectorD(0.1, 0.5, 8)
+    wallS_shape.GetBoxGeometry().Size = chrono.ChVectorD(0.1, frame_h/2, (zspan[1]-zspan[0])/2-0.1)
     wallS.GetAssets().push_back(wallS_shape)
     wallS.GetAssets().push_back(wall_texture)
     
     system.Add(wallS)
 
-   
-
     # North wall
-    wallN = chrono.ChBody()
-    wallN.SetBodyFixed(True)
-    wallN.SetPos(chrono.ChVectorD(8.5,h+0.5,-3))
-    
-    # Collision shape
-    wallN.GetCollisionModel().ClearModel()
-    wallN.GetCollisionModel().AddBox(0.1, 0.5, 8) # hemi sizes
-    wallN.GetCollisionModel().BuildModel()
-    wallN.SetCollide(True)
-    
-    # Visualization shape
-    wallN_shape = chrono.ChBoxShape()
-    wallN_shape.GetBoxGeometry().Size = chrono.ChVectorD(0.1, 0.5, 8)
-    wallN.GetAssets().push_back(wallN_shape)
-    wallN.GetAssets().push_back(wall_texture)
-    
+    wallN = wallS.Clone()
+    wallN.SetPos(chrono.ChVectorD(xspan[1]+0.15,yspan[0]+frame_h/2,(zspan[1]+zspan[0])/2))  
     system.Add(wallN)
 
     # MA roof
