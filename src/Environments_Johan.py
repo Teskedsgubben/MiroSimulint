@@ -291,7 +291,7 @@ def MIT_walls(system, H):
     add_boxShape(system, beam_w, beam_h, beam_w, beam_pos_5, 'textures/white concrete.jpg', scale)
 
     # Beams along wall
-    for beam in range(6):
+    for beam in range(5):
         x = 12.75 + beam*0.46
         z = 8.16+0.05+wall_t - beam*4.47
         beam_pos = chrono.ChVectorD(x, 0+beam_h, z)
