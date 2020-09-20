@@ -204,8 +204,8 @@ def coin(ChSystem, target, angle = 0):
     ChSystem.Add(coin)
 
 def MIT_door(ChSystem, pos, rot = 0):
-    b = 1.2
-    h = 2.5
+    b = 1.0
+    h = 2.1
 
     door = chrono.ChBody()
     door.SetBodyFixed(True)
