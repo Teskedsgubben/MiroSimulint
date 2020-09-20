@@ -312,7 +312,7 @@ def screen(system):
 
 def back_stage(system):
     coner_pos = chrono.ChVectorD(-5.3,1.55,-8.8) # Real coner -5.3,1.25,-8.8
-    length = 1.8
+    length = 1.0
     in_screen_pos = coner_pos + chrono.ChVectorD(1/np.sqrt(2),0, 1/np.sqrt(2))*length
     in_screen = chrono.ChBody()
     in_screen.SetBodyFixed(True)
