@@ -18,7 +18,7 @@ def Franz_Components(system, SPEEDMODE = False):
 
 
 def second_floor(system):
-    start_table_pos = chrono.ChVectorD(-6, 0, -9.8)  # The position for the table in x and z direction
+    start_table_pos = chrono.ChVectorD(-3.8, 0, -7.6)  # The position for the table in x and z direction
     num_table_z = 2     # Tabels along the z axis 
     num_table_x = 3     # Tabels along the x axis
     #The table size and position in y direction.                              
@@ -82,7 +82,7 @@ def third_floor(system):
             MIT_chair(system, pos_chair,chair_i)  
 
 def fourth_floor(system):
-    table_pos = chrono.ChVectorD(9.05,6.64,-8.5)
+    table_pos = chrono.ChVectorD(9.15,6.64,-5.8)
     size_table_x = 1
     size_table_y = 0.1
     size_table_z = 1
@@ -238,15 +238,14 @@ def stage(system):
 
 
 def screen(system):
-    corner_pos = chrono.ChVectorD(-5.3,5,-8.8)
+    corner_pos = chrono.ChVectorD(-5.3,3.55,-8.8)
     size_length = 4
     size_width = 0.01
     size_height = size_length/(4/3)
-
-
-    size_length = 4
+    
     alpha = np.pi/10
-    screen_pos = corner_pos + chrono.ChVectorD(1/2,0, 1/2)*size_length
+    delta_tilt = chrono.ChVectorD(np.sin(alpha)/np.sqrt(2), np.cos(alpha), np.sin(alpha)/np.sqrt(2))*size_height/2
+    screen_pos = corner_pos + chrono.ChVectorD(1/np.sqrt(8),0, 1/np.sqrt(8))*size_length + delta_tilt
     pro_screen = chrono.ChBody()
     pro_screen.SetBodyFixed(True)
     pro_screen.SetPos(screen_pos)
@@ -262,7 +261,7 @@ def screen(system):
     pro_screen_shape.GetBoxGeometry().Size = chrono.ChVectorD(size_length/2, size_height/2, size_width/2)
     pro_screen_shape.SetColor(chrono.ChColor(255,255,255))
     pro_screen.GetAssets().push_back(pro_screen_shape)
-    system.Add(pro_screen)
+    
     pro_screen_texture = chrono.ChTexture()
     pro_screen_texture.SetTextureFilename(chrono.GetChronoDataFile('GroupLogo.png'))
     pro_screen_texture.SetTextureScale(-4, -3)
@@ -270,12 +269,46 @@ def screen(system):
 
     rot_x = chrono.ChVectorD(1,0,0)
     rot_y = chrono.ChVectorD(0,1,0)
+    alpha = np.pi/10
     beta = np.pi/4
     qr_x = chrono.Q_from_AngAxis(alpha, rot_x.GetNormalized())    # Rotate the screen
     qr_y = chrono.Q_from_AngAxis(beta, rot_y.GetNormalized())
     quaternion = qr_y* qr_x * pro_screen.GetRot()
     pro_screen.SetRot(quaternion)
 
+    system.Add(pro_screen)
+
+    # Top cylinder
+    r = 0.08
+    roller = chrono.ChBodyEasyCylinder(r, 4.15, 1000)
+    roller.SetBodyFixed(True)
+    roller.SetCollide(False)
+    roller.SetPos(screen_pos + delta_tilt*((1.9*r+size_height)/size_height))
+    qr = chrono.Q_from_AngAxis(np.pi/2, chrono.ChVectorD(1,0,1).GetNormalized())
+    roller.SetRot(qr * roller.GetRot())
+
+    system.Add(roller)
+
+    # Hanging bars
+    bar_h = 0.05
+    dx = chrono.ChVectorD(0.25, 0, 0)  
+    dz = chrono.ChVectorD(0, 0, 0.25)  
+
+    barN = chrono.ChBodyEasyBox(bar_h, bar_h, 1.2, 1000)
+    barN.SetBodyFixed(True)
+    barN.SetCollide(False)
+    roller_mid = screen_pos + delta_tilt*((3.9*r+size_height)/size_height) + chrono.ChVectorD(0,bar_h/2,0)
+    offset = chrono.ChVectorD(1,0,-1)
+    offset.SetLength(1.8)
+    barN.SetPos(roller_mid + offset - dz)
+
+    system.Add(barN)
+
+    barS = barN.Clone()
+    barS.SetRot(chrono.Q_from_AngAxis(np.pi/2, chrono.ChVectorD(0,1,0)) * barS.GetRot())
+    barS.SetPos(roller_mid - offset - dx)
+
+    system.Add(barS)
 
 def back_stage(system):
     coner_pos = chrono.ChVectorD(-5.3,1.55,-8.8) # Real coner -5.3,1.25,-8.8
