@@ -64,7 +64,8 @@ simulation_system.MoveToReference('Lander', 'Launcher')
 # Special: 'follow', 'Module Name', [x, y, z]
 # Use mouse, scroll wheel, arrow keys and pg up & pg down to move
 # Press I and see the help section for a full list of controls
-simulation_system.Set_Perspective('4th floor observing launcher')
+simulation_system.Add_Camview('testpos', [4.25,1.35,-3.45], [1,0,0], 1)
+simulation_system.Set_Perspective('testpos')
 
 # Run the system simulation at [w, h] resolution and X seconds delay to let
 # the lander settle in before pausing (which is then released by SPACEBAR)

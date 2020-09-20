@@ -52,6 +52,9 @@ class MiroSystem():
             self.notifier = True
             self.Environment.Get_Notifier().AddToSystem(self)
             self.Environment.Get_Notifier().Set_Idle()
+    
+    def Get_Environment(self):
+        return self.Environment
 
     def Get_Target(self):
         return self.Environment.Get_Target()
@@ -74,7 +77,22 @@ class MiroSystem():
             self.camname = camname
         else:
             print('Camera Error: "'+camname+'" is not a recognized camera position, using default')
-    
+
+    def Add_Camview(self, name, position = [0,0,0], direction = [1,0,0], distance = 1):
+        '''Add your own camera perspective to the environment. \n
+        name: string 'perspective name'\n
+        position: camera coordinates in [x,y,z]\n
+        direction: aim of the camera in [x,y,z]\n
+        distance: number of how far away the camera should look\n
+        Use Set_Perspective('your name') to use the camera position.'''
+        self.Environment.Add_Camview({
+            name: {
+                'pos': position,
+                'dir': direction,
+                'lah': distance
+            }
+        })
+
     def Add_MiroModule(self, module, name, position = False, vel = False):
         if(position):
             module.Move(position)
