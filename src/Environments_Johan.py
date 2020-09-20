@@ -264,6 +264,9 @@ def MIT_walls(system, H):
     texture_wall = 'textures/yellow_brick.jpg'
     office_wall = 'textures/MITwall_dark.jpg'
     scale = [10,10]   # Texture scale
+
+    n = chrono.ChVectorD(0,1,0)         # Normal vector for rotation
+    alpha = -np.arctan(211/1380-0.05)   # Rotation angle for positive x wall
     
     # First main wall in the end of this function, don't ask why
     pos_2 = chrono.ChVectorD(-5.3-wall_t, 0, -3+1.1) + chrono.ChVectorD(0, wall_h, 0)
@@ -291,11 +294,32 @@ def MIT_walls(system, H):
     add_boxShape(system, beam_w, beam_h, beam_w, beam_pos_4, 'textures/white concrete.jpg', scale)
     add_boxShape(system, beam_w, beam_h, beam_w, beam_pos_5, 'textures/white concrete.jpg', scale)
 
-    for beam in range(6):
-        x = 12.7 + beam*0.46
+    # Beams along wall
+    for beam in range(5):
+        x = 12.75 + beam*0.46
         z = 8.16+wall_t - beam*4.47
         beam_pos = chrono.ChVectorD(x, 0+beam_h, z)
-        add_boxShape(system, beam_w, beam_h, beam_w, beam_pos, 'textures/white concrete.jpg', scale)
+        # Create a box
+        beam = chrono.ChBody()
+        beam.SetBodyFixed(True)
+        beam.SetPos(chrono.ChVectorD(beam_pos))
+
+        qr = chrono.Q_from_AngAxis(alpha, n.GetNormalized())    # Rotation
+        quaternion = qr * beam.GetRot()
+        beam.SetRot(quaternion)
+    
+        # Visualization shape
+        beam_shape = chrono.ChBoxShape()
+        beam_shape.GetBoxGeometry().Size = chrono.ChVectorD(beam_w, beam_h, beam_w)
+        beam_shape.SetColor(chrono.ChColor(0.4,0.4,0.5))
+        beam.GetAssets().push_back(beam_shape)
+        
+        beam_texture = chrono.ChTexture()
+        beam_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/grey concrete.jpg'))
+        beam_texture.SetTextureScale(10,10)
+        beam.GetAssets().push_back(beam_texture)
+        
+        system.Add(beam)
 
     # Add wall, 4th floor towards MIT place
     topWall_pos = chrono.ChVectorD(0.6, 5/2*H, 5.1)
@@ -376,13 +400,11 @@ def MIT_walls(system, H):
     texture = ['textures/mit_2nd.jpg', 'textures/mit_3rd.jpg', 'textures/mit_4th.jpg']
     for floor in range(3):
         y_pos = H*floor + H/2
-        pos = chrono.ChVectorD(10.5+2.8-0.29, y_pos, -17+2.2+2.2)
-        add_boxShape(system, 1.71, H/2, wall_t, pos, texture[floor], [-4,-3])
+        pos = chrono.ChVectorD(10.5+2.8-0.23, y_pos, -17+2.2+2.2)
+        add_boxShape(system, 1.77, H/2, wall_t, pos, texture[floor], [-4,-3])
 
     # Main wall in positive x direction
     pos_1 = chrono.ChVectorD(13.775+wall_t, 0, -2.2) + chrono.ChVectorD(0, wall_h, 0)
-    n = chrono.ChVectorD(0,1,0)
-    alpha = -np.arctan(211/1380-0.05)
     length = 10.58
     # Create a box
     body_wall = chrono.ChBody()
