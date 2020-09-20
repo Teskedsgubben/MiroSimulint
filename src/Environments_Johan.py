@@ -234,13 +234,9 @@ def MIT_floors(system, H, SPEEDMODE):
     pos = chrono.ChVectorD(7.25, 0-floor_t, 10.16)
     add_boxShape(system, 5.25, floor_t, 2, pos, texture_floor, scale_floor)
 
-    # Add 4th floor roof (data)
-    pos = chrono.ChVectorD(9, 0+3*H+floor_t, 10.16)
-    add_boxShape(system, 3.5, floor_t, 2, pos, texture_roof, scale_roof)
-
     # Add MIT roof over entrence
-    pos = chrono.ChVectorD(4.25, 0+H-2*floor_t, 10.16)
-    add_boxShape(system, 2.25, 2*floor_t, 2, pos, texture_roof, scale_roof)
+    # pos = chrono.ChVectorD(4.25, 0+H-2*floor_t, 10.16)
+    # add_boxShape(system, 2.25, 2*floor_t, 2, pos, texture_roof, scale_roof)
 
     # Add horizontal beam along floors
     beam_length = 7.2
@@ -295,9 +291,9 @@ def MIT_walls(system, H):
     add_boxShape(system, beam_w, beam_h, beam_w, beam_pos_5, 'textures/white concrete.jpg', scale)
 
     # Beams along wall
-    for beam in range(5):
+    for beam in range(6):
         x = 12.75 + beam*0.46
-        z = 8.16+wall_t - beam*4.47
+        z = 8.16+0.05+wall_t - beam*4.47
         beam_pos = chrono.ChVectorD(x, 0+beam_h, z)
         # Create a box
         beam = chrono.ChBody()
@@ -327,8 +323,8 @@ def MIT_walls(system, H):
 
     # Add wall, 2nd floor towards MIT place
     bWall_height = H/2-wall_t
-    pos = chrono.ChVectorD(-2.5-3*wall_t, 0+bWall_height, 5+wall_t)
-    add_boxShape(system, 5-3*wall_t, bWall_height, wall_t, pos, 'textures/wwp.png', scale)
+    pos = chrono.ChVectorD(-1.82, 0+bWall_height, 5+wall_t)
+    add_boxShape(system, 3.48, bWall_height, wall_t, pos, 'textures/wwp.png', scale)
 
     # Add wall, 4th floor flower pot (Negative x direction)
     pos = chrono.ChVectorD(6.5-wall_t+0.01, 5/2*H, 7.08+wall_t+0.01)
@@ -359,16 +355,20 @@ def MIT_walls(system, H):
     add_boxShape(system, wall_t, H/2-0.1, 2, pos, 'textures/yellow_brick.jpg', [5,5])
 
     # Add 2nd entrence wall (negative x direction)
-    pos = chrono.ChVectorD(2-wall_t-0.01, 0+H/2-0.1, 6.5+wall_t+0.01)
+    pos = chrono.ChVectorD(1.6, 0+H/2-0.1, 6.5+wall_t+0.01)
     add_boxShape(system, wall_t, H/2-0.1, 1.5+wall_t, pos, 'textures/yellow_brick.jpg', [5,5])
 
     # Add 1st entrence wall (negative x direction)
-    pos = chrono.ChVectorD(2-wall_t, 0+H/2-0.1, 10.16)
+    pos = chrono.ChVectorD(1.6, 0+H/2-0.1, 10.16)
     add_boxShape(system, wall_t, H/2-0.1, 2, pos, 'textures/white concrete.jpg', [5,5])
 
     # Add wall, 3rd floor towards NA (negative z direction)
-    pos = chrono.ChVectorD(-9.3-wall_t, 0+3/2*H, 5-wall_t)
-    add_boxShape(system, 4-wall_t, 3/2*H, wall_t, pos, 'textures/yellow_brick.jpg', [10,7])
+    pos = chrono.ChVectorD(-7.6, 0+3/2*H, 5.65)
+    add_boxShape(system, 1.75, H/2, wall_t, pos, 'textures/white concrete.jpg', [10,7])
+
+    # Add wall, 4th floor towards NA (negative z direction)
+    pos = chrono.ChVectorD(-9.3-wall_t, 0+5/2*H, 5-wall_t)
+    add_boxShape(system, 4-wall_t, H/2, wall_t, pos, 'textures/yellow_brick.jpg', [10,7])
 
     # Add wall, 3rd floor towards MIT fountain
     pos = chrono.ChVectorD(11.5, 3/2*H, 12.16+wall_t)
@@ -429,6 +429,32 @@ def MIT_walls(system, H):
     
     body_wall_texture = chrono.ChTexture()
     body_wall_texture.SetTextureFilename(chrono.GetChronoDataFile(texture_wall))
+    body_wall_texture.SetTextureScale(10,10)
+    body_wall.GetAssets().push_back(body_wall_texture)
+    
+    system.Add(body_wall)
+
+    # Add oblique wall towards NA
+    pos = chrono.ChVectorD(-5.6-wall_t, 3/2*H, 5.3)
+    length = 0.545
+    alpha = -(np.pi/4)
+    # Create a box
+    body_wall = chrono.ChBody()
+    body_wall.SetBodyFixed(True)
+    body_wall.SetPos(chrono.ChVectorD(pos))
+
+    qr = chrono.Q_from_AngAxis(alpha, n.GetNormalized())    # Rotate the cylinder
+    quaternion = qr * body_wall.GetRot()
+    body_wall.SetRot(quaternion)
+    
+    # Visualization shape
+    body_wall_shape = chrono.ChBoxShape()
+    body_wall_shape.GetBoxGeometry().Size = chrono.ChVectorD(wall_t, H/2, length)
+    body_wall_shape.SetColor(chrono.ChColor(0.4,0.4,0.5))
+    body_wall.GetAssets().push_back(body_wall_shape)
+    
+    body_wall_texture = chrono.ChTexture()
+    body_wall_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/white concrete.jpg'))
     body_wall_texture.SetTextureScale(10,10)
     body_wall.GetAssets().push_back(body_wall_texture)
     
