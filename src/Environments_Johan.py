@@ -346,10 +346,6 @@ def MIT_walls(system, H):
     pos = chrono.ChVectorD(6.5-wall_t, 0+3/2*H-0.16, 10.16+wall_t)
     add_boxShape(system, wall_t, H/2-0.16, 2-wall_t, pos, 'textures/yellow_brick.jpg', [5,5])
 
-    # Add wall, 3rd floor NA corridor end (negative x direction)
-    pos = chrono.ChVectorD(-15.5-wall_t, 0+3/2*H , 7)
-    add_boxShape(system, wall_t, H/2, 2, pos, 'textures/yellow_brick.jpg', [5,5])
-
     # Add entrence wall (positive x direction)
     pos = chrono.ChVectorD(12.5+wall_t, 0+H/2-0.1, 10.16)
     add_boxShape(system, wall_t, H/2-0.1, 2, pos, 'textures/yellow_brick.jpg', [5,5])
@@ -362,9 +358,21 @@ def MIT_walls(system, H):
     pos = chrono.ChVectorD(1.6, 0+H/2-0.1, 10.16)
     add_boxShape(system, wall_t, H/2-0.1, 2, pos, 'textures/white concrete.jpg', [5,5])
 
-    # Add wall, 3rd floor towards NA (negative z direction)
+    # Add wall, 3rd floor towards NA 1 (negative z direction)
     pos = chrono.ChVectorD(-7.6, 0+3/2*H, 5.65)
     add_boxShape(system, 1.75, H/2, wall_t, pos, 'textures/white concrete.jpg', [10,7])
+
+    # Add wall, 3rd floor towards NA 2 (negative z direction)
+    pos = chrono.ChVectorD(-10.675, 0+3/2*H, 5.65)
+    add_boxShape(system, 0.5, H/2, wall_t, pos, 'textures/yellow_brick.jpg', [10,7])
+
+    # Add wall, 3rd floor towards NTK (negative x direction)
+    pos = chrono.ChVectorD(-10.574, 0+3/2*H, 5.15)
+    add_boxShape(system, wall_t, H/2, 0.5, pos, 'textures/yellow_brick.jpg', [10,7])
+
+    # Add wall, 3rd floor NA corridor end (negative x direction)
+    pos = chrono.ChVectorD(-10.925, 3/2*H , 7)
+    add_boxShape(system, wall_t, H/2, 1.3, pos, 'textures/mit_3rd_na.jpg', [4,3])
 
     # Add wall, 4th floor towards NA (negative z direction)
     pos = chrono.ChVectorD(-9.3-wall_t, 0+5/2*H, 5-wall_t)
