@@ -15,8 +15,8 @@ def AddProps(system):
 
     props.MIT_door(system, [7.25, 6.6, 12.1])
 
-    props.painting(system, [13.98,2.0,-4], 'DemoBengan.png', wall_angle)
-    props.painting(system, [14.12,1.8,-5.35], 'bungeebengan_notes.png', wall_angle, [0.2,0.27])
+    props.painting(system, [13.8,2.0,-2], 'DemoBengan.png', wall_angle)
+    props.painting(system, [13.94,1.8,-3.35], 'bungeebengan_notes.png', wall_angle, [0.2,0.27])
     props.painting(system, [-3.5,2.1,5], 'walkplanck.png', 0, [0.8,0.6])
     props.pokeball(system, [1.75,0.85,-7.15], 0)
     props.sodacan(system, [1.25,0.85,-7.05], 'schrodbull.png', 180)
