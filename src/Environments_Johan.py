@@ -324,7 +324,7 @@ def MIT_walls(system, H):
     # Add wall, 2nd floor towards MIT place
     bWall_height = H/2-wall_t
     pos = chrono.ChVectorD(-1.82, 0+bWall_height, 5+wall_t)
-    add_boxShape(system, 3.48, bWall_height, wall_t, pos, 'textures/wwp.png', scale)
+    add_boxShape(system, 3.48, bWall_height, wall_t, pos, 'textures/storage_wall.jpg', [12,15])
 
     # Add wall, 4th floor flower pot (Negative x direction)
     pos = chrono.ChVectorD(6.5-wall_t+0.01, 5/2*H, 7.08+wall_t+0.01)
@@ -352,7 +352,7 @@ def MIT_walls(system, H):
 
     # Add entrence wall (negative x direction)
     pos = chrono.ChVectorD(-0.3, 0+H/2-0.1, 9.86)
-    add_boxShape(system, wall_t, H/2-0.1, 1.5, pos, 'textures/white concrete.jpg', [5,5])
+    add_boxShape(system, wall_t, H/2-0.1, 1.5, pos, 'textures/door_cs.jpg', [4,3])
 
     # Add entrence corridor (negative x direction)
     pos = chrono.ChVectorD(0.65, 0+H/2-0.1, 11.41)
@@ -371,20 +371,26 @@ def MIT_walls(system, H):
     add_boxShape(system, 1.75, H/2, wall_t, pos, 'textures/white concrete.jpg', [10,7])
 
     # Add wall, 3rd floor towards NA 2 (negative z direction)
-    pos = chrono.ChVectorD(-10.45, 0+3/2*H, 5.65)
-    add_boxShape(system, 0.25, H/2, wall_t, pos, 'textures/yellow_brick.jpg', [1,1])
+    pos = chrono.ChVectorD(-11.3, 0+3/2*H, 5.65)
+    add_boxShape(system, 0.25, H/2, wall_t, pos, 'textures/yellow_brick.jpg', [1,1], False)
 
-    # Add wall, 3rd floor towards NTK (negative x direction)
-    pos = chrono.ChVectorD(-10.295, 0+3/2*H, 5.45)
-    add_boxShape(system, wall_t, H/2, 0.2, pos, 'textures/yellow_brick.jpg', [1,1])
+    # Add wall, 3rd floor corridor towards NTK (negative x direction)
+    for wall in range(2):
+        x = -11.05 + wall*(1.71+wall_t)
+        pos = chrono.ChVectorD(x, 0+3/2*H, 5.25)
+        add_boxShape(system, wall_t, H/2, 0.4, pos, 'textures/yellow_brick.jpg', [1,1], False)
+
+    # Add wall, 3rd floor NTK door (negative z direction)
+    pos = chrono.ChVectorD(-10.2, 0+3/2*H, 5)
+    add_boxShape(system, 0.85, H/2, wall_t, pos, 'textures/yellow_brick.jpg', [1,1], False)
 
     # Add wall, 3rd floor NA corridor end (negative x direction)
-    pos = chrono.ChVectorD(-10.7, 3/2*H-0.16 , 6.95)
+    pos = chrono.ChVectorD(-11.55, 3/2*H-0.16 , 6.95)
     add_boxShape(system, wall_t, H/2-0.16, 1.25, pos, 'textures/mit_3rd_na2.jpg', [4,3])
 
     # Add wall, 4th floor towards NA (negative z direction)
     pos = chrono.ChVectorD(-9.3-wall_t, 0+5/2*H, 5-wall_t)
-    add_boxShape(system, 4-wall_t, H/2, wall_t, pos, 'textures/yellow_brick.jpg', [10,7])
+    add_boxShape(system, 4-wall_t, H/2, wall_t, pos, 'textures/yellow_brick.jpg', [10,7], False)
 
     # Add wall, 3rd floor towards MIT fountain
     pos = chrono.ChVectorD(11.5, 3/2*H, 12.16+wall_t)
@@ -476,7 +482,8 @@ def MIT_walls(system, H):
     
     system.Add(body_wall)
 
-def add_boxShape(system, size_x, size_y, size_z, pos, texture, scale = [5,5]):
+def add_boxShape(system, size_x, size_y, size_z, pos, texture, scale = [5,5], hitbox = True):
+    '''system, size_x, size_y, size_z, pos, texture, scale = [5,5], hitbox = True/False'''
 
     # Create a box
     body_box = chrono.ChBody()
@@ -487,7 +494,7 @@ def add_boxShape(system, size_x, size_y, size_z, pos, texture, scale = [5,5]):
     body_box.GetCollisionModel().ClearModel()
     body_box.GetCollisionModel().AddBox(size_x, size_y, size_z) # hemi sizes
     body_box.GetCollisionModel().BuildModel()
-    body_box.SetCollide(True)
+    body_box.SetCollide(hitbox)
     
     # Visualization shape
     body_box_shape = chrono.ChBoxShape()
