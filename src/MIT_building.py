@@ -17,12 +17,12 @@ def build_MIT(system, SPEEDMODE = False):
     MIT_Entrance.MIT_Entrance(system, SPEEDMODE)
 
     # Add MIT floor as a box
-    MIT_floor_x = 8 # Ska vara (4.5+4.8+4.5)/2
-    MIT_floor_z = 8 # Ska vara (4.5+4.8+4.5)/2
+    MIT_floor_x = (4.5+4.8+4.5)/2
+    MIT_floor_z = (4.5+4.8+4.5)/2
 
     body_floor = chrono.ChBody()
     body_floor.SetBodyFixed(True)
-    body_floor.SetPos(chrono.ChVectorD(0.5, -1, -3))    #2.5, -1, -1
+    body_floor.SetPos(chrono.ChVectorD(1.6, -1, -1.9))    #2.5, -1, -1
     
     # Collision shape
     body_floor.GetCollisionModel().ClearModel()
