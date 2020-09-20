@@ -11,7 +11,7 @@ MIT_place.Set_Target([2, 1.5, -3], props.dartboard)
 
 MIT_place.Set_Initializer(MIT.build_MIT)
 
-MIT_place.Set_Notifier(MN.MiroNotifier([13.45, 8.5, 1], 84.125, 0))
+MIT_place.Set_Notifier(MN.MiroNotifier([13.41, 8.5, 1.55], 84.125, 0))
 
 MIT_place.Add_Lightsource([  5, 25,  20], [3, 0, -5], 100, 15, 40, 40, False)
 MIT_place.Add_Lightsource([-20,  1,   0], [0, 2,  0],  24,  7, 40, 70, False)
