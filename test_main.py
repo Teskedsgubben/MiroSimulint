@@ -34,8 +34,10 @@ simulation_system.Set_Environment(env.MIT_place)
 # Get the position of the target as [x, y, z]
 target = simulation_system.Get_Target()
 
-# # To add other test targets, use the code below and specify the position. You can also try adding other props.
-# Props.dartboard(simulation_system.Get_ChSystem(), [ 4, 3, 0])
+# To add other test targets, use the code below and specify the position. You can also try adding other props.
+dartboard_position = [-2, 3, -1]
+Props.dartboard(simulation_system.Get_ChSystem(), dartboard_position)
+Props.sodacan(simulation_system.Get_ChSystem(), dartboard_position)
 
 # COMPUTE THE ARGUMENTS YOU NEED FOR YOUR LAUNCHER AND LANDER HERE
 # You can pass any arguments you want to your launcher or lander
@@ -64,7 +66,7 @@ simulation_system.MoveToReference('Lander', 'Launcher')
 # Special: 'follow', 'Module Name', [x, y, z]
 # Use mouse, scroll wheel, arrow keys and pg up & pg down to move
 # Press I and see the help section for a full list of controls
-simulation_system.Add_Camview('testpos', [4.25,1.35,-3.45], [1,0,0], 1)
+simulation_system.Add_Camview('testpos', [-3.5, 3.75, 0], [1.5,-0.5,-1], 1.9)
 simulation_system.Set_Perspective('testpos')
 
 # Run the system simulation at [w, h] resolution and X seconds delay to let
