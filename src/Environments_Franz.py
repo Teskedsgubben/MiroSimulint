@@ -290,11 +290,11 @@ def screen(system):
     system.Add(roller)
 
     # Hanging bars
-    bar_h = 0.05
+    bar_h = 0.1
     dx = chrono.ChVectorD(0.25, 0, 0)  
     dz = chrono.ChVectorD(0, 0, 0.25)  
 
-    barN = chrono.ChBodyEasyBox(bar_h, bar_h, 1.2, 1000)
+    barN = chrono.ChBodyEasyBox(bar_h/2, bar_h/2, 2.4/2, 1000)
     barN.SetBodyFixed(True)
     barN.SetCollide(False)
     roller_mid = screen_pos + delta_tilt*((3.9*r+size_height)/size_height) + chrono.ChVectorD(0,bar_h/2,0)
@@ -312,7 +312,7 @@ def screen(system):
 
 def back_stage(system):
     coner_pos = chrono.ChVectorD(-5.3,1.55,-8.8) # Real coner -5.3,1.25,-8.8
-    length = 1.0
+    length = 1.3
     in_screen_pos = coner_pos + chrono.ChVectorD(1/np.sqrt(2),0, 1/np.sqrt(2))*length
     in_screen = chrono.ChBody()
     in_screen.SetBodyFixed(True)

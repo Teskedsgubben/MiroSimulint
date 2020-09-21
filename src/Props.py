@@ -45,6 +45,111 @@ def dartboard(ChSystem, target):
 
     ChSystem.Add(targetFrame)
 
+def trialsurface(ChSystem, target):
+    nx = 10
+    dz = 1.5
+    diag = 0.2
+    eps = 0.008
+    
+    box_side = diag/np.sqrt(2)
+    h = diag/2
+
+    thunk = chrono.ChBodyEasyBox(box_side, box_side, dz, 2500)
+    thunk.SetBodyFixed(True)
+    thunk.SetCollide(True)
+    thunk.SetRot(chrono.Q_from_AngAxis(np.deg2rad(45), chrono.ChVectorD(0,0,1)))
+    thunk.SetPos(chrono.ChVectorD(target[0] - (nx - 1)*diag/2, target[1]-h, target[2]))
+
+    thunk.GetCollisionModel().ClearModel()
+    thunk.GetCollisionModel().AddBox(box_side/2, box_side/2, dz/2) # hemi sizes
+    thunk.GetCollisionModel().BuildModel()
+
+    texture = chrono.ChTexture()
+    texture.SetTextureFilename(chrono.GetChronoDataFile('textures/white concrete.jpg'))
+    texture.SetTextureScale(4, 3)
+    thunk.GetAssets().push_back(texture)
+
+    ChSystem.Add(thunk)
+
+    for i in range(1, nx):
+        newthunk = thunk.Clone()
+        newthunk.SetPos(chrono.ChVectorD(target[0] - (nx - 1 - 2*i)*diag/2, target[1]-h, target[2]))
+
+        newthunk.GetCollisionModel().ClearModel()
+        newthunk.GetCollisionModel().AddBox(box_side/2, box_side/2, dz/2) # hemi sizes
+        newthunk.GetCollisionModel().BuildModel()
+
+        ChSystem.Add(newthunk)
+
+    th = 1.2*h
+    table = chrono.ChBodyEasyBox(nx*diag+2*eps, th, dz+2*eps, 2500)
+    table.SetBodyFixed(True)
+    table.SetCollide(True)
+    table.SetPos(chrono.ChVectorD(target[0], target[1]-h-th/2, target[2]))
+
+    table.GetCollisionModel().ClearModel()
+    table.GetCollisionModel().AddBox(nx*diag/2+eps, th/2, dz/2+eps) # hemi sizes
+    table.GetCollisionModel().BuildModel()
+
+    texture = chrono.ChTexture()
+    texture.SetTextureFilename(chrono.GetChronoDataFile('textures/wood_ikea_style.png'))
+    texture.SetTextureScale(28, 3)
+    table.GetAssets().push_back(texture)
+
+    ChSystem.Add(table)
+
+    r = 0.03
+    h = target[1]-th-h
+    d = 0.1
+    # [+, +]
+    table_leg = chrono.ChBodyEasyCylinder(r, h, 2500)
+    table_leg.SetPos(chrono.ChVectorD(target[0] + nx*diag/2 - d, h/2, target[2] + dz/2 -d))
+    table_leg.SetBodyFixed(True)
+
+    # Collision shape
+    table_leg.SetCollide(True)
+    table_leg.GetCollisionModel().ClearModel()
+    table_leg.GetCollisionModel().AddCylinder(r, r, h/2)
+    table_leg.GetCollisionModel().BuildModel()
+
+    # Frame texture
+    texture = chrono.ChTexture()
+    texture.SetTextureFilename(chrono.GetChronoDataFile('textures/chrome.png'))
+    texture.SetTextureScale(2, 2)
+    table_leg.GetAssets().push_back(texture)
+
+    ChSystem.Add(table_leg)
+
+    # [-, +]
+    table_leg = table_leg.Clone()
+    table_leg.SetPos(chrono.ChVectorD(target[0] - nx*diag/2 + d, h/2, target[2] + dz/2 -d))
+    table_leg.GetCollisionModel().ClearModel()
+    table_leg.GetCollisionModel().AddCylinder(r, r, h/2)
+    table_leg.GetCollisionModel().BuildModel()
+
+    ChSystem.Add(table_leg)
+
+    # [-, -]
+    table_leg = table_leg.Clone()
+    table_leg.SetPos(chrono.ChVectorD(target[0] - nx*diag/2 + d, h/2, target[2] - dz/2 +d))
+    table_leg.GetCollisionModel().ClearModel()
+    table_leg.GetCollisionModel().AddCylinder(r, r, h/2)
+    table_leg.GetCollisionModel().BuildModel()
+
+    ChSystem.Add(table_leg)
+
+    # [+, -]
+    table_leg = table_leg.Clone()
+    table_leg.SetPos(chrono.ChVectorD(target[0] + nx*diag/2 - d, h/2, target[2] - dz/2 +d))
+    table_leg.GetCollisionModel().ClearModel()
+    table_leg.GetCollisionModel().AddCylinder(r, r, h/2)
+    table_leg.GetCollisionModel().BuildModel()
+
+    ChSystem.Add(table_leg)
+
+    
+    
+
 def sodacan(ChSystem, target, text = 'schrodbull.png', angle = 0, SPEEDMODE = False):
     h = 0.22
     r = 0.04
@@ -78,12 +183,13 @@ def sodacan(ChSystem, target, text = 'schrodbull.png', angle = 0, SPEEDMODE = Fa
 
     if not SPEEDMODE:
         eps = 0.003
+        padding = 0.002
         epsvec = chrono.ChVectorD(0,eps/2,0)
         can.Move(epsvec)
         can.Move(epsvec)
         pos_bot = chrono.ChVectorD(target[0], target[1]+eps/2, target[2])
         pos_lid = chrono.ChVectorD(target[0], target[1]+eps*3/2+h, target[2])
-        
+
         # Create top
         lid = chrono.ChBodyEasyCylinder(r, eps, 150)
         lid.SetPos(chrono.ChVectorD(pos_lid))
@@ -93,7 +199,7 @@ def sodacan(ChSystem, target, text = 'schrodbull.png', angle = 0, SPEEDMODE = Fa
         # Collision shape
         lid.SetCollide(True)
         lid.GetCollisionModel().ClearModel()
-        lid.GetCollisionModel().AddCylinder(r, r, eps/2)
+        lid.GetCollisionModel().AddCylinder(r+padding, r+padding, eps/2)
         lid.GetCollisionModel().BuildModel()
         
         # Body texture
@@ -113,7 +219,7 @@ def sodacan(ChSystem, target, text = 'schrodbull.png', angle = 0, SPEEDMODE = Fa
         # Collision shape
         bot.SetCollide(True)
         bot.GetCollisionModel().ClearModel()
-        bot.GetCollisionModel().AddCylinder(r, r, eps/2)
+        bot.GetCollisionModel().AddCylinder(r+padding, r+padding, eps/2)
         bot.GetCollisionModel().BuildModel()
         
         # Body texture
