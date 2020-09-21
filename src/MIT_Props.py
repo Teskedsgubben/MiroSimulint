@@ -28,6 +28,12 @@ def AddProps(system):
     props.sodacan(system, [4.25,0.85,-7.25], 'joultcola.png')
     # props.coin(system, [1.65,0.85,-7.25])
 
+    s = 1.15 # scale due to high roof
+    props.painting(system, [1.0, 5.0, 8.18], 'black_painting_1.png', 0, [s*1.17/2, s*0.91/2])
+    props.painting(system, [3.1, 5.0, 8.18], 'black_painting_2.png', 0, [s*1.17/2, s*0.91/2])
+    props.painting(system, [5.2, 5.0, 8.18], 'black_painting_3.png', 0, [s*1.17/2, s*0.91/2])
+
+
     # In the staircase
     # props.pokeball(system, [7.35,4.85,2.5], 0)
     # props.pokeball(system, [7.355,5.05,2.55], 0)
