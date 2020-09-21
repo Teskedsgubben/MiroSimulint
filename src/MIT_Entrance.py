@@ -1,7 +1,7 @@
 import pychrono.core as chrono
 import numpy as np
 
-def MIT_Entrance(ChSystem, SPEEDMODE = False):
+def build(ChSystem, SPEEDMODE = False):
     pos_south = [1.7, 0, 12.16]
     pos_north = [8.67, 0, 12.16]
     if(SPEEDMODE):

@@ -14,7 +14,7 @@ def build_MIT(system, SPEEDMODE = False):
     Environments_Johan.Johan_Components(system, SPEEDMODE)
     Environments_Marcus.Marcus_Components(system, SPEEDMODE)
     Environments_Franz.Franz_Components(system, SPEEDMODE)
-    MIT_Entrance.MIT_Entrance(system, SPEEDMODE)
+    MIT_Entrance.build(system, SPEEDMODE)
 
     # Add MIT floor as a box
     MIT_floor_x = (4.5+4.8+4.5)/2
