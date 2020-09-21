@@ -51,8 +51,30 @@ def QuickEntrance(ChSystem, pos_south, pos_north):
 
 def FullEntrance(ChSystem, pos_south, pos_north):
     d = 0.08
-    
     l = 3.02
+
+    p = chrono.ChVectorD(pos_south[0]+2.89, 1.51, pos_south[2]-0.6)
+    pole = chrono.ChBodyEasyBox(2*d, l, 2*d, 1000)
+    pole.SetBodyFixed(True)
+    pole.SetCollide(False)
+    pole.SetPos(p)
+
+    texture = chrono.ChTexture(chrono.GetChronoDataFile('textures/white concrete.jpg'))
+    texture.SetTextureScale(4, 12)
+    pole.GetAssets().push_back(texture)
+    ChSystem.Add(pole)
+
+    p = chrono.ChVectorD(pos_south[0]+2.89, 2.7, pos_south[2]-0.6-d-0.01)
+    pole = chrono.ChBodyEasyBox(0.568*0.7, 0.285*0.7, 0.02, 1000)
+    pole.SetBodyFixed(True)
+    pole.SetCollide(False)
+    pole.SetPos(p)
+
+    texture = chrono.ChTexture(chrono.GetChronoDataFile('textures/exit.png'))
+    texture.SetTextureScale(4, 3)
+    pole.GetAssets().push_back(texture)
+    ChSystem.Add(pole)
+
     ChSystem.Add(greenpole(d, l, 0, 0, [pos_south[0]+(1/2)*d, 1.51, pos_south[2]]))
     ChSystem.Add(greenpole(d, l, 0, 0, [pos_south[0]+   0.68, 1.51, pos_south[2]]))
     ChSystem.Add(greenpole(d, l, 0, 0, [pos_south[0]+   2.72, 1.51, pos_south[2]]))
