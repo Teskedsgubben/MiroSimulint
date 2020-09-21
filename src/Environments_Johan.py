@@ -23,9 +23,12 @@ def MIT_stair(system, center, H):
     rad = 1/360*2*np.pi     # Degrees to radians
     texture = 'textures/white concrete.jpg' 
     pos_stair = center + chrono.ChVectorD(0, stair_h/2, 0)  # Correction for stair position
+    pos_disk = center + chrono.ChVectorD(0, stair_h+0.025, 0)
 
     # Add center cylinder of stair
     add_cylinderShape(system, stair_r, stair_h, stair_d, pos_stair, texture, [10,10]) 
+    # Top disk
+    add_cylinderShape(system, stair_r+0.01, 0.05, 1, pos_disk, 'textures/stone_floor.jpg', [1,1]) 
     # Add fake stair to base floor
     add_cylinderShape(system, stair_r+1.7, 0.001, stair_d, center, 'textures/black.jpg', [1,1])
 
