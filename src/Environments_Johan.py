@@ -381,7 +381,7 @@ def MIT_walls(system, H):
 
     # Add wall, 3rd floor NTK door (negative z direction)
     pos = chrono.ChVectorD(-10.2, 0+3/2*H, 5)
-    add_boxShape(system, 0.85, H/2, wall_t, pos, 'textures/yellow_brick.jpg', [1,1], False)
+    add_boxShape(system, 0.85, H/2, wall_t, pos, 'textures/door_ntk.jpg', [-4,-3], False)
 
     # Add wall, 3rd floor NA corridor end (negative x direction)
     pos = chrono.ChVectorD(-11.55, 3/2*H-0.16 , 6.95)
