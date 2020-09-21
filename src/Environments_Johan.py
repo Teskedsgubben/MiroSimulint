@@ -397,16 +397,16 @@ def MIT_walls(system, H):
     add_boxShape(system, 5.15, H/2, wall_t, pos, 'textures/yellow_brick.jpg', [5,5])
 
     # Add wall, 3rd floor wall, rigth hand side towards UMU library (negative z direction)
-    pos = chrono.ChVectorD(16.3, 3/2*H-wall_t, 8.16+wall_t)
-    add_boxShape(system, 3.6, H/2-wall_t, wall_t, pos, 'textures/yellow_brick.jpg', [3,3])
+    # pos = chrono.ChVectorD(16.3, 3/2*H-wall_t, 8.16+wall_t)
+    # add_boxShape(system, 3.6, H/2-wall_t, wall_t, pos, 'textures/yellow_brick.jpg', [3,3])
 
     # Add wall, 3rd floor wall, left hand side towards UMU library (negative z direction)
     pos = chrono.ChVectorD(18.3, 3/2*H-wall_t, 12.16+wall_t)
     add_boxShape(system, 1.5, H/2-wall_t, wall_t, pos, 'textures/white concrete.jpg', [3,3])
 
     # Add wall, 3rd floor UMU library end (negative x direction)
-    pos = chrono.ChVectorD(19.9, 3/2*H-0.16 , 10.25)
-    add_boxShape(system, wall_t, H/2-0.16, 1.9, pos, 'textures/mit_3rd_na2.jpg', [4,3])
+    pos = chrono.ChVectorD(19.9, 3/2*H-0.16 , 10.56)
+    add_boxShape(system, wall_t, H/2-0.16, 1.6, pos, 'textures/mit_3rd_sam.jpg', [4,-3])
 
     # Add wall, 4th floor wall towards MIT fountain
     pos = chrono.ChVectorD(9, 5/2*H, 12.16+wall_t)
@@ -490,33 +490,31 @@ def MIT_walls(system, H):
     
     system.Add(body_wall)
 
-    # 16.3, 3/2*H-wall_t, 8.16+wall_t)
-    # add_boxShape(system, 3.6, H/2-wall_t, wall_t, pos,
+    
     # Add oblique wall towards umu libary
-    # pos = chrono.ChVectorD(16.3, 3/2*H-wall_t, 8.16+wall_t)
-    # length = 3.6
-    # alpha_1 = -(np.arcsin(1.75/7.2-0.05))
-    # # Create a box
-    # body_wall = chrono.ChBody()
-    # body_wall.SetBodyFixed(True)
-    # body_wall.SetPos(chrono.ChVectorD(pos))
+    pos = chrono.ChVectorD(16.3, 3/2*H-wall_t, 0.34+8.16+wall_t)
+    length = 3.6
+    # Create a box
+    body_wall = chrono.ChBody()
+    body_wall.SetBodyFixed(True)
+    body_wall.SetPos(chrono.ChVectorD(pos))
 
-    # qr = chrono.Q_from_AngAxis(alpha_1, n.GetNormalized())    # Rotate the cylinder
-    # quaternion = qr * body_wall.GetRot()
-    # body_wall.SetRot(quaternion)
+    qr = chrono.Q_from_AngAxis(np.pi*(0.5-0.03), n.GetNormalized())    # Rotate the cylinder
+    quaternion = qr * body_wall.GetRot()
+    body_wall.SetRot(quaternion)
     
-    # # Visualization shape
-    # body_wall_shape = chrono.ChBoxShape()
-    # body_wall_shape.GetBoxGeometry().Size = chrono.ChVectorD(wall_t, H/2, length)
-    # body_wall_shape.SetColor(chrono.ChColor(0.4,0.4,0.5))
-    # body_wall.GetAssets().push_back(body_wall_shape)
+    # Visualization shape
+    body_wall_shape = chrono.ChBoxShape()
+    body_wall_shape.GetBoxGeometry().Size = chrono.ChVectorD(wall_t, H/2, length)
+    body_wall_shape.SetColor(chrono.ChColor(0.4,0.4,0.5))
+    body_wall.GetAssets().push_back(body_wall_shape)
     
-    # body_wall_texture = chrono.ChTexture()
-    # body_wall_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/yellow_brick.jpg'))
-    # body_wall_texture.SetTextureScale(10,10)
-    # body_wall.GetAssets().push_back(body_wall_texture)
+    body_wall_texture = chrono.ChTexture()
+    body_wall_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/yellow_brick.jpg'))
+    body_wall_texture.SetTextureScale(10,10)
+    body_wall.GetAssets().push_back(body_wall_texture)
     
-    # system.Add(body_wall)
+    system.Add(body_wall)
 
 def add_boxShape(system, size_x, size_y, size_z, pos, texture, scale = [5,5], hitbox = True):
     '''system, size_x, size_y, size_z, pos, texture, scale = [5,5], hitbox = True/False'''
