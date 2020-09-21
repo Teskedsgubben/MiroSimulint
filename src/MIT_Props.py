@@ -13,7 +13,11 @@ def AddProps(system):
     props.MIT_door(system, [13.04, 6.6, 5.5], wall_angle)
     props.MIT_door(system, [14.48, 6.6, -8.5], wall_angle)
 
-    props.MIT_door(system, [7.25, 6.6, 12.1])
+    props.MIT_door(system, [7.25, 3.3, 12.22])
+    props.MIT_door(system, [7.25, 6.6, 12.22])
+
+    props.MIT_door(system, [13.6, 3.3, 12.22])
+    props.MIT_door(system, [17.6, 3.3, 12.22])
 
     props.painting(system, [13.8,2.0,-2], 'DemoBengan.png', wall_angle)
     props.painting(system, [13.94,1.8,-3.35], 'bungeebengan_notes.png', wall_angle, [0.2,0.27])
