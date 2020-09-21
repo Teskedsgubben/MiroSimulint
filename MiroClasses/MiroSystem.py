@@ -1,5 +1,6 @@
 import pychrono.core as chrono
 import pychrono.irrlicht as chronoirr
+import numpy as np
 import time
 import os
  
@@ -26,6 +27,8 @@ class MiroSystem():
         
         self.camname = 'default'
         self.follow = False
+        self.cycle = False
+        self.fps = 300
         
         # Set the default outward/inward shape margins for collision detection,
         # this is epecially important for very large or very small objects.
@@ -62,17 +65,35 @@ class MiroSystem():
     def Get_ChSystem(self):
         return self.ChSystem
     
-    def Set_Perspective(self, camname, module_name = False, follow_position = [1.5, 0.75, 0]):
+    def Set_Perspective(self, camname, input_name = False, follow_position = [1.5, 0.75, 0], cycle_laptime = 4):
         if camname == 'follow':
-            if not module_name:
+            if not input_name:
                 print('Camera Error: Input a module name to use follow perspective, using default')
             else:
-                if module_name in self.modules:
+                if input_name in self.modules:
                     self.follow = True
-                    self.followmod = self.modules[module_name]
+                    self.followmod = self.modules[input_name]
                     self.followpos = chronoirr.vector3df(follow_position[0], follow_position[1], follow_position[2])
                 else:
-                    print('Camera Error: "'+module_name+'" is not a recognized module and cannot be followed, using default')
+                    print('Camera Error: "'+input_name+'" is not a recognized module and cannot be followed, using default')
+        if camname == 'cycle':
+            if not input_name:
+                print('Camera Error: Input a valid perspective name to use cycle perspective, using default')
+            else:
+                if input_name in self.Environment.Get_Camviews():
+                    self.cycle = True
+                    self.camname = input_name
+                    cam = self.Environment.Get_Camviews()[self.camname]
+                    position = chrono.ChVectorD(cam['pos'][0], cam['pos'][1], cam['pos'][2])
+                    dp = chrono.ChVectorD(cam['dir'][0], cam['dir'][1], cam['dir'][2])
+                    dp.SetLength(cam['lah'])
+                    looker = position + dp
+                    self.cycle_point = looker
+                    self.cycle_vector = position - looker
+                    self.cycle_angle = -2*np.pi/cycle_laptime
+                else:
+                    print('Camera Error: "'+input_name+'" is not a recognized perspective and cannot be cycled, using default')
+
         elif camname in self.Environment.Get_Camviews():
             self.camname = camname
         else:
@@ -124,6 +145,13 @@ class MiroSystem():
             pos = self.followmod.GetBasePosition()
             looker = chronoirr.vector3df(pos.x, pos.y, pos.z)
             self.simulation.AddTypicalCamera(looker + self.followpos, looker)
+        elif self.cycle:
+            p = self.cycle_point + self.cycle_vector
+            position = chronoirr.vector3df(p.x, p.y, p.z)
+            looker = chronoirr.vector3df(self.cycle_point.x, self.cycle_point.y, self.cycle_point.z)
+            self.simulation.AddTypicalCamera(position, looker)
+            q = chrono.Q_from_AngAxis(self.cycle_angle/self.fps, chrono.ChVectorD(0,1,0))
+            self.cycle_vector = q.Rotate(self.cycle_vector)
         else:
             cam = self.Environment.Get_Camviews()[self.camname]
             position = chronoirr.vector3df(cam['pos'][0], cam['pos'][1], cam['pos'][2])
@@ -251,7 +279,7 @@ class MiroSystem():
                 for _, sensor in self.sensors.items():
                     sensor.LogData()
 
-            if self.follow and not paused:
+            if (self.follow or self.cycle) and not paused:
                 self.Set_Camera()
         
             if self.notifier and not paused and self.simulation.GetPaused():
