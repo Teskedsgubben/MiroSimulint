@@ -66,15 +66,15 @@ simulation_system.MoveToReference('Lander', 'Launcher')
 # Special: 'follow', 'Module Name', [x, y, z]
 # Use mouse, scroll wheel, arrow keys and pg up & pg down to move
 # Press I and see the help section for a full list of controls
-simulation_system.Add_Camview('testpos', [-3.5, 3.75, 0], [1.5,-0.5,-1], 1.9)
-simulation_system.Set_Perspective('testpos')
+simulation_system.Add_Camview('dartboard', [-3.5, 3.75, 0], [1.5,-0.5,-1], 1.9)
+simulation_system.Set_Perspective('follow', follow_module_name='Lander', follow_position=[2.0, 0.4, 0], cycle=True, cycle_laptime=3.4)
 
 # Run the system simulation at [w, h] resolution and X seconds delay to let
 # the lander settle in before pausing (which is then released by SPACEBAR)
 config = {
     'resolution': [1920, 1080],
     'delay': 3,
-    'datalog': False,
+    'datalog': True,
     'print module info': True,
 }
 simulation_system.Run(config)

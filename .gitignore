@@ -15,3 +15,5 @@ plotscript.py
 ignored_storage
 # scaled .obj files
 *scale*.obj
+# MIT bilder som referens
+MIT_pics

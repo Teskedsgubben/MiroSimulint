@@ -190,7 +190,7 @@ class MiroSystem():
         else:
             self.print = False
     
-    def Run(self, config):
+    def Run(self, config = {}):
         '''Runs the simulation. Configuration options and their default values are:\n
         "resolution": [1280, 720]\n
         "delay":  4\n
@@ -241,8 +241,7 @@ class MiroSystem():
 
         if self.log:
             for sensor_ID, sensor in self.sensors.items():
-                print(dt/substeps)
-                sensor.Initialize(sensor_ID+'.txt', [dt/substeps])
+                sensor.Initialize(sensor_ID+'.txt', self.simulation)
 
         self.simulation.GetDevice().run()
         self.simulation.BeginScene()

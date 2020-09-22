@@ -3,6 +3,14 @@ import numpy as np
 
 from MiroClasses import MiroComponent as mc
 
+density = {
+    'ABS': 950,
+    'PVC': 1380,
+    'Aluminium': 2700,
+    'Steel Forged Concrete': 5000,
+}
+
+
 # This is a sphere to help visualization of certain points
 def DUMMY(rot = [0,0,0], pos = [0,0,0], Fixed = False):
     body_ball = chrono.ChBody()
@@ -28,8 +36,11 @@ def DUMMY(rot = [0,0,0], pos = [0,0,0], Fixed = False):
 
 ############### MC0XX ###############
 # Plate with mounting sockets in corners on one side
-def MC0XX(size_x, size_y, size_z, rot, pos, Fixed):
-    density_brick = 950   # kg/m^3
+def MC0XX(M1, M3, M2, rot, pos, Fixed):
+    size_x = M1
+    size_y = M3
+    size_z = M2
+    density_brick = density['ABS']   # kg/m^3
     mass_brick = density_brick * size_x * size_y * size_z
 
     inertia_brick_xx = (size_y**2 + size_z**2)*mass_brick/3
@@ -163,7 +174,7 @@ def MC1XX(M1, M2, M3, rot = [0,0,0], pos = [0,0,0], Fixed = False):
     size_y = M2
     size_z = M2
 
-    density_brick = 2700   # kg/m^3
+    density_brick = density['Aluminium']   # kg/m^3
     mass_brick = density_brick * size_x * size_y * size_z
     inertia_brick_xx = (size_y**2 + size_z**2)*mass_brick/3
     inertia_brick_yy = (size_x**2 + size_z**2)*mass_brick/3
@@ -264,7 +275,7 @@ def MC145(rot = [0,0,0], pos = [0,0,0], Fixed = False):
 def MC2XX(M1, M2, rot = [0,0,0], pos = [0,0,0], Fixed = False):
     size_h = M1
     size_r = M2
-    density_brick = 1000   # kg/m^3
+    density_brick = density['ABS']   # kg/m^3
 
     body_brick = chrono.ChBodyEasyCylinder(size_r, size_h, density_brick)
     body_brick.SetBodyFixed(Fixed)
@@ -365,17 +376,14 @@ def MC264(rot = [0,0,0], pos = [0,0,0], Fixed = False):
 def MC265(rot = [0,0,0], pos = [0,0,0], Fixed = False):
     return MC2XX(0.08, 0.20/np.sqrt(2)-0.01, rot, pos, Fixed)
 
-
-
-
 ############### MC3XX ###############
 # Small PVC connector
 def MC3XX(M1, M2, M3, rot = [0,0,0], pos = [0,0,0], Fixed = False):
     size_x = M1
-    size_y = M2
-    size_z = M3
+    size_y = M3
+    size_z = M2
 
-    density_brick = 1400   # kg/m^3
+    density_brick = density['PVC']   # kg/m^3
     mass_brick = density_brick * size_x * size_y * size_z
     inertia_brick_xx = (size_y**2 + size_z**2)*mass_brick/3
     inertia_brick_yy = (size_x**2 + size_z**2)*mass_brick/3
@@ -411,10 +419,10 @@ def MC3XX(M1, M2, M3, rot = [0,0,0], pos = [0,0,0], Fixed = False):
 
     COMPONENT.AddLinkPoint('A', [-1, 0, 0], chrono.ChVectorD(-size_x/2, 0, 0))
     COMPONENT.AddLinkPoint('B', [ 1, 0, 0], chrono.ChVectorD( size_x/2, 0, 0))
-    COMPONENT.AddLinkPoint('C', [ 0,-1, 0], chrono.ChVectorD( 0,-size_y/2, 0))
-    COMPONENT.AddLinkPoint('D', [ 0, 1, 0], chrono.ChVectorD( 0, size_y/2, 0))
-    COMPONENT.AddLinkPoint('E', [ 0, 0,-1], chrono.ChVectorD( 0, 0,-size_z/2))
-    COMPONENT.AddLinkPoint('F', [ 0, 0, 1], chrono.ChVectorD( 0, 0, size_z/2))
+    COMPONENT.AddLinkPoint('C', [ 0, 0,-1], chrono.ChVectorD( 0, 0,-size_z/2))
+    COMPONENT.AddLinkPoint('D', [ 0, 0, 1], chrono.ChVectorD( 0, 0, size_z/2))
+    COMPONENT.AddLinkPoint('E', [ 0,-1, 0], chrono.ChVectorD( 0,-size_y/2, 0))
+    COMPONENT.AddLinkPoint('F', [ 0, 1, 0], chrono.ChVectorD( 0, size_y/2, 0))
     
     COMPONENT.Rotate(rot)
     COMPONENT.MoveToPosition(pos)
@@ -470,7 +478,7 @@ def MC4XX(M1, M2, M3, rot = [0,0,0], pos = [0,0,0], Fixed = False):
     size_y = M2 + 0.02
     size_z = M3 + 0.02
 
-    density_brick = 1400   # kg/m^3
+    density_brick = density['PVC']   # kg/m^3
     mass_brick = density_brick * size_x * size_y * size_z
     inertia_brick_xx = (size_y**2 + size_z**2)*mass_brick/3
     inertia_brick_yy = (size_x**2 + size_z**2)*mass_brick/3
@@ -625,7 +633,7 @@ def MC5XX(M1, M2, M3, rot = [0,0,0], pos = [0,0,0], Fixed = False):
     size_rx = M1
     size_ry = M2
     size_rz = M3
-    density_brick = 1000   # kg/m^3
+    density_brick = density['ABS']   # kg/m^3
 
     body_brick = chrono.ChBodyEasySphere(size_rx, density_brick)
     body_brick.SetBodyFixed(Fixed)
@@ -662,11 +670,11 @@ def MC5XX(M1, M2, M3, rot = [0,0,0], pos = [0,0,0], Fixed = False):
 
 
 # Big fat thunk
-def MC106(rot = [0,0,0], pos = [0,0,0], Fixed = False):
+def MC906(rot = [0,0,0], pos = [0,0,0], Fixed = False):
     size_brick_x = 0.8
     size_brick_y = 0.8
     size_brick_z = 0.6
-    density_brick = 5000   # kg/m^3
+    density_brick = density['Steel Forged Concrete']   # kg/m^3
     mass_brick = density_brick * size_brick_x * size_brick_y * size_brick_z
     inertia_brick_xx = (size_brick_y**2 + size_brick_z**2)*mass_brick/3
     inertia_brick_yy = (size_brick_x**2 + size_brick_z**2)*mass_brick/3
@@ -718,11 +726,11 @@ def MC106(rot = [0,0,0], pos = [0,0,0], Fixed = False):
     return COMPONENT
 
 # BIG Plate with mounting sockets in corners on one side
-def MC007(rot = [0,0,0], pos = [0,0,0], Fixed = False):
+def MC907(rot = [0,0,0], pos = [0,0,0], Fixed = False):
     size_brick_x = 0.8
     size_brick_y = 0.1
     size_brick_z = 0.9
-    density_brick = 10000   # kg/m^3
+    density_brick = density['Steel Forged Concrete']    # kg/m^3
     mass_brick = density_brick * size_brick_x * size_brick_y * size_brick_z
     inertia_brick_xx = (size_brick_y**2 + size_brick_z**2)*mass_brick/3
     inertia_brick_yy = (size_brick_x**2 + size_brick_z**2)*mass_brick/3

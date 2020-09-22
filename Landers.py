@@ -49,6 +49,7 @@ def DemoLander(args):
 
     return Lander
 
+# Lander with only the custom import object
 def KristersLandare(args):
     aim = args[0]
     tilt = -args[1]
@@ -65,7 +66,7 @@ def KristersLandare(args):
 
     return Lander
 
-# Custom Component Example
+# Custom Component Example, not a lander, only returns a component
 def KristerK(rot = [0,0,0], pos = [0,0,0], Fixed = False): 
     # Create blank MiroComponent
     CustomComponent = MC.MiroComponent()

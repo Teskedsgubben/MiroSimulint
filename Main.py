@@ -34,9 +34,6 @@ simulation_system.Set_Environment(env.MIT_place)
 # Get the position of the target as [x, y, z]
 target = simulation_system.Get_Target()
 
-# # To add other test targets, use the code below and specify the position. You can also try adding other props.
-# Props.dartboard(simulation_system.Get_ChSystem(), [ 4, 3, 0])
-
 # COMPUTE THE ARGUMENTS YOU NEED FOR YOUR LAUNCHER AND LANDER HERE
 # You can pass any arguments you want to your launcher or lander
 # that you compute from the target coordinates

@@ -8,6 +8,10 @@ from MiroClasses import MiroComponent as MC
 from src import Components
 from src import Sensors
 
+# To learn how to modify the Launcher, start by changing the component 'Main arm' on line 26, 
+# adjust the arm length on line 35 accordingly and calibrate the spring constant on line 77. 
+# The Launcher can hit the target with modifications to only these three things.
+
 def DemoLauncher(args):
     # Extract arguments into local variables
     aim = args[0]
@@ -17,9 +21,9 @@ def DemoLauncher(args):
     Launcher = MM.Module()
 
     # Add some components
-    Launcher.AddComponent(Components.MC007([0,0,0]), 'Base')
-    Launcher.AddComponent(Components.MC106([0,0,0]), 'Pillar')
-    Launcher.AddComponent(Components.MC143([0,0,-angle]), 'Main arm')
+    Launcher.AddComponent(Components.MC907([0,0,0]), 'Base')
+    Launcher.AddComponent(Components.MC906([0,0,0]), 'Pillar')
+    Launcher.AddComponent(Components.MC144([0,0,-angle]), 'Main arm')
     Launcher.AddComponent(Components.MC095([0,90,-angle]), 'Launch plate')
     
     Launcher.AddComponent(Components.MC115([0,90,180-angle]), 'Stop holder')
@@ -28,8 +32,10 @@ def DemoLauncher(args):
 
     # Example of how to find the reference point
     # by pulling arm back before aiming
-    rc = [0.0, 0.79, 0.225]
-    arm = [1.0-0.115,0.135,0]
+    arm_length = 2.5                        # Length of MC144
+    rc = [0.0, 0.79, 0.225]                 # Rotation point
+    arm = [arm_length/2 - 0.115, 0.135, 0]  # Point to put lander relative rotation point
+    # This rotates the 'arm' vector when the catapult is pulled back or forward
     armrot = [
          arm[0]*np.cos(np.deg2rad(angle)) + arm[1]*np.sin(np.deg2rad(angle)),
         -arm[0]*np.sin(np.deg2rad(angle)) + arm[1]*np.cos(np.deg2rad(angle)),
@@ -64,9 +70,13 @@ def DemoLauncher(args):
 
     # Set a spring to make the catapult launch. You can use any values, but they must be fixed 
     # (i.e. not computed from input arguments)
-    Launcher.SetSpring('Base', 'A', 'Main arm', 'E', 1.1, 30000)
+    # State which two connection points you want to connect the spring to, then choose a rest length and spring constant.
+    # Rest length: How long the spring is when it exerts no force. If it is made shorter then this length, 
+    #    it is compressed and will push out to expand. If it is made longer, it is streched and will pull to contract.
+    # Spring constant: How powerful the spring is. Higher value means more force.
+    Launcher.SetSpring('Base', 'A', 'Main arm', 'E', 1.1, 20000)
 
-    # Fixate the moving parts so that they initially do not move. This is released when resuming after the initial pause.
+    # Fixate the moving parts so that they initially do not move. This is released after the initial delay.
     Launcher.Fixate('Main arm')
 
     return Launcher

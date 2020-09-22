@@ -2,20 +2,28 @@ import pychrono.core as chrono
 import numpy as np
 
 from src import Shapes as shp
-from src import Environments_Johan
-from src import Environments_Marcus
-from src import Environments_Franz
+from src import MIT_Walls
+from src import MIT_Stage
+from src import MIT_Tables
 from src import MIT_Entrance
 from src import MIT_Props
 
-def build_MIT(system, SPEEDMODE = False):
+def build_MIT(ChSystem, SPEEDMODE = False):
     # Create the room floor: a simple fixed rigid body with a collision shape
     # and a visualization shape
-    Environments_Johan.Johan_Components(system, SPEEDMODE)
-    Environments_Marcus.Marcus_Components(system, SPEEDMODE)
-    Environments_Franz.Franz_Components(system, SPEEDMODE)
-    MIT_Entrance.build(system, SPEEDMODE)
+    MIT_Walls.build(ChSystem, SPEEDMODE)
+    MIT_Stage.build(ChSystem, SPEEDMODE)
+    MIT_Tables.build(ChSystem, SPEEDMODE)
+    MIT_Entrance.build(ChSystem, SPEEDMODE)
 
+    
+    mit_carpet_floor(ChSystem)
+    roof(ChSystem)
+    if not SPEEDMODE:
+        MIT_Props.AddProps(ChSystem)
+
+
+def mit_carpet_floor(system):
     # Add MIT floor as a box
     MIT_floor_x = (4.5+4.8+4.5)/2
     MIT_floor_z = (4.5+4.8+4.5)/2
@@ -41,10 +49,6 @@ def build_MIT(system, SPEEDMODE = False):
     body_floor.GetAssets().push_back(body_floor_texture)
     
     system.Add(body_floor)
-
-    roof(system)
-    if not SPEEDMODE:
-        MIT_Props.AddProps(system)
 
 def roof(system):
     frame_h = 1.0
