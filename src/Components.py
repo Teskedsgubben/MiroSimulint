@@ -619,6 +619,47 @@ def MC489(rot = [0,0,0], pos = [0,0,0], Fixed = False):
 def MC499(rot = [0,0,0], pos = [0,0,0], Fixed = False):
     return MC4XX(0.005, 0.22, 0.22, rot, pos, Fixed)
 
+############### MC5XX ###############
+# Ball
+def MC5XX(M1, M2, M3, rot = [0,0,0], pos = [0,0,0], Fixed = False):
+    size_rx = M1
+    size_ry = M2
+    size_rz = M3
+    density_brick = 1000   # kg/m^3
+
+    body_brick = chrono.ChBodyEasySphere(size_rx, density_brick)
+    body_brick.SetBodyFixed(Fixed)
+    body_brick.SetCollide(True)
+    # set mass properties
+    # body_brick.SetMass(mass_brick)
+    # body_brick.SetInertiaXX(chrono.ChVectorD(inertia_brick_xx,inertia_brick_yy,inertia_brick_zz))       
+
+    # Collision shape
+    body_brick.GetCollisionModel().ClearModel()
+    body_brick.GetCollisionModel().AddEllipsoid(size_rx, size_ry, size_rz) # hemi sizes
+    body_brick.GetCollisionModel().BuildModel()
+
+    # Apply texture
+    texture = chrono.ChTexture()
+    texture.SetTextureFilename(chrono.GetChronoDataFile('textures/MITstol.jpg'))
+    texture.SetTextureScale(1, 1)
+    body_brick.AddAsset(texture)
+
+    # Generate MiroComponent with above ChBody
+    COMPONENT = mc.MiroComponent(body_brick)
+
+    # COMPONENT.AddLinkPoint('A', [ 0, 1, 0], chrono.ChVectorD(0, size_h/2, 0))
+    # COMPONENT.AddLinkPoint('B', [ 0,-1, 0], chrono.ChVectorD(0,-size_h/2, 0))
+    # COMPONENT.AddLinkPoint('C', [ 1, 0, 0], chrono.ChVectorD( size_r, 0, 0))
+    # COMPONENT.AddLinkPoint('D', [-1, 0, 0], chrono.ChVectorD(-size_r, 0, 0))
+    # COMPONENT.AddLinkPoint('E', [ 0, 0, 1], chrono.ChVectorD( 0, 0, size_r))
+    # COMPONENT.AddLinkPoint('F', [ 0, 0,-1], chrono.ChVectorD( 0, 0,-size_r))
+    
+    COMPONENT.Rotate(rot)
+    COMPONENT.MoveToPosition(pos)
+
+    return COMPONENT
+
 
 # Big fat thunk
 def MC106(rot = [0,0,0], pos = [0,0,0], Fixed = False):

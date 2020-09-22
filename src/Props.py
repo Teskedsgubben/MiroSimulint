@@ -47,7 +47,7 @@ def dartboard(ChSystem, target):
 
 def trialsurface(ChSystem, target):
     nx = 10
-    dz = 1.5
+    dz = 1.4
     diag = 0.2
     eps = 0.008
     
