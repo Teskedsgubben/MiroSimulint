@@ -9,7 +9,7 @@ ___
 
 ### Step 1) *Install Git*
 
-Download and install Git from: 
+Download and install Git from:
 
 > https://git-scm.com/downloads
 
@@ -36,7 +36,7 @@ __b)__ Create an environment and install PyChrono by:
     conda create -n MiroSim python=3.7 numpy matplotlib pylint ffmpeg
 
     conda install -n MiroSim -c projectchrono pychrono
-    
+
 __c)__ _Optional._ You should be able to run the program now. You can try it if you want, but we will do it a different way using VS Code in the next step. If you are familiar with code editing, you can just use this method and edit your files in your own editor, if you prefer.
 
     cd MiroSimulint
@@ -50,7 +50,6 @@ __c)__ _Optional._ You should be able to run the program now. You can try it if 
 This is the recommended code editor:
 
 > https://code.visualstudio.com/download
-
 
 ### Step 5) *Setup the program with VS Code*
 
@@ -72,37 +71,47 @@ You will have a target that the launcher is supposed to hit
 
 ### The Camera
 
-To rotate the camera, use the mouse with left-click to drag the view. You can use the arrow keys and _Page Up / Page Down_ to move the point the camera looks at, and the scroll wheel to move closer or further away from that point. Press _I_ and klick _Help_ for a full list of camera controls. There are also several pre-configured camera positions you can use, as can be seen in the comments in the _Main.py_ file.
+To rotate the camera, use the mouse with left-click to drag the view. You can use the arrow keys and _Page Up / Page Down_ to move the observation point the camera looks at, and the scroll wheel to move closer or further away from that point. Press _I_ and click _Help_ for a full list of camera controls. There are also several pre-configured camera positions you can use, as can be seen in the comments in the _Main.py_ file.
+
+There are two special camera functions you can use as well.
+
+__Follow:__ If you set the perspective to 'follow' and input the name of a module you have added to the system, the camera will follow that module. You can also specify from which direction the camera should view the module. Note that manual controls only work while the simulation is paused when using this.
+
+__Cycle:__ You can add `cycle = True` to the end of the input arguments. This will override manual controls and circle the camera around the observation point. You can also add `cycle_laptime = X` to change the speed of the camera rotation, where `X` is any number you like. This can be used in combination with the follow perspective.
+
+_Note: Laptime means how many simulation time seconds it takes for the camera to complete one revolution, meaning a laptime of 10 will create a video that takes 50 seconds to complete the lap, using the default 60 fps video and 300 fps simulation speed._
 
 ### The Coding
 
-You have three code files to work with: _Main.py_, _Landers.py_ and _Launchers.py_. Any code in the subfolders are free to read if you are curious, but do not change them. You will only submit the three files. 
+You have three code files to work with: _Main.py_, _Landers.py_ and _Launchers.py_. Any code in the subfolders are free to read if you are curious, but do not change them. You will only submit the three files.
 
 _Main.py_ is the file that starts the program. Here you can change camera views, rendering resolution and initial start delay. You can also compute any arguments you want to pass along to your Lander or Launcher. An important feature here is __Speedmode__ which you find is set to __False__. Setting this to __True__ will remove many details in the program, speeding up the simulation. This is most likely more conviniet to use when running tests and so on.
 
 _Landers.py_ is where you can define you Lander. You have a demo where a simple lander is built by adding a bottom and top plate and connecting them with rods. Note how the top plate is rotated 180 degrees so the connection points are at the bottom, and the order of the components being connected. Start by modifying this lander, try to add more components etc.
 
-_Launchers.py_ defines your Launcher in the same way as above. To try different designs, you can define several Launchers here and choose which one to try out in the _Main.py:_ file. 
+_Launchers.py_ defines your Launcher in the same way as above. To try different designs, you can define several Launchers here and choose which one to try out in the _Main.py:_ file.
 
 Your Lander and Launcher are both built as MiroModules using MiroComponents. This means that you add the components you need, rotate the properly and then assemble them into a complete module. The order here is important, as connecting components 1 and 2 will move component 2 so that the connection points match. If you connect first and rotate the object after, things are going to get messy. However, that doesn't mean you shouldn't try it :bowtie:.
 
 ### The Goal
 
-The challenge is to create a compact, portable launcher, that can hit a specified target. The ultimate goal is that the lander is automatically calibrated by knowing its own position and the position of the target, adjusting aim and power to hit the target without manual tweaking.
+The challenge is to create a compact, portable launcher, that can hit a specified target. The ultimate goal is that the launcher is automatically calibrated by knowing its own position and the position of the target, adjusting aim and power to hit the target with the lander without any manual tweaking.
 
 ### Create a Video File
 
 We installed ffmpeg into the MiroSim environment to enable creating a video file from the simulation. This is not something you have to do, but if you want to use the video, here is how it works.
 
-First, start the simulation as usual. When you press PrintScreen the program will start saving images into a directory called video_capture. Press PrtSc to start recording, then close the window to stop. To then convert these images into a video file, we use ffmpeg. From the terminal window in VS Code (or from the Anaconda Prompt in the MiroSimulint directory) you can run the command:
+First, start the simulation as usual. When you press PrintScreen the program will start saving images into a directory called video_capture. Press PrtSc to start recording, then press it again or close the window to stop. You can move the camera during capture, and you can pause to change camera angle, no frames are saved while paused. To then convert these images into a video file, we use ffmpeg.
 
-    ffmpeg -framerate 60 -i video_capture/screenshot%05d.bmp -b:v 100M video_capture/MiroSim.avi
+From VS Code you can run the command below in the terminal window. If the terminal is not showing, click _View -> Terminal_ to open it. If you are not using VS Code, you can run the same command from the Anaconda Prompt in the MiroSimulint directory, just make sure MiroSim is your active environment as in Step 3c. The command to run is:
 
-This will put the screenshot files into a video file called MiroSim.avi in the video_capture folder. The framerate of 60 can be changed to alter the speed of the video. A value of 300 is full speed, so using 60 renders the video in slow motion, but this is more suitable for seeing details. 
+    ffmpeg -framerate 60 -i video_capture/screenshot%05d.bmp -b:v 128M video_capture/MiroSim.avi
 
-You can also add audio by supplying an audio file as input after the .bmp like below. If the audio file is too short and the video cuts too early, remove the -shortest command.
+This will put the screenshot files into a video file called MiroSim.avi in the video\_capture folder. The framerate of 60 can be changed to alter the speed of the video. A value of 300 is full speed, so using 60 renders the video in slow motion, but this is more suitable for seeing details. You can also change the quality and file size by changing the _128M_ to another number.
 
-    ...screenshot%05d.bmp -i audiofile.mp3 -shortest -b:v...
+You can also add audio by supplying an audio file as input between the _d.bmp_ and _-b:v_ like below. If the audio file is too short and the video cuts too early, remove the -shortest command.
+
+    ...d.bmp -i audiofile.mp3 -shortest -b:v...
 
 __Mac users:__ If you are using Mac OS and do not have VLC or similar installed, you may not me able to play the .avi file. In that case, try using the command below to produce a playable file.
 
