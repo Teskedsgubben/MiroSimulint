@@ -180,12 +180,26 @@ class MiroSystem():
         else:
             self.log = False
 
+        if "pause_before_launch" in config:
+            self.pre_pause = config['pause_before_launch']
+        else:
+            self.pre_pause = True
+
         if "print module info" in config:
             self.print = config['print module info']
         else:
             self.print = False
     
     def Run(self, config):
+        '''Runs the simulation. Configuration options and their default values are:\n
+        "resolution": [1280, 720]\n
+        "delay":  4\n
+        "fps":  300\n
+        "subframes":  1\n
+        "datalog": False\n
+        "pause_before_launch": True\n
+        "print module info": False\n
+        '''
         # ---------------------------------------------------------------------
         #
         #  Create an Irrlicht application to visualize the system
@@ -220,13 +234,15 @@ class MiroSystem():
         
         dt = 1/self.fps # per frame
         substeps = self.subframes
+        paused = False
 
         self.simulation.SetTimestep(dt/substeps)
         self.simulation.SetTryRealtime(True)
 
         if self.log:
             for sensor_ID, sensor in self.sensors.items():
-                sensor.Initialize(sensor_ID+'.txt')
+                print(dt/substeps)
+                sensor.Initialize(sensor_ID+'.txt', [dt/substeps])
 
         self.simulation.GetDevice().run()
         self.simulation.BeginScene()
@@ -253,12 +269,12 @@ class MiroSystem():
             module.Release()
         
         
-        
-        print('\n--- Press SPACE to release! ---')
-        self.simulation.SetPaused(True)
-        paused = True
-        if self.notifier:
-            self.Environment.Get_Notifier().Set_Ready()
+        if self.pre_pause:
+            print('\n--- Press SPACE to release! ---')
+            self.simulation.SetPaused(True)
+            paused = True
+            if self.notifier:
+                self.Environment.Get_Notifier().Set_Ready()
 
         while(self.simulation.GetDevice().run()):
             # for _, link in self.links.items():
@@ -269,11 +285,10 @@ class MiroSystem():
             self.simulation.DrawAll()
             for _ in range(0,substeps):
                 self.simulation.DoStep()
+                if self.log and not paused:
+                    for _, sensor in self.sensors.items():
+                        sensor.LogData()
             self.simulation.EndScene()
-
-            if self.log and not paused:
-                for _, sensor in self.sensors.items():
-                    sensor.LogData()
 
             if (self.follow or self.cycle) and not paused:
                 self.Set_Camera()

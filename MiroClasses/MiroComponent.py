@@ -151,10 +151,11 @@ class MiroComponent():
 
 # Sensor class extends component class
 class MiroSensor(MiroComponent):
-    def Initialize(self, output_file_name):
+    def Initialize(self, output_file_name, params = []):
         self.filename = output_file_name
         self.filestream = open(self.filename, "w")
         self.filestream.truncate(0)
+        self.params = params
     def LogData(self):
         return
 
@@ -162,6 +163,8 @@ class MiroSensor(MiroComponent):
 class MiroSensor_Accelerometer(MiroSensor):
     def LogData(self):
         acc = self.GetBody().GetPos_dtdt()
-        data = str(acc.x)+' '+str(acc.y + 9.8)+' '+str(acc.z)+'\n'
+        acc.Scale(300 * self.params[0])
+        g = - 9.8*(300 * self.params[0])
+        data = str(acc.x)+' '+str(acc.y - g)+' '+str(acc.z)+'\n'
         self.filestream.write(data)
 
