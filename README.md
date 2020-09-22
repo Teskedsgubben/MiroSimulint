@@ -11,17 +11,17 @@ ___
 
 Download and install Git from:
 
-> https://git-scm.com/downloads
+> <https://git-scm.com/downloads>
 
 ### Step 2) *Install Anaconda*
 
 Download and install Anaconda from:
 
-> https://www.anaconda.com/products/individual
+> <https://www.anaconda.com/products/individual>
 
 _Note: MiroSimulint was built using the 2019.10 version of Anaconda. If you run into issues, you can try uninstalling your current Anaconda version and installing the older one from:_
 
-> https://repo.anaconda.com/archive/
+> <https://repo.anaconda.com/archive/>
 
 ### Step 3) *Install PyChrono and MiroSimulint*
 
@@ -49,7 +49,7 @@ __c)__ _Optional._ You should be able to run the program now. You can try it if 
 
 This is the recommended code editor:
 
-> https://code.visualstudio.com/download
+> <https://code.visualstudio.com/download>
 
 ### Step 5) *Setup the program with VS Code*
 
