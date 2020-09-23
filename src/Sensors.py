@@ -7,8 +7,8 @@ def MSA01(rot = [0,0,0]):
     size_x = 0.04
     size_y = 0.012
     size_z = 0.024
-    density_brick = 1000   # kg/m^3
-    mass_brick = density_brick * size_x * size_y * size_z
+    # density_brick = 868   # kg/m^3
+    mass_brick = 0.010
 
     inertia_brick_xx = (size_y**2 + size_z**2)*mass_brick/3
     inertia_brick_yy = (size_x**2 + size_z**2)*mass_brick/3
@@ -51,8 +51,8 @@ def MSA02(rot = [0,0,0]):
     size_x = 0.04
     size_y = 0.012
     size_z = 0.024
-    density_brick = 1000   # kg/m^3
-    mass_brick = density_brick * size_x * size_y * size_z
+    # density_brick = 1000   # kg/m^3
+    mass_brick = 0.010
 
     inertia_brick_xx = (size_y**2 + size_z**2)*mass_brick/3
     inertia_brick_yy = (size_x**2 + size_z**2)*mass_brick/3
@@ -95,8 +95,8 @@ def MSV01(rot = [0,0,0]):
     size_x = 0.04
     size_y = 0.012
     size_z = 0.024
-    density_brick = 1000   # kg/m^3
-    mass_brick = density_brick * size_x * size_y * size_z
+    # density_brick = 1000   # kg/m^3
+    mass_brick = 0.020
 
     inertia_brick_xx = (size_y**2 + size_z**2)*mass_brick/3
     inertia_brick_yy = (size_x**2 + size_z**2)*mass_brick/3
@@ -138,8 +138,8 @@ def MSO01(rot = [0,0,0]):
     size_x = 0.04
     size_y = 0.012
     size_z = 0.024
-    density_brick = 1000   # kg/m^3
-    mass_brick = density_brick * size_x * size_y * size_z
+    # density_brick = 1000   # kg/m^3
+    mass_brick = 0.040
 
     inertia_brick_xx = (size_y**2 + size_z**2)*mass_brick/3
     inertia_brick_yy = (size_x**2 + size_z**2)*mass_brick/3
