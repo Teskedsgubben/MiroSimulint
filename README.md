@@ -55,9 +55,13 @@ This is the recommended code editor:
 
 To open the files, start VS Code and click _File -> Open Folder_ to open the *MiroSimulint* folder. This should be at you user directory, such as __C:\\Users\\*MyUsername*\\MiroSimulint__ unless you changed it in step __3a)__.
 
-When VS Code is open, click _View -> Command Palette..._ and type _"Python: Select Interpreter"_ and click it. You can then select the _('MiroSim': conda)_ option. Clicking this will create a file telling VS code to use the MiroSim environment for this project, and is only needed once.
+To run the program, open the Anaconda Prompt and go back to Step 3c). This method will eventually be changed, but follow this for now. You can then press the Arrow Up key to get the previous command "python Main.py" and hit Enter to run the simulation again. Any changes you make and __save__ in the code files will have effect once you run the code again.
 
-Then, open the _Main.py_ file in the explorer menu on your left. When the file is open, click the green "Play Button" on the top right to run the code. If it starts, you're all set to begin coding. Otherwise, contact a supervisor with any error(s) you get.
+__IMPORTANT NOTE:__ Some GPU driver issues have been occuring. I'm working on a fix for this. If you can run the program but get a black screen, this is most likely the cause of it.
+
+<!-- When VS Code is open, click _View -> Command Palette..._ and type _"Python: Select Interpreter"_ and click it. You can then select the _('MiroSim': conda)_ option. Clicking this will create a file telling VS code to use the MiroSim environment for this project, and is only needed once.
+
+Then, open the _Main.py_ file in the explorer menu on your left. When the file is open, click the green "Play Button" on the top right to run the code. If it starts, you're all set to begin coding. Otherwise, contact a supervisor with any error(s) you get. -->
 
 ___
 
@@ -65,9 +69,7 @@ ___
 
 ### The Program
 
-When the program starts, the program runs for few seconds and then pauses. This is so the lander can settle in to the launcher and allows you to find an epic camera angle before launching. You can then press SPACE to resume and release the launcher.
-
-You will have a target that the launcher is supposed to hit
+When the program starts, the program runs for few seconds and then pauses. This is so the lander can settle in to the launcher and allows you to find an epic camera angle before launching. You can then press SPACE to resume and release the launcher. You will have a target that the launcher is supposed to hit.
 
 ### The Camera
 
