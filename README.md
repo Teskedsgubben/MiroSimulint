@@ -55,7 +55,7 @@ This is the recommended code editor:
 
 To open the files, start VS Code and click _File -> Open Folder_ to open the *MiroSimulint* folder. This should be at you user directory, such as __C:\\Users\\*MyUsername*\\MiroSimulint__ unless you changed it in step __3a)__.
 
-To run the program, open the Anaconda Prompt and go back to Step 3c). This method will eventually be changed, but follow this for now. You can then press the Arrow Up key to get the previous command "python Main.py" and hit Enter to run the simulation again. Any changes you make and __save__ in the code files will have effect once you run the code again.
+To run the program, open the Anaconda Prompt and go back to Step 3c). This method will eventually be changed, but follow this for now. You can then press the Arrow Up key to get the previous command "python Main.py" and hit Enter to run the simulation again. Any changes you make and __save__ in the code files will have effect once you run the code again. If you get any errors, try updating the MiroSimulint version by running the command _git pull_ first.
 
 __IMPORTANT NOTE:__ Some GPU driver issues have been occuring. I'm working on a fix for this. If you can run the program but get a black screen, this is most likely the cause of it.
 
