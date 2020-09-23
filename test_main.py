@@ -20,8 +20,16 @@ from src import Environments as env
 from src import Props
 import numpy as np
 
-import Landers
-import Launchers
+# Import any local files first, otherwise use repo files
+try:
+    import Landers_local as Landers
+except:
+    import Landers
+
+try:
+    import Launchers_local as Launchers
+except:
+    import Launchers
 
 # Initialize a Miro System
 simulation_system  = ms.MiroSystem()
