@@ -91,7 +91,9 @@ _Landers.py_ is where you can define you Lander. You have a demo where a simple 
 
 _Launchers.py_ defines your Launcher in the same way as above. To try different designs, you can define several Launchers here and choose which one to try out in the _Main.py:_ file.
 
-Your Lander and Launcher are both built as MiroModules using MiroComponents. This means that you add the components you need, rotate the properly and then assemble them into a complete module. The order here is important, as connecting components 1 and 2 will move component 2 so that the connection points match. If you connect first and rotate the object after, things are going to get messy. However, that doesn't mean you shouldn't try it :bowtie:.
+_test\_main.py_ is a copy of the _Main.py_ file and will run the program as well. It shows some other tricks you can use for testing and camera controls. You can also use this file to try stuff out without having to change the Main file.
+
+Your Lander and Launcher are both built as MiroModules using MiroComponents. This means that you add the components you need, rotate them properly and then assemble them into a complete module. The order here is important, as connecting components 1 and 2 will move component 2 so that the connection points match. If you connect first and rotate the object after, things are going to get messy. However, that doesn't mean you shouldn't try it :bowtie:.
 
 ### The Goal
 
