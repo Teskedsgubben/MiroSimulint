@@ -67,7 +67,7 @@ Now restart Visual Studio Code and the configuration is complete.
 
 Open VS Code and open the MiroSimulint directory (_File -> Open Folder..._). Open the _Main.py_ file in the explorer menu on your left. When the file is open, click the green "Play Button" on the top right to run the code. If it starts, you're all set to begin coding. Otherwise, contact a supervisor with any error(s) you get.
 
-__IMPORTANT NOTE:__ Some DirectX issues have been occuring. What happens is that the code runs but the simulation only produces a black screen. The current fix for this is to copy a working D3DX9_43.dll file into your C:\Windows\System32 directory, contact a supervisor for help on this.
+__IMPORTANT NOTE:__ Some DirectX issues have been occuring. What happens is that the code runs, but the simulation only produces a black screen. See the folder dx9_shaderfix and follow the readme.txt instructions for a quickfix on this. A reliable solution will be posted when ready.
 
 ___
 
