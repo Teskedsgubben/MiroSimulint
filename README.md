@@ -53,15 +53,21 @@ This is the recommended code editor:
 
 ### Step 5) *Setup the program with VS Code*
 
-To open the files, start VS Code and click _File -> Open Folder_ to open the *MiroSimulint* folder. This should be at you user directory, such as __C:\\Users\\*MyUsername*\\MiroSimulint__ unless you changed it in step __3a)__.
+To open the files, start VS Code and click _File -> Open Folder_ to open the *MiroSimulint* folder. This should be at you user directory, such as __C:\\Users\\*MyUsername*\\MiroSimulint__ unless you changed it in step __3a)__, or __C:\\Users\\*MyUsername*\\Documents\\MiroSimulint__.
 
-To run the program, open the Anaconda Prompt and go back to Step 3c). This method will eventually be changed, but follow this for now. You can then press the Arrow Up key to get the previous command "python Main.py" and hit Enter to run the simulation again. Any changes you make and __save__ in the code files will have effect once you run the code again. If you get any errors, try updating the MiroSimulint version by running the command _git pull_ first.
+There is a package needed to get full support for Python commands. When VS Code is open, click _View -> Extensions_, search for Python and install Microsofts Python package.
 
-__IMPORTANT NOTE:__ Some GPU driver issues have been occuring. I'm working on a fix for this. If you can run the program but get a black screen, this is most likely the cause of it.
+Once the Python package is installed, click _View -> Command Palette..._ and type _"Python: Select Interpreter"_ and click it. You can then select the _('MiroSim': conda)_ option. Clicking this will create a file telling VS code to use the MiroSim environment for this project, and is only needed once.
 
-<!-- When VS Code is open, click _View -> Command Palette..._ and type _"Python: Select Interpreter"_ and click it. You can then select the _('MiroSim': conda)_ option. Clicking this will create a file telling VS code to use the MiroSim environment for this project, and is only needed once.
+You also need to set the command prompt to default shell. Click _View -> Command Palette..._ and type _"Terminal: Select Default Shell"_ and click it. Now choose _Command Prompt_ in the menu.
 
-Then, open the _Main.py_ file in the explorer menu on your left. When the file is open, click the green "Play Button" on the top right to run the code. If it starts, you're all set to begin coding. Otherwise, contact a supervisor with any error(s) you get. -->
+Now restart Visual Studio Code and the configuration is complete.
+
+### Step 6) *Run the program*
+
+Open VS Code and open the MiroSimulint directory (_File -> Open Folder..._). Open the _Main.py_ file in the explorer menu on your left. When the file is open, click the green "Play Button" on the top right to run the code. If it starts, you're all set to begin coding. Otherwise, contact a supervisor with any error(s) you get.
+
+__IMPORTANT NOTE:__ Some DirectX issues have been occuring. What happens is that the code runs but the simulation only produces a black screen. The current fix for this is to copy a working D3DX9_43.dll file into your C:\Windows\System32 directory, contact a supervisor for help on this.
 
 ___
 
