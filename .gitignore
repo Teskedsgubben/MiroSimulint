@@ -1,5 +1,5 @@
 # local python files
-*_local.py
+*_local*
 # python compiler filer
 __pycache__
 *.pyc
@@ -12,6 +12,6 @@ video_capture
 # sparade lokala filer
 ignored_storage
 # scaled .obj files
-*scale*.obj
+*_scale*.obj
 # MIT bilder som referens
 MIT_pics
