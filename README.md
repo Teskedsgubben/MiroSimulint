@@ -45,6 +45,20 @@ __c)__ _Optional._ You should be able to run the program now. You can try it if 
 
     python Main.py
 
+__Linux Users:__
+
+You then need to install irrlicht, run these commands in a terminal window:
+
+    sudo apt-get install libirrlicht1.8 libirrlicht-dev libirrlicht-doc
+
+    sudo apt-get install freeglut3
+
+If you get glibc version error, try checking the version by the command below and compare to your error.
+
+    ldd --version
+
+If your version of glibc (technically ldd, but they should be the same) is older than the error says that the program needs, you probably need to update to the latest LTS version of you distro. On Ubuntu, this is currently version 20.04 and this has been confirmed to work.
+
 ### Step 4) *Install VS Code*
 
 This is the recommended code editor:
