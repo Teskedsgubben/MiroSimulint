@@ -13,7 +13,7 @@ class MiroComponent():
     def SetImportDir(self, dirname):
         self.importdir = dirname
 
-    def ImportObj(self, filename, color = [0.8, 0.8, 0.8], scale = 0.001):
+    def ImportObj(self, filename, color = [0.8, 0.8, 0.8], scale = 0.001, density = 1000):
         filename = self.importdir+filename
         if not os.path.isfile(filename):
             print('Could not locate file: '+filename)
@@ -21,7 +21,7 @@ class MiroComponent():
         loadfile = filename[0:filename.find('.obj')]+'_scale'+str(scale)+'.obj'
         if not os.path.isfile(loadfile):
             self.ScaleObjFile(filename, loadfile, scale)
-        self.body = chrono.ChBodyEasyMesh(loadfile, 1000, True, True)
+        self.body = chrono.ChBodyEasyMesh(loadfile, density, True, True)
         self.body.AddAsset(chrono.ChColorAsset(chrono.ChColor(color[0], color[1], color[2])))
 
     def ScaleObjFile(self, filename_to_scale, output_name, scale = 0.001):
