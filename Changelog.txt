@@ -1,0 +1,61 @@
+
+----------------------------------------------------------------------------------------------------
+2020-09-27
+
+1) Fixed link point orientation not working properly. Now all links should rotate around the link 
+direction axis, regardless of orientation. If this somehow makes something unstable that 
+previosuly was not, then the design was actually unstable. However, you can use ConnectComponents_old 
+to use the old version anyway. 
+
+2) Added a MarkLinkpoint function. Essentially a shorthand for adding a dummy to the component and 
+attaching it to a linkpoint, but this way it does not appear in module information as counted 
+links and components.
+
+3) Can now change radius of DUMMY component by input argument.
+
+4) SetSpring now places two small spheres on each connection point.
+
+5) MC0XX now follows the same convention as other MC_XX functions with M1, M2 and M3 in proper order 
+and default values of rot, pos and fixed. This means if you used MC0XX before, you need to update 
+you arguments by swapping from M1, M3, M2 to M1, M2, M3.
+
+6) Added a MC5XX component. Ellipsoid with M1 = radius in x, M2 = radius in y and M3 = radius in z. 
+Has linkpoints A: +x, B: -x, C: +y, D: -y, E: +z, F: -z.
+
+7) The 'follow' perspective now follows the center of mass for the module. Avoids some awkward 
+spin-motion.
+
+8) Added a file CustomComponents.py that can be imported to landers and launchers. This simplifies 
+separation between components and modules (landers/launchers) and enables using custom components 
+in bothe lander and launcher after defining them.
+
+9) Added a SetReferenceComponent function. This is much easier to use, as you can say "put the 
+lander above this component" rather than computing the vector with SetReferencePoint.
+
+10) Renaming any files to GruppX_filename (i.e. adding GruppX_ to the beginning of the file name, 
+where X is your groups letter or name) will now ignore the file in git.
+
+11) Now chooses GroupLogo_local.png if available, otherwise GroupLogo.png. This allows local grouplogo 
+file to be ignored by git.
+
+12) Added a Schrodbull can on the floor to mark the global origin (coordinate 0,0,0) by request
+
+13) Added MoveComponentBy and MoveComponentTo to MiroModule class. This means you can now manually move
+a single component relative to the rest of the module. MoveComponentBy moves the component from where
+it is, and MoveComponentTo ignores current position and puts the component in a specific location.
+
+----------------------------------------------------------------------------------------------------
+2020-09-24
+
+Can now set custom density when importing objects from .obj files.
+
+----------------------------------------------------------------------------------------------------
+2020-09-23
+
+Added specifications to the two big thunks making ut the Demo Launcher to the specs document in the
+documents directory.
+
+Added the DirectX .dll file to the repository with instructions on how to perform the shader fix on
+Windows. Note that this procedure should in general not be followed if instructed by sources you do 
+not trust, as the .dll file gets access to your system. In this case, it is an old graphics API file
+that microsoft has created that has been copied from another Windows machine's directory.
