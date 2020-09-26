@@ -7,14 +7,13 @@ def build(system, SPEEDMODE = False):
     # Create the room: simple fixed rigid bodys with a collision shape
     # and a visualization shape
     Height = 3.32                                   # Height between each floor
-    if SPEEDMODE == False:
-        center = chrono.ChVectorD(6.5, 0, 3)        # Center position for the stair
-        MIT_stair(system, center, Height)           # Add a spiral stair
+
+    center = chrono.ChVectorD(6.5, 0, 3)            # Center position for the stair
+    MIT_stair(system, center, Height, SPEEDMODE)    # Add a spiral stair
     MIT_floors(system, Height, SPEEDMODE)           # Add floors
     MIT_walls(system, Height)                       # Add walls
 
-def MIT_stair(system, center, H):
-        
+def MIT_stair(system, center, H, SPEEDMODE):
     stair_r =  0.3          # Radius
     stair_h = 2*H+1         # Hight
     stair_d = 1             # Density
@@ -24,9 +23,14 @@ def MIT_stair(system, center, H):
     texture = 'textures/white concrete.jpg' 
     pos_stair = center + chrono.ChVectorD(0, stair_h/2, 0)  # Correction for stair position
     pos_disk = center + chrono.ChVectorD(0, stair_h+0.025, 0)
-
+    
     # Add center cylinder of stair
-    add_cylinderShape(system, stair_r, stair_h, stair_d, pos_stair, texture, [10,10]) 
+    add_cylinderShape(system, stair_r, stair_h, stair_d, pos_stair, texture, [10,10])
+
+    # If SPEEDMODE is activated, stop here
+    if SPEEDMODE:
+        return
+    
     # Top disk
     add_cylinderShape(system, stair_r+0.01, 0.05, 1, pos_disk, 'textures/stone_floor.jpg', [1,1]) 
     # Add fake stair to base floor
@@ -539,7 +543,7 @@ def MIT_walls(system, H):
     pos_ob = [pos_1, pos_2, pos_3]
     dim = [dim_1, dim_2, dim_3]
     ang = [ang_1, ang_2, ang_3]
-    textures = [texture_wall, 'texture/white concrete.jpg', texture_wall]
+    textures = [texture_wall, 'textures/white concrete.jpg', texture_wall]
     scale = [sca_1, sca_1, sca_1]
     for i in range(len(pos_ob)):
         # Create a box
