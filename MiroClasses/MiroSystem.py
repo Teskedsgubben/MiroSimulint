@@ -326,5 +326,8 @@ class MiroSystem():
                 add_light = False
             if add_light:
                 pos = chronoirr.vector3df(light[0][0], light[0][1], light[0][2])
-                aim = chronoirr.vector3df(light[1][0], light[1][1], light[1][2])
-                self.simulation.AddLightWithShadow(pos, aim, light[2], light[3], light[4], light[5])
+                if light[7]:
+                    aim = chronoirr.vector3df(light[1][0], light[1][1], light[1][2])
+                    self.simulation.AddLightWithShadow(pos, aim, light[2], light[3], light[4], light[5])
+                else:
+                    self.simulation.AddLight(pos, light[2])
