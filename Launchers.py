@@ -10,9 +10,9 @@ from src import Sensors
 
 import CustomComponents
 
-# To learn how to modify the Launcher, start by changing the component 'Main arm' on line 26, 
-# adjust the arm length on line 35 accordingly and calibrate the spring constant on line 77. 
-# The Launcher can hit the target with modifications to only these three things.
+# To learn how to modify the Launcher, start by changing the component 'Main arm' on line 26
+# to one of different length and calibrate the spring constant on line 77. 
+# The Launcher can hit the target with modifications to only these two things.
 
 def DemoLauncher(args):
     # Extract arguments into local variables
