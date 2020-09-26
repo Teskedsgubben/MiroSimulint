@@ -17,7 +17,7 @@ def stage(system):
     dir_f = chrono.ChVectorD(np.cos(theta_f), 0, np.sin(theta_f)) 
     pos_b = chrono.ChVectorD(-5.3, 0, -7.8)
     dir_b = chrono.ChVectorD(np.cos(theta_b), 0, np.sin(theta_b))
-    step = shp.step(pos_f, dir_f, pos_b, dir_b, 3, 0.3, [0.1,0.1,0.1])
+    step = shp.step(pos_f, dir_f, pos_b, dir_b, 3, 0.3, [0.02,0.02,0.02])
     system.Add(step)
 
 
