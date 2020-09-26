@@ -8,6 +8,8 @@ from MiroClasses import MiroComponent as MC
 from src import Components
 from src import Sensors
 
+import CustomComponents
+
 def DemoLander(args):
     aim = args[0]
     tilt = -args[1]
@@ -16,8 +18,11 @@ def DemoLander(args):
     # Add top and bottom plates
     # MC component arguments are rotation, position and fixed (true/false)
     # Defaults to [0,0,0], [0,0,0], False if arguments are not provided
-    Lander.AddComponent(Components.MC035([  0,90,0], [0,0,0], False), 'Bottom plate')
-    Lander.AddComponent(Components.MC035([180,90,0]), 'Top plate')
+    # Note: Use Lander.RotateX, Y or Z if you are making several rotations to
+    #       a component, as the order the rotations are made in is significant. 
+    Lander.AddComponent(Components.MC035([ 0,90,0], [0,0,0], False), 'Bottom plate')
+    Lander.AddComponent(Components.MC035([ 0,90,0]), 'Top plate')
+    Lander.RotateX('Top plate', 180)
 
     # Add vertical rods
     Lander.AddComponent(Components.MC113([0, 0, 90]), 'Rod A')
@@ -44,41 +49,7 @@ def DemoLander(args):
     Lander.ConnectComponents('Rod C', 'B', 'Top plate', 'A')
     Lander.ConnectComponents('Rod D', 'B', 'Top plate', 'B')
 
-    # Connect sensor to the module, behave just like a component
+    # Connect sensor to the module, behaves just like a component
     Lander.ConnectComponents('Top plate', 'E', 'Accelerometer', 'Linkpoint')
 
     return Lander
-
-# Lander with only the custom import object
-def KristersLandare(args):
-    aim = args[0]
-    tilt = -args[1]
-    Lander = MM.Module()
-
-    Lander.AddComponent(KristerK([0, 0, 0]), 'Custom K')
-    
-    # Lander.AddSensor(Sensors.MSA02([180,0,0]), 'Kristerometer')
-    
-    # Lander.ConnectComponents('Custom K', 'A', 'Kristerometer', 'Linkpoint')
-
-    Lander.RotateComponentsZ(tilt)
-    Lander.RotateComponentsY(aim)
-
-    return Lander
-
-# Custom Component Example, not a lander, only returns a component
-def KristerK(rot = [0,0,0], pos = [0,0,0], Fixed = False): 
-    # Create blank MiroComponent
-    CustomComponent = MC.MiroComponent()
-    
-    # Import .obj file from object_files directory and set color [R, G, B]
-    CustomComponent.ImportObj('K.obj', color = [1, 0.2, 0.6])
-    
-    # Add linkpoints to enable connecting with other components
-    CustomComponent.AddLinkPoint('A', [0, 1, 0], [0, 0.0235/2, 0])
-    CustomComponent.AddLinkPoint('B', [0,-1, 0], [0,-0.0235/2, 0])
-    
-    CustomComponent.Rotate(rot)
-    CustomComponent.MoveToPosition(pos)
-
-    return CustomComponent
