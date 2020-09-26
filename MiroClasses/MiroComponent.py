@@ -38,13 +38,26 @@ class MiroComponent():
         xdim = {'min': float('inf'), 'max': float('-inf')}
         ydim = {'min': float('inf'), 'max': float('-inf')}
         zdim = {'min': float('inf'), 'max': float('-inf')}
-        
+
+        m=[0,0,0]
+        num_vs = 0
         for i in range(iend):
             if text[i][0] == 'v' and text[i][1] == ' ':
                 v = text[i].split()
-                x = float(v[1])*scale
-                y = float(v[2])*scale
-                z = float(v[3])*scale
+                num_vs = num_vs + 1
+                m[0] = float(v[1])*scale
+                m[1] = float(v[2])*scale
+                m[2] = float(v[3])*scale
+        m[0] = m[0]/num_vs
+        m[1] = m[2]/num_vs
+        m[2] = m[2]/num_vs
+
+        for i in range(iend):
+            if text[i][0] == 'v' and text[i][1] == ' ':
+                v = text[i].split()
+                x = float(v[1])*scale-m[0]
+                y = float(v[2])*scale-m[1]
+                z = float(v[3])*scale-m[2]
                 if x < xdim['min']:
                     xdim['min'] = x
                 if x > xdim['max']:
@@ -73,7 +86,10 @@ class MiroComponent():
         if type(coord) == type([]):
             coord = chrono.ChVectorD(coord[0], coord[1], coord[2])
         self.linkpoints.update({name: coord})
-        self.linkdirs.update({name: chrono.ChVectorD(normal[0], normal[1], normal[2]).GetNormalized()})
+        linkdir = chrono.ChVectorD(normal[0], normal[1], normal[2])
+        if linkdir.Length() > 0:
+            linkdir.Normalize()
+        self.linkdirs.update({name: linkdir})
 
     def GetPosition(self):
         return self.body.GetPos()
@@ -82,7 +98,7 @@ class MiroComponent():
         return self.body.GetPos() + self.linkpoints[name]
 
     def GetLinkDir(self, name):
-        return self.body.GetRot().Rotate(self.linkdirs[name])
+        return self.linkdirs[name]
         
     def GetLinkPointXYZ(self, name):
         lp = self.body.GetPos() + self.linkpoints[name]
@@ -105,9 +121,12 @@ class MiroComponent():
         pos_z = pos[2]
 
         posvec = chrono.ChVectorD(pos_x, pos_y, pos_z)
-        
         self.body.Move(posvec - self.body.GetPos())
+
     def MoveToMatch(self, pointname, other_component, other_pointname, dist = 0):
+        '''Moves the component to match the provided linkpoint position with the position of a 
+        linkpoint on the other component. Distance is calculated in the direction of the 
+        linkpoint on the other, non-moving component.'''
         marg = other_component.GetLinkDir(other_pointname).GetNormalized()
         marg.SetLength(dist)
         self.body.Move(other_component.GetLinkPoint(other_pointname) - self.GetLinkPoint(pointname) + marg)
@@ -126,6 +145,8 @@ class MiroComponent():
 
         for name, link in self.linkpoints.items():
             self.linkpoints.update({name: quaternion.Rotate(link)})
+        for name, link in self.linkdirs.items():
+            self.linkdirs.update({name: quaternion.Rotate(link)})
     
     def RotateAxis(self, theta, axis):
         '''Rotates the component an angle theta degrees around axis in global coordinates.'''
@@ -148,6 +169,39 @@ class MiroComponent():
 
         self.body.SetPos_dt(chrono.ChVectorD(vel_x, vel_y, vel_z))
 
+    def SetCollisionAsBox(self, size_x, size_y, size_z, offset = [0,0,0]):
+        mass = self.GetBody().GetMass()
+        dr = chrono.ChVectorD(offset[0], offset[1], offset[2])
+        
+        inertia_brick_xx = (size_y**2 + size_z**2)*mass/3
+        inertia_brick_yy = (size_x**2 + size_z**2)*mass/3
+        inertia_brick_zz = (size_x**2 + size_y**2)*mass/3
+        self.GetBody().SetInertiaXX(chrono.ChVectorD(inertia_brick_xx,inertia_brick_yy,inertia_brick_zz))   
+        self.GetBody().GetCollisionModel().ClearModel()
+        self.GetBody().GetCollisionModel().AddBox(size_x/2, size_y/2, size_z/2, dr)
+        self.GetBody().GetCollisionModel().BuildModel()
+
+    def SetCollisionAsEllipsoid(self, radius_x, radius_y, radius_z, offset = [0,0,0]):
+        mass = self.GetBody().GetMass()
+        dr = chrono.ChVectorD(offset[0], offset[1], offset[2])
+        
+        inertia_brick_xx = (radius_y**2 + radius_z**2)*mass/5
+        inertia_brick_yy = (radius_x**2 + radius_z**2)*mass/5
+        inertia_brick_zz = (radius_x**2 + radius_y**2)*mass/5
+        self.GetBody().SetInertiaXX(chrono.ChVectorD(inertia_brick_xx,inertia_brick_yy,inertia_brick_zz))   
+        self.GetBody().GetCollisionModel().ClearModel()
+        self.GetBody().GetCollisionModel().AddEllipsoid(radius_x/2, radius_y/2, radius_z/2, dr)
+        self.GetBody().GetCollisionModel().BuildModel()
+
+    def SetCollisionAsSphere(self, radius, offset = [0,0,0]):
+        mass = self.GetBody().GetMass()
+        dr = chrono.ChVectorD(offset[0], offset[1], offset[2])
+        
+        inertia_brick = radius**2*mass*2/5
+        self.GetBody().SetInertiaXX(chrono.ChVectorD(inertia_brick, inertia_brick, inertia_brick))   
+        self.GetBody().GetCollisionModel().ClearModel()
+        self.GetBody().GetCollisionModel().AddSphere(radius, dr)
+        self.GetBody().GetCollisionModel().BuildModel()
 
 # Sensor class extends component class
 class MiroSensor(MiroComponent):
