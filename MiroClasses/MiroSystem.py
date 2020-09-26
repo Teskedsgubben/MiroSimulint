@@ -201,6 +201,11 @@ class MiroSystem():
             self.start_paused = config['start paused']
         else:
             self.start_paused = False
+
+        if "frame save interval" in config:
+            self.framesave_interval = config['frame save interval']
+        else:
+            self.framesave_interval = 1
     
     def Run(self, config = {}):
         '''Runs the simulation. Configuration options and their default values are:\n
@@ -212,6 +217,7 @@ class MiroSystem():
         "pause_before_launch": True\n
         "print module info": False\n
         "start paused" = False\n
+        "frame save interval" = 1\n
         '''
         # ---------------------------------------------------------------------
         #
@@ -250,6 +256,7 @@ class MiroSystem():
 
         self.simulation.SetTimestep(dt/substeps)
         self.simulation.SetTryRealtime(True)
+        self.simulation.SetVideoframeSaveInterval(self.framesave_interval)
         
         if self.start_paused:
             self.simulation.SetPaused(True)

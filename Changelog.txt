@@ -47,6 +47,8 @@ it is, and MoveComponentTo ignores current position and puts the component in a 
 
 14) Improved lighting. Should give some performance boost without any notable loss of quality.
 
+15) Added "start paused" and "frame save interval" to simulation config options.
+
 ----------------------------------------------------------------------------------------------------
 2020-09-24
 
