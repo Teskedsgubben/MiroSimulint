@@ -8,7 +8,15 @@ from MiroClasses import MiroComponent as MC
 from src import Components
 from src import Sensors
 
-import CustomComponents
+try:
+    import CustomComponents_local as CustomComponents
+except:
+    import CustomComponents
+
+# To learn how to modify the Lander, start by changing the components for the
+# Bottom and Top plates on lines 31 and 32 to change the Lander dimension.
+# Then change the rods on lines 36-39 to another component model to see how 
+# the lander changes. 
 
 def DemoLander(args):
     aim = args[0]
@@ -20,15 +28,15 @@ def DemoLander(args):
     # Defaults to [0,0,0], [0,0,0], False if arguments are not provided
     # Note: Use Lander.RotateX, Y or Z if you are making several rotations to
     #       a component, as the order the rotations are made in is significant. 
-    Lander.AddComponent(Components.MC035([ 0,90,0], [0,0,0], False), 'Bottom plate')
-    Lander.AddComponent(Components.MC035([ 0,90,0]), 'Top plate')
+    Lander.AddComponent(Components.MC035([ 0, 90, 0], [0,0,0], False), 'Bottom plate')
+    Lander.AddComponent(Components.MC035([ 0, 90, 0]), 'Top plate')
     Lander.RotateX('Top plate', 180)
 
     # Add vertical rods
-    Lander.AddComponent(Components.MC113([0, 0, 90]), 'Rod A')
-    Lander.AddComponent(Components.MC113([0, 0, 90]), 'Rod B')
-    Lander.AddComponent(Components.MC113([0, 0, 90]), 'Rod C')
-    Lander.AddComponent(Components.MC113([0, 0, 90]), 'Rod D')
+    Lander.AddComponent(Components.MC113([ 0, 0, 90]), 'Rod A')
+    Lander.AddComponent(Components.MC113([ 0, 0, 90]), 'Rod B')
+    Lander.AddComponent(Components.MC113([ 0, 0, 90]), 'Rod C')
+    Lander.AddComponent(Components.MC113([ 0, 0, 90]), 'Rod D')
     
     Lander.AddSensor(Sensors.MSA02([180,0,0]), 'Accelerometer')
     

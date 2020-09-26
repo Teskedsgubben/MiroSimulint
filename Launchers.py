@@ -8,7 +8,10 @@ from MiroClasses import MiroComponent as MC
 from src import Components
 from src import Sensors
 
-import CustomComponents
+try:
+    import CustomComponents_local as CustomComponents
+except:
+    import CustomComponents
 
 # To learn how to modify the Launcher, start by changing the component 'Main arm' on line 26
 # to one of different length and calibrate the spring constant on line 77. 

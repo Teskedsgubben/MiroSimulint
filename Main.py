@@ -20,7 +20,6 @@ from src import Environments as env
 from src import Props
 import numpy as np
 
-# Import any local files first, otherwise use repo files
 try:
     import Landers_local as Landers
 except:
@@ -30,6 +29,7 @@ try:
     import Launchers_local as Launchers
 except:
     import Launchers
+# The above imports any local files first, otherwise uses repo files
 
 # Initialize a Miro System
 simulation_system  = ms.MiroSystem()
