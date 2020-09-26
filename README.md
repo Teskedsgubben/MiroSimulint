@@ -105,7 +105,7 @@ _Note: Laptime means how many simulation time seconds it takes for the camera to
 
 ### The Coding
 
-You have three code files to work with: _Main.py_, _Landers.py_ and _Launchers.py_. Any code in the subfolders are free to read if you are curious, but do not change them. You will only submit the three files.
+You have four code files to work with: _Main.py_, _Landers.py_, _Launchers.py_ and _CustomComponents.py_. Any code in the subfolders are free to read if you are curious, but do not change them. You will only submit up to the four files, unless otherwise agreed upon.
 
 _Main.py_ is the file that starts the program. Here you can change camera views, rendering resolution and initial start delay. You can also compute any arguments you want to pass along to your Lander or Launcher. An important feature here is __Speedmode__ which you find is set to __False__. Setting this to __True__ will remove many details in the program, speeding up the simulation. This is most likely more conviniet to use when running tests and so on.
 
@@ -113,7 +113,9 @@ _Landers.py_ is where you can define you Lander. You have a demo where a simple 
 
 _Launchers.py_ defines your Launcher in the same way as above. To try different designs, you can define several Launchers here and choose which one to try out in the _Main.py:_ file.
 
-_test\_main.py_ is a copy of the _Main.py_ file and will run the program as well. It shows some other tricks you can use for testing and camera controls. You can also use this file to try stuff out without having to change the Main file.
+_CustomComponents.py_ is where you can define your custom components that you either have imported from an object file (.obj) or agreed to create from component template function, like MC0XX. You do not have to use this file if you do not feel the need to.
+
+There is also a _test\_main.py_ file which is a copy of the _Main.py_ file and will run the program as well. It shows some other tricks you can use for testing and camera controls. You can also use this file to try stuff out without having to change the Main file.
 
 Your Lander and Launcher are both built as MiroModules using MiroComponents. This means that you add the components you need, rotate them properly and then assemble them into a complete module. The order here is important, as connecting components 1 and 2 will move component 2 so that the connection points match. If you connect first and rotate the object after, things are going to get messy. However, that doesn't mean you shouldn't try it :bowtie:.
 
@@ -142,3 +144,15 @@ __Mac users:__ If you are using Mac OS and do not have VLC or similar installed,
     ffmpeg -i video_capture/MiroSim.avi -preset slow -codec:v libx264 -pix_fmt yuv420p -b:v 100M video_capture/MiroSimMAC.mp4
 
 Then open the MiroSimMAC.mp4 file in the video_capture directory.
+
+### Keeping MiroSimulint up to date
+
+To get the latest updates we push to the repository, you can follow a simple procedure to set up the way you work. After that, it's as simple as a couple clicks to always get the latest version.
+
+Step 1) Rename the files you will or have worked with by adding the suffix "_local" to their names, e.g. Main_local.py and GroupLogo_local.png and so on. This will make git ignore the files.
+
+Step 2) Go to _View_ -> _SCM_ or _Source Control_, which is the same as clicking the "fork" or "graph" symbol on your left side panel. Here, discard all changes in the list by hovering over the file name and clicking the "reverse" style arrow. This should reset the original file.
+
+Step 3) Once the list is completely empty, click the three dots button ... and click Pull. This will get the latest versions of the files from the repository.
+
+You then work in the files named _local instead of the ordinary files. After doing this once, you only need to redo step 3 to get the latest version again.
