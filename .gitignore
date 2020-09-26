@@ -15,3 +15,5 @@ ignored_storage
 *_scale*.obj
 # MIT bilder som referens
 MIT_pics
+# Any group files
+Grupp*_*
