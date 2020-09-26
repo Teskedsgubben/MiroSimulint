@@ -19,6 +19,9 @@ def AddProps(system):
     props.MIT_door(system, [13.6, 3.3, 12.22])
     props.MIT_door(system, [17.6, 3.3, 12.22])
 
+    # Marks global origin
+    props.sodacan(system, [0,0,0], 'schrodbull.png')
+
     props.painting(system, [13.8,2.0,-2], 'DemoBengan.png', wall_angle)
     props.painting(system, [13.94,1.8,-3.35], 'bungeebengan_notes.png', wall_angle, [0.2,0.27])
     props.painting(system, [6.46,5.0,10], 'infoboard.jpg', -90, [0.85/2, 1.46/2])
