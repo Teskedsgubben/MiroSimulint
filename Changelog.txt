@@ -33,7 +33,8 @@ in bothe lander and launcher after defining them.
 lander above this component" rather than computing the vector with SetReferencePoint.
 
 10) Renaming any files to GruppX_filename (i.e. adding GruppX_ to the beginning of the file name, 
-where X is your groups letter or name) will now ignore the file in git.
+where X is your groups letter or name) will now ignore the file in git. However, using this 
+requires changing imports in the other files to e.g. "import GruppX_Launchers as Launchers".
 
 11) Now chooses GroupLogo_local.png if available, otherwise GroupLogo.png. This allows local grouplogo 
 file to be ignored by git.
@@ -43,6 +44,8 @@ file to be ignored by git.
 13) Added MoveComponentBy and MoveComponentTo to MiroModule class. This means you can now manually move
 a single component relative to the rest of the module. MoveComponentBy moves the component from where
 it is, and MoveComponentTo ignores current position and puts the component in a specific location.
+
+14) Improved lighting. Should give some performance boost without any notable loss of quality.
 
 ----------------------------------------------------------------------------------------------------
 2020-09-24
