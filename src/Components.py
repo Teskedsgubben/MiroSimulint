@@ -12,13 +12,13 @@ density = {
 
 
 # This is a sphere to help visualization of certain points
-def DUMMY(rot = [0,0,0], pos = [0,0,0], Fixed = False):
+def DUMMY(rot = [0,0,0], pos = [0,0,0], Fixed = False, radius = 0.025):
     body_ball = chrono.ChBody()
     body_ball.SetBodyFixed(Fixed)
     body_ball.SetCollide(False)  
 
     # Visualization shape, for rendering animation
-    body_ball_shape = chrono.ChSphereShape(chrono.ChSphere(chrono.ChVectorD(0, 0, 0), 0.025))
+    body_ball_shape = chrono.ChSphereShape(chrono.ChSphere(chrono.ChVectorD(0, 0, 0), radius))
     body_ball.AddAsset(body_ball_shape)
 
     texture = chrono.ChTexture()
@@ -28,7 +28,7 @@ def DUMMY(rot = [0,0,0], pos = [0,0,0], Fixed = False):
 
     # Generate MiroComponent with above ChBody
     COMPONENT = mc.MiroComponent(body_ball)
-    COMPONENT.AddLinkPoint('A', [ 0, 1, 0], chrono.ChVectorD(0, 0, 0))
+    COMPONENT.AddLinkPoint('A', [ 0, 0, 0], chrono.ChVectorD(0, 0, 0))
     COMPONENT.Rotate(rot)
     COMPONENT.MoveToPosition(pos)
 
@@ -36,7 +36,7 @@ def DUMMY(rot = [0,0,0], pos = [0,0,0], Fixed = False):
 
 ############### MC0XX ###############
 # Plate with mounting sockets in corners on one side
-def MC0XX(M1, M3, M2, rot, pos, Fixed):
+def MC0XX(M1, M2, M3, rot = [0,0,0], pos = [0,0,0], Fixed = False):
     size_x = M1
     size_y = M3
     size_z = M2
@@ -97,75 +97,75 @@ def MC0XX(M1, M3, M2, rot, pos, Fixed):
 
 # MC01X
 def MC011(rot = [0,0,0], pos = [0,0,0], Fixed = False):
-    return MC0XX(0.08, 0.02, 0.08, rot, pos, Fixed)
+    return MC0XX(0.08, 0.08, 0.02, rot, pos, Fixed)
 def MC012(rot = [0,0,0], pos = [0,0,0], Fixed = False):
-    return MC0XX(0.12, 0.02, 0.08, rot, pos, Fixed)
+    return MC0XX(0.12, 0.08, 0.02, rot, pos, Fixed)
 def MC013(rot = [0,0,0], pos = [0,0,0], Fixed = False):
-    return MC0XX(0.16, 0.02, 0.08, rot, pos, Fixed)
+    return MC0XX(0.16, 0.08, 0.02, rot, pos, Fixed)
 def MC014(rot = [0,0,0], pos = [0,0,0], Fixed = False):
-    return MC0XX(0.20, 0.02, 0.08, rot, pos, Fixed)
+    return MC0XX(0.20, 0.08, 0.02, rot, pos, Fixed)
 def MC015(rot = [0,0,0], pos = [0,0,0], Fixed = False):
-    return MC0XX(0.24, 0.02, 0.08, rot, pos, Fixed)
+    return MC0XX(0.24, 0.08, 0.02, rot, pos, Fixed)
 
 # MC02X
 def MC021(rot = [0,0,0], pos = [0,0,0], Fixed = False):
-    return MC0XX(0.08, 0.02, 0.12, rot, pos, Fixed)
+    return MC0XX(0.08, 0.12, 0.02, rot, pos, Fixed)
 def MC022(rot = [0,0,0], pos = [0,0,0], Fixed = False):
-    return MC0XX(0.12, 0.02, 0.12, rot, pos, Fixed)
+    return MC0XX(0.12, 0.12, 0.02, rot, pos, Fixed)
 def MC023(rot = [0,0,0], pos = [0,0,0], Fixed = False):
-    return MC0XX(0.16, 0.02, 0.12, rot, pos, Fixed)
+    return MC0XX(0.16, 0.12, 0.02, rot, pos, Fixed)
 def MC024(rot = [0,0,0], pos = [0,0,0], Fixed = False):
-    return MC0XX(0.20, 0.02, 0.12, rot, pos, Fixed)
+    return MC0XX(0.20, 0.12, 0.02, rot, pos, Fixed)
 def MC025(rot = [0,0,0], pos = [0,0,0], Fixed = False):
-    return MC0XX(0.24, 0.02, 0.12, rot, pos, Fixed)
+    return MC0XX(0.24, 0.12, 0.02, rot, pos, Fixed)
 
 # MC03X
 def MC031(rot = [0,0,0], pos = [0,0,0], Fixed = False):
-    return MC0XX(0.08, 0.02, 0.16, rot, pos, Fixed)
+    return MC0XX(0.08, 0.16, 0.02, rot, pos, Fixed)
 def MC032(rot = [0,0,0], pos = [0,0,0], Fixed = False):
-    return MC0XX(0.12, 0.02, 0.16, rot, pos, Fixed)
+    return MC0XX(0.12, 0.16, 0.02, rot, pos, Fixed)
 def MC033(rot = [0,0,0], pos = [0,0,0], Fixed = False):
-    return MC0XX(0.16, 0.02, 0.16, rot, pos, Fixed)
+    return MC0XX(0.16, 0.16, 0.02, rot, pos, Fixed)
 def MC034(rot = [0,0,0], pos = [0,0,0], Fixed = False):
-    return MC0XX(0.20, 0.02, 0.16, rot, pos, Fixed)
+    return MC0XX(0.20, 0.16, 0.02, rot, pos, Fixed)
 def MC035(rot = [0,0,0], pos = [0,0,0], Fixed = False):
-    return MC0XX(0.24, 0.02, 0.16, rot, pos, Fixed)
+    return MC0XX(0.24, 0.16, 0.02, rot, pos, Fixed)
 
 # MC04X
 def MC041(rot = [0,0,0], pos = [0,0,0], Fixed = False):
-    return MC0XX(0.08, 0.02, 0.20, rot, pos, Fixed)
+    return MC0XX(0.08, 0.20, 0.02, rot, pos, Fixed)
 def MC042(rot = [0,0,0], pos = [0,0,0], Fixed = False):
-    return MC0XX(0.12, 0.02, 0.20, rot, pos, Fixed)
+    return MC0XX(0.12, 0.20, 0.02, rot, pos, Fixed)
 def MC043(rot = [0,0,0], pos = [0,0,0], Fixed = False):
-    return MC0XX(0.16, 0.02, 0.20, rot, pos, Fixed)
+    return MC0XX(0.16, 0.20, 0.02, rot, pos, Fixed)
 def MC044(rot = [0,0,0], pos = [0,0,0], Fixed = False):
-    return MC0XX(0.20, 0.02, 0.20, rot, pos, Fixed)
+    return MC0XX(0.20, 0.20, 0.02, rot, pos, Fixed)
 def MC045(rot = [0,0,0], pos = [0,0,0], Fixed = False):
-    return MC0XX(0.24, 0.02, 0.20, rot, pos, Fixed)
+    return MC0XX(0.24, 0.20, 0.02, rot, pos, Fixed)
 
 # MC05X
 def MC051(rot = [0,0,0], pos = [0,0,0], Fixed = False):
-    return MC0XX(0.08, 0.02, 0.24, rot, pos, Fixed)
+    return MC0XX(0.08, 0.24, 0.02, rot, pos, Fixed)
 def MC052(rot = [0,0,0], pos = [0,0,0], Fixed = False):
-    return MC0XX(0.12, 0.02, 0.24, rot, pos, Fixed)
+    return MC0XX(0.12, 0.24, 0.02, rot, pos, Fixed)
 def MC053(rot = [0,0,0], pos = [0,0,0], Fixed = False):
-    return MC0XX(0.16, 0.02, 0.24, rot, pos, Fixed)
+    return MC0XX(0.16, 0.24, 0.02, rot, pos, Fixed)
 def MC054(rot = [0,0,0], pos = [0,0,0], Fixed = False):
-    return MC0XX(0.20, 0.02, 0.24, rot, pos, Fixed)
+    return MC0XX(0.20, 0.24, 0.02, rot, pos, Fixed)
 def MC055(rot = [0,0,0], pos = [0,0,0], Fixed = False):
-    return MC0XX(0.24, 0.02, 0.24, rot, pos, Fixed)
+    return MC0XX(0.24, 0.24, 0.02, rot, pos, Fixed)
 
 # MC09X
 def MC091(rot = [0,0,0], pos = [0,0,0], Fixed = False):
-    return MC0XX(0.08, 0.06, 0.08, rot, pos, Fixed)
+    return MC0XX(0.08, 0.08, 0.06, rot, pos, Fixed)
 def MC092(rot = [0,0,0], pos = [0,0,0], Fixed = False):
-    return MC0XX(0.12, 0.06, 0.12, rot, pos, Fixed)
+    return MC0XX(0.12, 0.12, 0.06, rot, pos, Fixed)
 def MC093(rot = [0,0,0], pos = [0,0,0], Fixed = False):
-    return MC0XX(0.16, 0.06, 0.16, rot, pos, Fixed)
+    return MC0XX(0.16, 0.16, 0.06, rot, pos, Fixed)
 def MC094(rot = [0,0,0], pos = [0,0,0], Fixed = False):
-    return MC0XX(0.20, 0.06, 0.20, rot, pos, Fixed)
+    return MC0XX(0.20, 0.20, 0.06, rot, pos, Fixed)
 def MC095(rot = [0,0,0], pos = [0,0,0], Fixed = False):
-    return MC0XX(0.24, 0.06, 0.24, rot, pos, Fixed)
+    return MC0XX(0.24, 0.24, 0.06, rot, pos, Fixed)
 
 ############### MC1XX ###############
 # Mounting rod
@@ -630,12 +630,17 @@ def MC499(rot = [0,0,0], pos = [0,0,0], Fixed = False):
 ############### MC5XX ###############
 # Ball
 def MC5XX(M1, M2, M3, rot = [0,0,0], pos = [0,0,0], Fixed = False):
+    '''Ellipsoid component, ABS plastic.\n
+    M1 = radius in x\n 
+    M2 = radius in y\n
+    M3 = radius in z\n
+    Linkpoints: A: +x, B: -x, C: +y, D: -y, E: +z, F: -z.'''
     size_rx = M1
     size_ry = M2
     size_rz = M3
     density_brick = density['ABS']   # kg/m^3
-
-    body_brick = chrono.ChBodyEasySphere(size_rx, density_brick)
+    
+    body_brick = chrono.ChBodyEasyEllipsoid(chrono.ChVectorD(size_rx, size_ry, size_rz), density_brick)
     body_brick.SetBodyFixed(Fixed)
     body_brick.SetCollide(True)
     # set mass properties
@@ -656,12 +661,12 @@ def MC5XX(M1, M2, M3, rot = [0,0,0], pos = [0,0,0], Fixed = False):
     # Generate MiroComponent with above ChBody
     COMPONENT = mc.MiroComponent(body_brick)
 
-    # COMPONENT.AddLinkPoint('A', [ 0, 1, 0], chrono.ChVectorD(0, size_h/2, 0))
-    # COMPONENT.AddLinkPoint('B', [ 0,-1, 0], chrono.ChVectorD(0,-size_h/2, 0))
-    # COMPONENT.AddLinkPoint('C', [ 1, 0, 0], chrono.ChVectorD( size_r, 0, 0))
-    # COMPONENT.AddLinkPoint('D', [-1, 0, 0], chrono.ChVectorD(-size_r, 0, 0))
-    # COMPONENT.AddLinkPoint('E', [ 0, 0, 1], chrono.ChVectorD( 0, 0, size_r))
-    # COMPONENT.AddLinkPoint('F', [ 0, 0,-1], chrono.ChVectorD( 0, 0,-size_r))
+    COMPONENT.AddLinkPoint('A', [ 1, 0, 0], chrono.ChVectorD( size_rx, 0, 0))
+    COMPONENT.AddLinkPoint('B', [-1, 0, 0], chrono.ChVectorD(-size_rx, 0, 0))
+    COMPONENT.AddLinkPoint('C', [ 0, 1, 0], chrono.ChVectorD( 0, size_ry, 0))
+    COMPONENT.AddLinkPoint('D', [ 0,-1, 0], chrono.ChVectorD( 0, size_ry, 0))
+    COMPONENT.AddLinkPoint('E', [ 0, 0, 1], chrono.ChVectorD( 0, 0, size_rz))
+    COMPONENT.AddLinkPoint('F', [ 0, 0,-1], chrono.ChVectorD( 0, 0,-size_rz))
     
     COMPONENT.Rotate(rot)
     COMPONENT.MoveToPosition(pos)
