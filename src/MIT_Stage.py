@@ -1,5 +1,6 @@
 import pychrono.core as chrono
 import numpy as np
+import os
 
 from src import Shapes as shp
 
@@ -46,7 +47,10 @@ def screen(system, SPEEDMODE = False):
     pro_screen.GetAssets().push_back(pro_screen_shape)
     
     pro_screen_texture = chrono.ChTexture()
-    pro_screen_texture.SetTextureFilename(chrono.GetChronoDataFile('GroupLogo.png'))
+    grouplogo_file = 'GroupLogo_local.png'
+    if not os.path.isfile(grouplogo_file):
+        grouplogo_file = 'GroupLogo.png'
+    pro_screen_texture.SetTextureFilename(chrono.GetChronoDataFile(grouplogo_file))
     pro_screen_texture.SetTextureScale(-4, -3)
     pro_screen.GetAssets().push_back(pro_screen_texture)
 
