@@ -43,6 +43,7 @@ class MiroSystem():
         self.ChSystem.SetSolverMaxIterations(70)
         
     def Set_Speedmode(self, SPEEDMODE = True):
+        '''Sets is speedmode is to be used. This removes many visual items to speed up the simulation.'''
         self.SPEEDMODE = SPEEDMODE
 
     def Set_Environment(self, Environment):
@@ -72,6 +73,7 @@ class MiroSystem():
         return self.ChSystem
     
     def Set_Perspective(self, camname, follow_module_name = False, follow_position = [1.5, 0.75, 0], follow_distance = 0, cycle = False, cycle_laptime = 4):
+        '''Sets the camera perspective configuration for the simulation. Available perspectives depend on the MiroEnvironment used.'''
         if cycle:
             self.cycle = True
             self.cycle_angle = -2*np.pi/cycle_laptime
@@ -83,7 +85,7 @@ class MiroSystem():
                     self.follow = True
                     self.followmod = self.modules[follow_module_name]
                     self.cam_to_obs = -chrono.ChVectorD(follow_position[0], follow_position[1], follow_position[2])
-                    self.obs_pos = self.followmod.GetBasePosition()
+                    self.obs_pos = self.followmod.GetCenterOfMass()
                     self.cam_pos = self.obs_pos - self.cam_to_obs
                     if follow_distance > 0:
                         self.cam_to_obs.SetLength(follow_distance)
@@ -118,17 +120,20 @@ class MiroSystem():
         })
 
     def Set_Camera(self):
+        '''This sets the camera during simulation. For internal usage when the simulation is being run, 
+        use SetPerspective to configure the camera before running the simulation.'''
         if self.cycle:
             q = chrono.Q_from_AngAxis(self.cycle_angle/self.fps, chrono.ChVectorD(0,1,0))
             self.cam_to_obs = q.Rotate(self.cam_to_obs)
         if self.follow:
-            self.obs_pos = self.followmod.GetBasePosition()
+            self.obs_pos = self.followmod.GetCenterOfMass()
         self.cam_pos = self.obs_pos - self.cam_to_obs
         position = chronoirr.vector3df(self.cam_pos.x, self.cam_pos.y, self.cam_pos.z)
         looker = chronoirr.vector3df(self.obs_pos.x, self.obs_pos.y, self.obs_pos.z)
         self.simulation.AddTypicalCamera(position, looker)
 
     def Add_MiroModule(self, module, name, position = False, vel = False):
+        '''Adds a MiroModule to the MiroSystem with a custom name. Can set an initial position and velocity.'''
         if(position):
             module.Move(position)
         if vel:
@@ -147,11 +152,13 @@ class MiroSystem():
             module.PrintInfo()
 
     def MoveToReference(self, move_module, ref_module):
+        '''Moves the first module to the reference point of the second module.'''
         moveMod = self.modules[move_module]
         refMod = self.modules[ref_module]
         moveMod.SetPosition(refMod.GetReferencePoint())
 
     def Add_Object(self, Object):
+        '''Adds a ChBody or similar object to the ChSystem under the MiroSystem.'''
         self.ChSystem.Add(Object)
 
     def Initialize_Config(self, config):
@@ -189,6 +196,11 @@ class MiroSystem():
             self.print = config['print module info']
         else:
             self.print = False
+        
+        if "start paused" in config:
+            self.start_paused = config['start paused']
+        else:
+            self.start_paused = False
     
     def Run(self, config = {}):
         '''Runs the simulation. Configuration options and their default values are:\n
@@ -199,6 +211,7 @@ class MiroSystem():
         "datalog": False\n
         "pause_before_launch": True\n
         "print module info": False\n
+        "start paused" = False\n
         '''
         # ---------------------------------------------------------------------
         #
@@ -234,10 +247,17 @@ class MiroSystem():
         
         dt = 1/self.fps # per frame
         substeps = self.subframes
-        paused = False
 
         self.simulation.SetTimestep(dt/substeps)
         self.simulation.SetTryRealtime(True)
+        
+        if self.start_paused:
+            self.simulation.SetPaused(True)
+            paused = True
+        else:
+            paused = False
+
+        
 
         if self.log:
             for sensor_ID, sensor in self.sensors.items():
@@ -246,7 +266,6 @@ class MiroSystem():
         self.simulation.GetDevice().run()
         self.simulation.BeginScene()
         self.simulation.DrawAll()
-        self.simulation.DoStep()
         self.simulation.EndScene()
 
         if self.print:
@@ -261,7 +280,7 @@ class MiroSystem():
                 self.simulation.DoStep()
             self.simulation.EndScene()
 
-            if self.follow:
+            if self.follow and not self.simulation.GetPaused():
                 self.Set_Camera()
         
         for _, module in self.modules.items():
