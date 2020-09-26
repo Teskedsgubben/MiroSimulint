@@ -13,10 +13,15 @@ MIT_place.Set_Initializer(MIT.build_MIT)
 
 MIT_place.Set_Notifier(MN.MiroNotifier([13.41, 8.5, 1.55], 84.125, 0))
 
-MIT_place.Add_Lightsource([  5, 25,  20], [3, 0, -5], 100, 15, 40, 40, False)
-MIT_place.Add_Lightsource([-20,  1,   0], [0, 2,  0],  24,  7, 40, 70, False)
-MIT_place.Add_Lightsource([  0,  1, -20], [0, 2,  0],  24,  7, 40, 70, False)
-MIT_place.Add_Lightsource([ 10,  2,  -4], [9, 3,  4],  24,  15, 60, 50, False)
+MIT_place.Add_Lightsource([  5, 25,  20], [3, 0, -5], 100, 15, 40, 40)
+MIT_place.Add_Lightsource([13, 6.67,-6], power = 80, shadows=False)
+MIT_place.Add_Lightsource([-3, 0.25, 1], power = 80, shadows=False)
+
+# MIT_place.Add_Lightsource([0,-45,0],[0,0,0],1000,25,55,120)
+# MIT_place.Add_Lightsource([0,5,0],[0,3,0],100,0,25,360)
+# MIT_place.Add_Lightsource([-20,  1,   0], [0, 2,  0],  24,  7, 40, 70, False)
+# MIT_place.Add_Lightsource([  0,  1, -20], [0, 2,  0],  24,  7, 40, 70, False)
+# MIT_place.Add_Lightsource([ 10,  2,  -4], [9, 3,  4],  24,  15, 60, 50, False)
 
 MIT_place.Add_Camview({
             'default': {
