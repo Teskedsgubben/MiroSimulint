@@ -41,8 +41,8 @@ class MiroEnvironment():
         else:
             return False
 
-    def Add_Lightsource(self, point, target, power, near, far, angle, isAmbient = True):
-        self.lights.append([point, target, power, near, far, angle, isAmbient])
+    def Add_Lightsource(self, point, target = [0,0,0], power = 50, near = 1, far = 25, angle = 90, isAmbient = True, shadows = True):
+        self.lights.append([point, target, power, near, far, angle, isAmbient, shadows])
 
     def Get_Lightsources(self):
         return self.lights
