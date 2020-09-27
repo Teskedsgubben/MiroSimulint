@@ -73,20 +73,20 @@ def third_floor(system):
             MIT_chair(system, pos_chair,chair_i)  
 
 def fourth_floor(system):
-    table_pos = chrono.ChVectorD(9.15,6.64,-5.8)
-    size_table_x = 1
-    size_table_y = 0.1
-    size_table_z = 1
-    size_leg_h = 0.8
-    size_leg_r = 0.03
-    length = np.sqrt((size_table_x/2)**2 + (size_table_z/2)**2)
-    MIT_table(system, table_pos, size_table_x, size_table_y, size_table_z, size_leg_h, size_leg_r)   # The table
-    for chair_i in range(1,4,2):
-        length_rand = length - random.random()/5 #makes the chairs look more natural because they wont be perfect inline
-        theta = chair_i*0.5*np.pi
-        n = chrono.ChVectorD(-length_rand*np.cos(theta), 0, length_rand*np.sin(theta))
-        pos_chair = table_pos + n
-        MIT_chair(system, pos_chair,chair_i)  
+    for table_pos in [chrono.ChVectorD(9.15,6.64,-5.8), chrono.ChVectorD(10.15,6.64,-5.8), chrono.ChVectorD(9.2,6.64,1.7)]:
+        size_table_x = 1
+        size_table_y = 0.1
+        size_table_z = 1
+        size_leg_h = 0.8
+        size_leg_r = 0.03
+        length = np.sqrt((size_table_x/2)**2 + (size_table_z/2)**2)
+        MIT_table(system, table_pos, size_table_x, size_table_y, size_table_z, size_leg_h, size_leg_r)   # The table
+        for chair_i in range(1,4,2):
+            length_rand = length - random.random()/5 #makes the chairs look more natural because they wont be perfect inline
+            theta = chair_i*0.5*np.pi
+            n = chrono.ChVectorD(-length_rand*np.cos(theta), 0, length_rand*np.sin(theta))
+            pos_chair = table_pos + n
+            MIT_chair(system, pos_chair,chair_i)  
 
 def MIT_table(system, table_pos, size_table_x, size_table_y, size_table_z,size_leg_h, size_leg_r):    
     size_table = np.array([size_table_x, size_table_y, size_table_z, size_leg_h])
