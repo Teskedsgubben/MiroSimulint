@@ -178,7 +178,7 @@ def MIT_floors(system, H, SPEEDMODE):
     floor_t = 0.08               # Floor thickness
     floor_w = 1.58                # Floor width towards NA
     floor_w_2 = 1.95 +2.11       # towards technology house
-    texture_floor = ['textures/stone_floor.jpg', 'textures/stone_floor.jpg', 'textures/stone_floor.jpg']
+    texture_floor = ['textures/stone_floor.jpg', 'textures/story_floor.jpg', 'textures/story_floor.jpg']
     texture_roof = 'textures/white concrete.jpg'
     scale_roof = [80,10]
     handle_l = 13.5    
