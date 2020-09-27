@@ -36,6 +36,13 @@ def AddProps(system):
     props.painting(system, [3.1, 5.0, 8.18], 'black_painting_2.png', 0, [s*1.17/2, s*0.91/2])
     props.painting(system, [5.2, 5.0, 8.18], 'black_painting_3.png', 0, [s*1.17/2, s*0.91/2])
 
+    # East wall floor vents
+    props.floorvent(system, [-0.55, 0.0, -8.85])
+    props.floorvent(system, [ 3.85, 0.0, -8.85])
+
+    # South wall floor vents
+    props.floorvent(system, [-5.3, 0.0, -4.15])
+    props.floorvent(system, [-5.3, 0.0, 0.3])
 
     # In the staircase
     # props.pokeball(system, [7.35,4.85,2.5], 0)
