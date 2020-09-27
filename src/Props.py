@@ -362,3 +362,71 @@ def dino(ChSystem, pos, rot = 0, scale = 0.1):
     # dino.SetShowCollisionMesh(True)
 
     ChSystem.Add(dino)
+
+def floorvent(ChSystem, target, SPEEDMODE = False):
+    h = 0.85
+    r = 0.30
+
+    h1 = 0.20
+    h3 = 0.04
+    h2 = h - h1 - h3
+    
+    pos_base = chrono.ChVectorD(target[0], target[1]+h1/2, target[2])
+    pos_vent = chrono.ChVectorD(target[0], target[1]+h2/2+h1, target[2])
+    pos_topp = chrono.ChVectorD(target[0], target[1]+h3/2+h1+h2, target[2])
+
+    # Create Base Hitbox
+    base = chrono.ChBodyEasyCylinder(r-0.02, h1, 1500)
+    base.SetBodyFixed(True)
+
+    # Collision shape
+    base.SetCollide(True)
+    base.GetCollisionModel().ClearModel()
+    base.GetCollisionModel().AddCylinder(r, r, h/2, chrono.ChVectorD(0,(h-h1)/2,0))
+    base.GetCollisionModel().BuildModel()
+
+    # Frame texture
+    base_texture = chrono.ChTexture()
+    base_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/vents_surface.jpg'))
+    base_texture.SetTextureScale(1, 1)
+    base.GetAssets().push_back(base_texture)
+
+    base.SetPos(chrono.ChVectorD(pos_base))
+
+
+    # Create Top part Hitbox
+    vent = chrono.ChBodyEasyCylinder(r, h2, 1500)
+    vent.SetBodyFixed(True)
+
+    # Collision shape is in base
+    vent.SetCollide(False)
+
+    # Frame texture
+    vent_texture = chrono.ChTexture()
+    vent_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/vents.jpg'))
+    vent_texture.SetTextureScale(2, 1)
+    vent.GetAssets().push_back(vent_texture)
+
+    vent.SetPos(chrono.ChVectorD(pos_vent))
+
+
+    # Create Top part Hitbox
+    topp = chrono.ChBodyEasyCylinder(r, h3, 1500)
+    topp.SetBodyFixed(True)
+
+    # Collision shape is in base
+    topp.SetCollide(False)
+
+    # Frame texture
+    topp_texture = chrono.ChTexture()
+    topp_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/vents_surface.jpg'))
+    topp_texture.SetTextureScale(1, -1)
+    topp.GetAssets().push_back(topp_texture)
+
+    topp.SetPos(chrono.ChVectorD(pos_topp))
+
+
+    # Add to system
+    ChSystem.Add(base)
+    ChSystem.Add(vent)
+    ChSystem.Add(topp)
