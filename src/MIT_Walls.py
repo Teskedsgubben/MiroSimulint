@@ -32,7 +32,7 @@ def MIT_stair(system, center, H, SPEEDMODE):
         return
     
     # Top disk
-    add_cylinderShape(system, stair_r+0.01, 0.05, 1, pos_disk, 'textures/stone_floor.jpg', [1,1]) 
+    add_cylinderShape(system, stair_r+0.01, 0.05, 1, pos_disk, 'textures/stone_floor.jpg', [1/8,1/8]) 
     # Add fake stair to base floor
     add_cylinderShape(system, stair_r+1.7, 0.001, stair_d, center, 'textures/black.jpg', [1,1])
 
@@ -178,9 +178,8 @@ def MIT_floors(system, H, SPEEDMODE):
     floor_t = 0.08               # Floor thickness
     floor_w = 1.58                # Floor width towards NA
     floor_w_2 = 1.95 +2.11       # towards technology house
-    texture_floor = 'textures/stone_floor.jpg'
+    texture_floor = ['textures/stone_floor.jpg', 'textures/stone_floor.jpg', 'textures/stone_floor.jpg']
     texture_roof = 'textures/white concrete.jpg'
-    scale_floor = [10,20] # Texture scale
     scale_roof = [80,10]
     handle_l = 13.5    
     
@@ -190,8 +189,8 @@ def MIT_floors(system, H, SPEEDMODE):
         floor_pos_1 = chrono.ChVectorD(-3.5, y_pos, 6.58)       # Add floors towards NA
         floor_pos_2 = chrono.ChVectorD(10.45+2.11, y_pos, -4-0.42)    # Add floors towards technology house
 
-        add_boxShape(system, floor_l, floor_t, floor_w, floor_pos_1, texture_floor, [20,10])
-        add_boxShape(system, floor_w_2, floor_t, floor_l+0.58, floor_pos_2, texture_floor, [10,20])
+        add_boxShape(system, floor_l, floor_t, floor_w, floor_pos_1, texture_floor[floor], [50,3.6])
+        add_boxShape(system, floor_w_2, floor_t, floor_l+0.58, floor_pos_2, texture_floor[floor], [18,28])
 
         if floor > 0 and SPEEDMODE == False:
             add_fence(system, H, postNum, floor_w, floor_w_2, floor, floor_t, handle_l)
@@ -213,7 +212,7 @@ def MIT_floors(system, H, SPEEDMODE):
         y_pos = piece*H - floor_t*0.999
         floor_pos = chrono.ChVectorD(7.5, y_pos+0.002, 4) 
         
-        add_boxShape(system, floor_x, floor_t, floor_z, floor_pos, texture_floor, [4,3])
+        add_boxShape(system, floor_x, floor_t, floor_z, floor_pos, texture_floor[0], [4,2])
     
     for piece in range(floorsNum):
         if piece > 0:
@@ -229,7 +228,7 @@ def MIT_floors(system, H, SPEEDMODE):
         y = i*H + H - floor_t
         pos = chrono.ChVectorD(10, y, 10.16)
 
-        add_boxShape(system, length, floor_t, width, pos, texture_floor, scale_floor)
+        add_boxShape(system, length, floor_t, width, pos, texture_floor[1], [48.9,6])
     
     for i in range(2):
         y = i*H + H - 3*floor_t
@@ -239,7 +238,7 @@ def MIT_floors(system, H, SPEEDMODE):
 
     # Add MIT entrence floor
     pos = chrono.ChVectorD(6.2, 0-floor_t, 10.16)
-    add_boxShape(system, 6.5, floor_t, 2, pos, texture_floor, scale_floor)
+    add_boxShape(system, 6.5, floor_t, 2, pos, texture_floor[0], [30,6])
 
     # Add MIT roof over entrence
     # pos = chrono.ChVectorD(4.25, 0+H-2*floor_t, 10.16)
