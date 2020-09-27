@@ -108,20 +108,14 @@ class MiroComponent():
         return self.body
 
     def MoveBy(self, delta_pos):
-        pos_x = delta_pos[0]
-        pos_y = delta_pos[1]
-        pos_z = delta_pos[2]
-
-        posvec = chrono.ChVectorD(pos_x, pos_y, pos_z)
-        self.body.Move(posvec)
+        if type(delta_pos) == type([]):
+            delta_pos = chrono.ChVectorD(delta_pos[0], delta_pos[1], delta_pos[2])
+        self.body.Move(delta_pos)
 
     def MoveToPosition(self, pos):
-        pos_x = pos[0]
-        pos_y = pos[1]
-        pos_z = pos[2]
-
-        posvec = chrono.ChVectorD(pos_x, pos_y, pos_z)
-        self.body.Move(posvec - self.body.GetPos())
+        if type(pos) == type([]):
+            pos = chrono.ChVectorD(pos[0], pos[1], pos[2])
+        self.body.Move(pos - self.body.GetPos())
 
     def MoveToMatch(self, pointname, other_component, other_pointname, dist = 0):
         '''Moves the component to match the provided linkpoint position with the position of a 
