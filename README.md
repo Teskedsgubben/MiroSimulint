@@ -117,6 +117,10 @@ _CustomComponents.py_ is where you can define your custom components that you ei
 
 There is also a _test\_main.py_ file which is a copy of the _Main.py_ file and will run the program as well. It shows some other tricks you can use for testing and camera controls. You can also use this file to try stuff out without having to change the Main file.
 
+Before you start coding, copy these files in the same directory and rename them by adding _local. There should in other words be a Main.py file and a Main_local.py file etc. You can then edit the local files and still do a git pull to get the latest version of the Simulint files, and you also keep the original files as a refernce.
+
+To do a git pull, go to Source Control _(View -> SCM)_ and click the three dots button ... to show the dropdown menu, then click Pull. If there are changes showing in the list, you need to discard them first. Save your changes in some way if you need to keep them, then discard them with the revert-like arrow button.
+
 Your Lander and Launcher are both built as MiroModules using MiroComponents. This means that you add the components you need, rotate them properly and then assemble them into a complete module. The order here is important, as connecting components 1 and 2 will move component 2 so that the connection points match. If you connect first and rotate the object after, things are going to get messy. However, that doesn't mean you shouldn't try it :bowtie:.
 
 ### The Goal
