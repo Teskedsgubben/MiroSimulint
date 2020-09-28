@@ -8,6 +8,7 @@ class Module():
         self.links = {}
         self.nonames_comp = 0
         self.nonames_sens = 0
+        self.nonames_boos = 0
         self.fixed = []
         self.refpoint = False
         self.refcomp = False
@@ -35,7 +36,20 @@ class Module():
             name = 'unnamed'+str(self.nonames_comp)
         self.components.update({name: comp})
         self.mass = self.mass + comp.GetMass()
+
+    def AddBooster(self, booster, name='unnamed'):
+        if(name == 'unnamed'):
+            self.nonames_boos = self.nonames_boos + 1
+            name = 'unnamed_booster'+str(self.nonames_boos)
+        self.AddSensor(booster, name)
     
+    def AddSensor(self, sensor, name='unnamed'):
+        if(name == 'unnamed'):
+            self.nonames_sens = self.nonames_sens + 1
+            name = 'unnamed_sensor'+str(self.nonames_sens)
+        self.sensors.update({name: sensor})
+        self.AddComponent(sensor, name)
+
     def GetBasePosition(self):
         if self.base:
             return self.base.GetPosition()
@@ -56,13 +70,6 @@ class Module():
 
     def GetComponent(self, name='unnamed'):
         return self.components[name]
-    
-    def AddSensor(self, sensor, name='unnamed'):
-        if(name == 'unnamed'):
-            self.nonames_sens = self.nonames_sens + 1
-            name = 'unnamed_sensor'+str(self.nonames_sens)
-        self.sensors.update({name: sensor})
-        self.AddComponent(sensor, name)
 
     def GetSensor(self, name='unnamed'):
         return self.sensors[name]

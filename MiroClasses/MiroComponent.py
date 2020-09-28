@@ -7,6 +7,7 @@ class MiroComponent():
         self.linkpoints = {}
         self.linkdirs = {}
         self.importdir = 'object_files/'
+        self.msystem = False
         if body:
             self.body = body
 
@@ -79,8 +80,9 @@ class MiroComponent():
     def GetMass(self):
         return self.body.GetMass()
         
-    def AddToSystem(self, system):
-        system.Add_Object(self.body)
+    def AddToSystem(self, Miro_System):
+        self.msystem = Miro_System
+        Miro_System.Add_Object(self.body)
 
     def AddLinkPoint(self, name, normal, coord):
         if type(coord) == type([]):
@@ -245,4 +247,70 @@ class MiroSensor_Odometer(MiroSensor):
         pos = self.GetBody().GetPos() - self.start
         data = str(pos.x)+' '+str(pos.y)+' '+str(pos.z)+'\n'
         self.filestream.write(data)
+
+# Booster class extends Sensor class
+class MiroBooster(MiroSensor):
+    def Initialize(self, output_file_name, simulation):
+        self.filename = output_file_name
+        self.filestream = open(self.filename, "w")
+        self.filestream.truncate(0)
+        self.dt = simulation.GetTimestep()
+        if not hasattr(self, 'fuel'):
+            self.fuel = 400
+        if not hasattr(self, 'cons'):
+            self.cons = 1
+        if not hasattr(self, 'trigger'):
+            self.trigger = False
+        self.triggered = False
+        self.expended = False
+
+    def SetTrigger(self, trigger_function):
+        self.trigger = trigger_function
+
+    def SetConsumption(self, consumption):
+        '''Fuel consumption per simulated second '''
+        self.cons = consumption
+
+    def SetForce(self, force, duration=1, point = [0,0,0]):
+        self.force = force
+        self.duration = duration
+        if type(point) == type([]):
+            point = chrono.ChVectorD(point[0], point[1], point[2])
+        self.relpoint = point
+
+    def SetFuelCap(self, total_fuel):
+        self.fuel = total_fuel
+
+    def CheckTrigger(self):
+        if not self.triggered:
+            if not self.trigger:
+                self.triggered = True
+            else:
+                pos = self.body.GetPos()
+                vel = self.body.GetPos_dt()
+                acc = self.body.GetPos_dtdt()
+                position = [pos.x, pos.y, pos.z]
+                velocity = [vel.x, vel.y, vel.z]
+                acceleration = [acc.x, acc.y, acc.z]
+                if self.trigger(position, velocity, acceleration):
+                    self.triggered = True
+                    self.F = chrono.ChForce()
+                    self.F.SetMode(1)
+                    self.F.SetF_x(chrono.ChFunction_Const(self.force))
+                    # F.SetVrelpoint(self.body.GetRot().Rotate(self.relpoint))
+                    # self.F.SetRelDir(chrono.ChVectorD(0,-1,0))
+                    self.body.AddForce(self.F)
+        elif self.fuel > 0:
+            self.fuel = self.fuel - self.cons*self.dt
+        elif not self.expended:
+            self.body.RemoveForce(self.F)
+            self.expended = True
+            
+    def LogData(self):
+        self.CheckTrigger()
+        f = self.force
+        if not self.triggered or self.fuel <= 0:
+            f = 0
+        self.filestream.write(str(f)+' '+str(self.fuel)+'\n')
+        return
 
