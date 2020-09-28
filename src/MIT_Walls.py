@@ -548,6 +548,7 @@ def MIT_walls(system, H):
         # Create a box
         body_wall = chrono.ChBody()
         body_wall.SetBodyFixed(True)
+        body_wall.SetCollide(True)
         body_wall.SetPos(chrono.ChVectorD(pos_ob[i]))
 
         qr = chrono.Q_from_AngAxis(ang[i], n.GetNormalized())    # Rotate the cylinder
@@ -559,6 +560,10 @@ def MIT_walls(system, H):
         body_wall_shape.GetBoxGeometry().Size = chrono.ChVectorD(dim[i])
         body_wall_shape.SetColor(chrono.ChColor(0.4,0.4,0.5))
         body_wall.GetAssets().push_back(body_wall_shape)
+
+        body_wall.GetCollisionModel().ClearModel()
+        body_wall.GetCollisionModel().AddBox(dim[i].x, dim[i].y, dim[i].z) # hemi sizes
+        body_wall.GetCollisionModel().BuildModel()
         
         body_wall_texture = chrono.ChTexture()
         body_wall_texture.SetTextureFilename(chrono.GetChronoDataFile(textures[i]))
