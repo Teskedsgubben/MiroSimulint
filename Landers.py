@@ -74,6 +74,6 @@ def RocketLander(args):
             return True
         else:
             return False
-    Lander.AddBooster(Boosters.MCB01(trigger_function), 'Booster')
+    Lander.AddBooster(Boosters.MCB01(trigger_function, pulses=2), 'Booster')
     Lander.RotateZ('Booster', 10)
     return Lander
