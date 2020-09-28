@@ -11,8 +11,8 @@ video_capture
 *.txt
 # sparade lokala filer
 ignored_storage
-# scaled .obj files
-*_scale*.obj
+# ignore all .obj files
+*.obj
 # MIT bilder som referens
 MIT_pics
 # Any group files
