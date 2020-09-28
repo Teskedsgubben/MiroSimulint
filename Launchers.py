@@ -6,6 +6,7 @@ from MiroClasses import MiroModule as MM
 from MiroClasses import MiroComponent as MC
 
 from src import Components
+from src import Boosters
 from src import Sensors
 
 try:
