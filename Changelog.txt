@@ -1,3 +1,14 @@
+2020-09-28
+
+1) Springs can now be drawn by adding draw_spring=True when creating them. Number of turns in the coil
+and radius can also be adjusted with spring_radius and spring_turns.
+
+2) Added rocketboosters. Check Landers.py for demo. Work like MiroComponents but exert a force pulse
+when its triggerfunction returns True. Define a trigger function and use AddBooster from the module.
+You MUST add "from src import Boosters" before using this. Logs data like a sensor of force exerted
+each time step to visualize when the boost occurs. 
+
+3) Updated specitifaction sheet with booster specs.
 
 ----------------------------------------------------------------------------------------------------
 2020-09-27
