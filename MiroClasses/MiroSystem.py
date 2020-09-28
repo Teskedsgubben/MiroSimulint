@@ -273,6 +273,7 @@ class MiroSystem():
         self.simulation.GetDevice().run()
         self.simulation.BeginScene()
         self.simulation.DrawAll()
+        self.simulation.DoStep()
         self.simulation.EndScene()
 
         if self.print:
