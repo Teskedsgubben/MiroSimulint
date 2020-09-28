@@ -206,6 +206,11 @@ class MiroSystem():
             self.framesave_interval = config['frame save interval']
         else:
             self.framesave_interval = 1
+            
+        if "record" in config:
+            self.record = config['record']
+        else:
+            self.record = 1
     
     def Run(self, config = {}):
         '''Runs the simulation. Configuration options and their default values are:\n
@@ -218,6 +223,7 @@ class MiroSystem():
         "print module info": False\n
         "start paused" = False\n
         "frame save interval" = 1\n
+        "record": False\n
         '''
         # ---------------------------------------------------------------------
         #
@@ -226,7 +232,7 @@ class MiroSystem():
         self.Initialize_Config(config)
         
         self.simulation = chronoirr.ChIrrApp(self.ChSystem, 'MiroSimulation', chronoirr.dimension2du(self.res[0], self.res[1]))
-        
+        self.simulation.SetVideoframeSave(self.record)
         self.simulation.AddTypicalSky()
         self.Set_Camera()
         self.Set_Lights(True)
