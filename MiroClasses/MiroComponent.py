@@ -256,9 +256,9 @@ class MiroBooster(MiroSensor):
         self.filestream.truncate(0)
         self.dt = simulation.GetTimestep()
         if not hasattr(self, 'fuel'):
-            self.fuel = 400
+            self.fuel = 100
         if not hasattr(self, 'cons'):
-            self.cons = 1
+            self.cons = 1000
         if not hasattr(self, 'trigger'):
             self.trigger = False
         self.triggered = False
@@ -271,14 +271,10 @@ class MiroBooster(MiroSensor):
         '''Fuel consumption per simulated second '''
         self.cons = consumption
 
-    def SetForce(self, force, duration=1, point = [0,0,0]):
+    def SetForce(self, force):
         self.force = force
-        self.duration = duration
-        if type(point) == type([]):
-            point = chrono.ChVectorD(point[0], point[1], point[2])
-        self.relpoint = point
 
-    def SetFuelCap(self, total_fuel):
+    def SetFuel(self, total_fuel):
         self.fuel = total_fuel
 
     def CheckTrigger(self):
@@ -295,10 +291,7 @@ class MiroBooster(MiroSensor):
                 if self.trigger(position, velocity, acceleration):
                     self.triggered = True
                     self.F = chrono.ChForce()
-                    self.F.SetMode(1)
                     self.F.SetF_y(chrono.ChFunction_Const(self.force))
-                    # F.SetVrelpoint(self.body.GetRot().Rotate(self.relpoint))
-                    # self.F.SetRelDir(chrono.ChVectorD(0,-1,0))
                     self.body.AddForce(self.F)
         elif self.fuel > 0:
             self.fuel = self.fuel - self.cons*self.dt
@@ -311,6 +304,6 @@ class MiroBooster(MiroSensor):
         f = self.force
         if not self.triggered or self.fuel <= 0:
             f = 0
-        self.filestream.write(str(f)+' '+str(self.fuel)+'\n')
+        self.filestream.write(str(f)+'\n')
         return
 
