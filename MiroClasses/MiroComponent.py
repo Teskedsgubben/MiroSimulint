@@ -296,7 +296,7 @@ class MiroBooster(MiroSensor):
                     self.triggered = True
                     self.F = chrono.ChForce()
                     self.F.SetMode(1)
-                    self.F.SetF_y(chrono.ChFunction_Const(-self.force))
+                    self.F.SetF_y(chrono.ChFunction_Const(self.force))
                     # F.SetVrelpoint(self.body.GetRot().Rotate(self.relpoint))
                     # self.F.SetRelDir(chrono.ChVectorD(0,-1,0))
                     self.body.AddForce(self.F)
