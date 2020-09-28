@@ -17,3 +17,5 @@ ignored_storage
 MIT_pics
 # Any group files
 Grupp*_*
+# Ignores data files
+*.dat
