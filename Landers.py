@@ -6,6 +6,7 @@ from MiroClasses import MiroModule as MM
 from MiroClasses import MiroComponent as MC
 
 from src import Components
+from src import Boosters
 from src import Sensors
 
 try:
@@ -60,4 +61,19 @@ def DemoLander(args):
     # Connect sensor to the module, behaves just like a component
     Lander.ConnectComponents('Top plate', 'E', 'Accelerometer', 'Linkpoint')
 
+    return Lander
+
+# Example of how to set a trigger function to a booster 
+def RocketLander(args):
+    Lander = MM.Module()
+    # The trigger function will get position, velocity and acceleration on the form [x,y,z]
+    # You choose when to trigger the rocket by deciding under what conditions to return True
+    def trigger_function(position, velocity, acceleration):
+        if position[1] < 2.5:
+            print('Triggered!')
+            return True
+        else:
+            return False
+    Lander.AddBooster(Boosters.MCB01(trigger_function), 'Booster')
+    Lander.RotateZ('Booster', 10)
     return Lander
