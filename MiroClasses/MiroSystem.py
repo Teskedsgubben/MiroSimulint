@@ -210,7 +210,7 @@ class MiroSystem():
         if "record" in config:
             self.record = config['record']
         else:
-            self.record = 1
+            self.record = False
     
     def Run(self, config = {}):
         '''Runs the simulation. Configuration options and their default values are:\n
