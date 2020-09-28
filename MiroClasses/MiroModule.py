@@ -232,7 +232,7 @@ class Module():
         
         self.links.update({name: mlink})
 
-    def SetSpring(self, name_A, point_A, name_B, point_B, L, K, marking_color = [0.5, 0.1, 0.1], marking_radius = 0.005):
+    def SetSpring(self, name_A, point_A, name_B, point_B, L, K, marking_color = [0.5, 0.1, 0.1], marking_radius = 0.005, draw_spring = False, spring_radius = 0.005, spring_turns = 40):
         '''Sets a spring of rest length L and spring constant K between the points on components A and B in the module. 
         Marks the connection points with a non-interactive sphere on each end. To remove marking spheres, set marking radius to 0.''' 
         
@@ -245,6 +245,8 @@ class Module():
         mlink.Initialize(comp_A.GetBody(), comp_B.GetBody(), False, comp_A.GetLinkPoint(point_A), comp_B.GetLinkPoint(point_B))
         mlink.SetSpringCoefficient(K)
         mlink.SetDampingCoefficient(K/200)
+        if draw_spring:
+            mlink.AddAsset(chrono.ChPointPointSpring(spring_radius, 15*spring_turns, spring_turns))
         mlink.SetRestLength(L)
 
         self.links.update({name: mlink})
