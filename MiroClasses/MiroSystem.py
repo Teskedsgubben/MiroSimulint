@@ -269,12 +269,9 @@ class MiroSystem():
             paused = True
         else:
             paused = False
-
         
-
-        if self.log:
-            for sensor_ID, sensor in self.sensors.items():
-                sensor.Initialize(sensor_ID+'.txt', self.simulation)
+        for sensor_ID, sensor in self.sensors.items():
+            sensor.Initialize(sensor_ID+'.txt', self.simulation, self.log)
 
         self.simulation.GetDevice().run()
         self.simulation.BeginScene()
@@ -317,7 +314,7 @@ class MiroSystem():
             self.simulation.DrawAll()
             for _ in range(0,substeps):
                 self.simulation.DoStep()
-                if self.log and not paused:
+                if not paused:
                     for _, sensor in self.sensors.items():
                         sensor.LogData()
             self.simulation.EndScene()

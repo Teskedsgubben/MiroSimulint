@@ -11,6 +11,7 @@ def MCB01(trigger_function, pulses = 1, rot = [0,0,0], pos = [0,0,0], Fixed = Fa
         pulses = 5
     if pulses < 0:
         pulses = 0
+    pulses = np.round(pulses)
         
     size_h = 0.05
     size_r = 0.0075

@@ -201,59 +201,66 @@ class MiroComponent():
 
 # Sensor class extends component class
 class MiroSensor(MiroComponent):
-    def Initialize(self, output_file_name, simulation):
+    def Initialize(self, output_file_name, simulation, logging = True):
         self.filename = output_file_name
         self.filestream = open(self.filename, "w")
         self.filestream.truncate(0)
+        self.logging = logging
     
     def LogData(self):
         return
 
 
 class MiroSensor_Accelerometer(MiroSensor):
-    def Initialize(self, output_file_name, simulation):
+    def Initialize(self, output_file_name, simulation, logging = True):
         self.filename = output_file_name
         self.filestream = open(self.filename, "w")
         self.filestream.truncate(0)
+        self.logging = logging
         self.dt = simulation.GetTimestep()
 
     def SetPollingRate(self, Hz):
         self.Hz = Hz
 
     def LogData(self):
-        acc = self.GetBody().GetPos_dtdt()
-        g = - 9.8
-        # Rescales so all instances of momentary acceleration act under 1/300 seconds
-        if hasattr(self, 'Hz'):
-            acc.Scale(self.Hz * self.dt)
-            g = g*(self.Hz * self.dt)
-        data = str(acc.x)+' '+str(acc.y - g)+' '+str(acc.z)+'\n'
-        self.filestream.write(data)
+        if(self.logging):
+            acc = self.GetBody().GetPos_dtdt()
+            g = - 9.8
+            # Rescales so all instances of momentary acceleration act under 1/300 seconds
+            if hasattr(self, 'Hz'):
+                acc.Scale(self.Hz * self.dt)
+                g = g*(self.Hz * self.dt)
+            data = str(acc.x)+' '+str(acc.y - g)+' '+str(acc.z)+'\n'
+            self.filestream.write(data)
 
 class MiroSensor_Speedometer(MiroSensor):
     def LogData(self):
-        vel = self.GetBody().GetPos_dt()
-        data = str(vel.x)+' '+str(vel.y)+' '+str(vel.z)+'\n'
-        self.filestream.write(data)
+        if(self.logging):
+            vel = self.GetBody().GetPos_dt()
+            data = str(vel.x)+' '+str(vel.y)+' '+str(vel.z)+'\n'
+            self.filestream.write(data)
 
 class MiroSensor_Odometer(MiroSensor):
-    def Initialize(self, output_file_name, simulation):
+    def Initialize(self, output_file_name, simulation, logging = True):
         self.filename = output_file_name
         self.filestream = open(self.filename, "w")
         self.filestream.truncate(0)
+        self.logging = logging
         self.start = chrono.ChVectorD(self.body.GetPos())
 
     def LogData(self):
-        pos = self.GetBody().GetPos() - self.start
-        data = str(pos.x)+' '+str(pos.y)+' '+str(pos.z)+'\n'
-        self.filestream.write(data)
+        if(self.logging):
+            pos = self.GetBody().GetPos() - self.start
+            data = str(pos.x)+' '+str(pos.y)+' '+str(pos.z)+'\n'
+            self.filestream.write(data)
 
 # Booster class extends Sensor class
 class MiroBooster(MiroSensor):
-    def Initialize(self, output_file_name, simulation):
+    def Initialize(self, output_file_name, simulation, logging = True):
         self.filename = output_file_name
         self.filestream = open(self.filename, "w")
         self.filestream.truncate(0)
+        self.logging = logging
         self.dt = simulation.GetTimestep()
         if not hasattr(self, 'fuel'):
             self.fuel = 100
@@ -301,9 +308,10 @@ class MiroBooster(MiroSensor):
             
     def LogData(self):
         self.CheckTrigger()
-        f = self.force
-        if not self.triggered or self.fuel <= 0:
-            f = 0
-        self.filestream.write(str(f)+'\n')
+        if(self.logging):
+            f = self.force
+            if not self.triggered or self.fuel <= 0:
+                f = 0
+            self.filestream.write(str(f)+'\n')
         return
 
