@@ -129,9 +129,9 @@ The challenge is to create a compact, portable launcher, that can hit a specifie
 
 ### Create a Video File
 
-We installed ffmpeg into the MiroSim environment to enable creating a video file from the simulation. This is not something you have to do, but if you want to use the video, here is how it works.
+We installed ffmpeg into the MiroSim environment to enable creating a video file from the simulation. For this to work properly, open your Display Settings and set scaling to 100%, otherwise the images will get skewed. Also, set the resolution of the simulation to something suitable for your monitor. Then, to generate the video, follow the steps below.
 
-First, start the simulation as usual. When you press PrintScreen the program will start saving images into a directory called video_capture. Press PrtSc to start recording, then press it again or close the window to stop. You can move the camera during capture, and you can pause to change camera angle, no frames are saved while paused. To then convert these images into a video file, we use ffmpeg.
+First, start the simulation as usual. When you press PrintScreen the program will start saving images into a directory called video_capture. Press PrtSc to start recording, then press it again or close the window to stop. You can move the camera during capture, and you can pause to change camera angle, no frames are saved while paused. You can also add "record": True to the simulation config, and it will record from the start. To then convert these images into a video file, we use ffmpeg.
 
 From VS Code you can run the command below in the terminal window. If the terminal is not showing, click _View -> Terminal_ to open it. If you are not using VS Code, you can run the same command from the Anaconda Prompt in the MiroSimulint directory, just make sure MiroSim is your active environment as in Step 3c. The command to run is:
 
@@ -143,11 +143,11 @@ You can also add audio by supplying an audio file as input between the _d.bmp_ a
 
     ...d.bmp -i audiofile.mp3 -shortest -b:v...
 
-__Mac users:__ If you are using Mac OS and do not have VLC or similar installed, you may not me able to play the .avi file. In that case, try using the command below to produce a playable file.
+__Convert to .mp4:__ The default video format is .avi which you can import in most video editors. If you just want to render a .mp4 file to play directly, you can use the command below.
 
-    ffmpeg -i video_capture/MiroSim.avi -preset slow -codec:v libx264 -pix_fmt yuv420p -b:v 100M video_capture/MiroSimMAC.mp4
+    ffmpeg -i video_capture/MiroSim.avi -preset slow -codec:v libx264 -pix_fmt yuv420p -b:v 128M video_capture/MiroSim.mp4
 
-Then open the MiroSimMAC.mp4 file in the video_capture directory.
+Then open the MiroSim.mp4 file in the video_capture directory.
 
 ### Keeping MiroSimulint up to date
 
