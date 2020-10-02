@@ -2,6 +2,9 @@ import pychrono.core as chrono
 import numpy as np
 
 
+def add_boxShapex2(MiroSystem, size_x, size_y, size_z, pos, texture='test.jpg', scale = [4,3], hitbox = True, rotX=0, rotY=0, rotZ=0, rotOrder=['x','y','z'], rotDegrees=True, Fixed=True):
+    add_boxShape(MiroSystem, 2*size_x, 2*size_y, 2*size_z, pos, texture, scale, hitbox, rotX, rotY, rotZ, rotOrder, rotDegrees, Fixed)
+
 def add_boxShape(MiroSystem, size_x, size_y, size_z, pos, texture='test.jpg', scale = [4,3], hitbox = True, rotX=0, rotY=0, rotZ=0, rotOrder=['x','y','z'], rotDegrees=True, Fixed=True):
     '''system, size_x, size_y, size_z, pos, texture, scale = [5,5], hitbox = True/False'''
 
