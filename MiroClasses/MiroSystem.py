@@ -49,7 +49,7 @@ class MiroSystem():
     def Set_Environment(self, Environment):
         
         self.Environment = Environment
-        self.Environment.Initialize(self.ChSystem, self.SPEEDMODE)
+        self.Environment.Initialize(self, self.SPEEDMODE)
         self.camviews = self.Environment.Get_Camviews()
 
         if self.Environment.Has_Notifier():
@@ -160,6 +160,8 @@ class MiroSystem():
     def Add_Object(self, Object):
         '''Adds a ChBody or similar object to the ChSystem under the MiroSystem.'''
         self.ChSystem.Add(Object)
+    def Add(self, Object):
+        self.Add_Object(Object)
 
     def Initialize_Config(self, config):
         if "resolution" in config:

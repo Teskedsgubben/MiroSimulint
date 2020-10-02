@@ -7,6 +7,7 @@ from src import MIT_Stage
 from src import MIT_Tables
 from src import MIT_Entrance
 from src import MIT_Props
+from src import MIT_CSplan4
 
 def build_MIT(ChSystem, SPEEDMODE = False):
     # Create the room floor: a simple fixed rigid body with a collision shape
@@ -15,6 +16,7 @@ def build_MIT(ChSystem, SPEEDMODE = False):
     MIT_Stage.build(ChSystem, SPEEDMODE)
     MIT_Tables.build(ChSystem, SPEEDMODE)
     MIT_Entrance.build(ChSystem, SPEEDMODE)
+    MIT_CSplan4.build(ChSystem, SPEEDMODE)
 
     
     mit_carpet_floor(ChSystem)

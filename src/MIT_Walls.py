@@ -392,9 +392,7 @@ def MIT_walls(system, H):
     add_boxShape(system, wall_t, H/2-0.16, 1.6, pos, 'textures/mit_3rd_sam.jpg', [-4,-3])
 
     #-------------4th floor---------------
-    # Add wall, 4th floor towards MIT place
-    topWall_pos = chrono.ChVectorD(0.6, 5/2*H, 5.1)
-    add_boxShape(system, 5.9, H/2, wall_t, topWall_pos, 'textures/MITwall_West.jpg', [4,3])
+    # Add wall, 4th floor towards MIT place, see MIT_CSplan4.py    
 
     # Add wall, 4th floor flower pot (Negative x direction)
     pos = chrono.ChVectorD(6.5-wall_t+0.01, 5/2*H, 7.08+wall_t+0.01)
