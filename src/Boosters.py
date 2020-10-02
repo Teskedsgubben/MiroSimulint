@@ -4,7 +4,8 @@ import numpy as np
 from MiroClasses import MiroComponent as mc
 
 def MCB01(trigger_function, pulses = 1, rot = [0,0,0], pos = [0,0,0], Fixed = False):
-    '''A booster that emits a pulse when the trigger function returns True.\n
+    '''A booster that emits a 0.5N, 0.4s pulse when the trigger function returns True.\n
+    Can emit up to 5 consecutive pulses based on input argument.\n
     The trigger function must follow the form:\n
     def trigger_function(position, velocity, acceleration)'''
     if pulses > 5:
@@ -46,4 +47,13 @@ def MCB01(trigger_function, pulses = 1, rot = [0,0,0], pos = [0,0,0], Fixed = Fa
     BOOSTER.Rotate(rot)
     BOOSTER.MoveToPosition(pos)
 
+    return BOOSTER
+
+def MCB02(trigger_function, pulses = 1, rot = [0,0,0], pos = [0,0,0], Fixed = False):
+    '''A booster that emits a 100N, 0.4s pulse when the trigger function returns True.\n
+    Can emit up to 5 consecutive pulses based on input argument.\n
+    The trigger function must follow the form:\n
+    def trigger_function(position, velocity, acceleration)'''
+    BOOSTER = MCB01(trigger_function, pulses, rot, pos, Fixed)
+    BOOSTER.SetForce(200)
     return BOOSTER
