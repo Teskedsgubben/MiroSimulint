@@ -13,8 +13,6 @@ video_capture
 ignored_storage
 # ignore all .obj files
 *.obj
-# MIT bilder som referens
-MIT_pics
 # Any group files
 Grupp*_*
 # Ignores data files
