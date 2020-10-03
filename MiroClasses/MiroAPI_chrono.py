@@ -10,7 +10,7 @@ def ChVecify(vec):
         ChVec = chrono.ChVectorD(vec)
     return ChVec
 
-def rotateBody(body, rotX, rotY, rotZ, rotOrder, rotDegrees=True):
+def rotateBody(body, rotX, rotY, rotZ, rotOrder, rotAngle, rotAxis, rotDegrees=True):
     if(rotDegrees):
         rotX = np.deg2rad(rotX)
         rotY = np.deg2rad(rotY)
