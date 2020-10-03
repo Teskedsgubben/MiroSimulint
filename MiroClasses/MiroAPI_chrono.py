@@ -19,7 +19,7 @@ def rotateBody(body, rotX, rotY, rotZ, rotOrder, rotAngle, ChRotAxis, rotDegrees
     
     if rotAngle:
         q = chrono.ChQuaternionD()
-        q.Q_from_AngAxis(rotAngle, ChRotAxis)
+        q.Q_from_AngAxis(rotAngle, ChRotAxis.GetNormalized())
         body.SetRot(q*body.GetRot())
 
     for dim in rotOrder:
@@ -65,6 +65,7 @@ def add_boxShape(MiroSystem, size_x, size_y, size_z, pos, texture='test.jpg', sc
         body_box_shape.SetColor(chrono.ChColor(0.4,0.4,0.5))
         body_box.GetAssets().push_back(body_box_shape)
     
+    print('textures/'+texture)
     body_box_texture = chrono.ChTexture()
     body_box_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/'+texture))
     body_box_texture.SetTextureScale(scale[0], scale[1])
@@ -75,6 +76,7 @@ def add_boxShape(MiroSystem, size_x, size_y, size_z, pos, texture='test.jpg', sc
 def add_cylinderShape(system, radius, height, density, pos, texture='test.jpg', scale=[1,1], Collide=True, Fixed=True, rotX=0, rotY=0, rotZ=0, rotOrder=['x','y','z'], rotAngle=0, rotAxis=[1,0,0], rotDegrees=True):
     # Convert position to chrono vector, supports using chvector as input as well
     ChPos = ChVecify(pos)
+    ChRotAxis = ChVecify(rotAxis)
 
     # Filter 'textures/' out of the texture name, it's added later
     if len(texture) > len('textures/'):
