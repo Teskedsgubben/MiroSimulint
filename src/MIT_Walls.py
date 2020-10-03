@@ -3,11 +3,14 @@ import numpy as np
 
 from src import Shapes as shp
 
+from MiroClasses import MiroAPI_chrono as MiroAPI
+
 def build(system, SPEEDMODE = False):
     # Create the room: simple fixed rigid bodys with a collision shape
     # and a visualization shape
     Height = 3.32                                   # Height between each floor
 
+    # center = np.array([6.5, 0, 3])
     center = chrono.ChVectorD(6.5, 0, 3)            # Center position for the stair
     MIT_stair(system, center, Height, SPEEDMODE)    # Add a spiral stair
     MIT_floors(system, Height, SPEEDMODE)           # Add floors
@@ -25,7 +28,12 @@ def MIT_stair(system, center, H, SPEEDMODE):
     pos_disk = center + chrono.ChVectorD(0, stair_h+0.025, 0)
     
     # Add center cylinder of stair
-    add_cylinderShape(system, stair_r, stair_h, stair_d, pos_stair, texture, [10,10])
+    MiroAPI.add_cylinderShape(system, stair_r, stair_h, stair_d, pos_stair, texture, [10,10])
+
+    # enter = np.array([4, 4, 0])
+    # enter = [4,4,0] + [0,4,0]
+    #MiroAPI.add_cylinderShape(system, stair_r, stair_h, stair_d, enter, texture, [10,10])
+    # MiroAPI.add_cylinderShape(system,0.25,5,1,enter,texture,[1,1],True,True)
 
     # If SPEEDMODE is activated, stop here
     if SPEEDMODE:
@@ -273,12 +281,12 @@ def MIT_walls(system, H):
     pos_2 = chrono.ChVectorD(-5.3-wall_t, 0, -3+1.1) + chrono.ChVectorD(0, wall_h, 0)
     pos_3_3 = chrono.ChVectorD(-4.5, 0+3/2*H, 8.16+wall_t)
     pos_3_4 = chrono.ChVectorD(-4.5-wall_t, 5/2*H, 8.16+wall_t)
-    pos_4 = chrono.ChVectorD(0.5+1.1, 0, -8.8-wall_t) + chrono.ChVectorD(0, wall_h, 0)
+    
 
     add_boxShape(system, wall_t, wall_h, wall_l-1.1, pos_2, 'textures/MITwall_South.jpg', [4,3]) # Negative x direction
     add_boxShape(system, 11, H/2, wall_t, pos_3_3, texture_wall, [10,10]) # Positive z direction
     add_boxShape(system, 11-wall_t, H/2, wall_t, pos_3_4, texture_wall, [10,10]) # Positive z direction
-    add_boxShape(system, wall_l-1.1, wall_h, wall_t, pos_4, 'textures/MITwall_East.jpg', [-4,-3])    # Negative z direction
+    
     
     # Add support colums as a box
     beam_h = 3/2*H
@@ -379,10 +387,6 @@ def MIT_walls(system, H):
     pos = chrono.ChVectorD(11.65, 3/2*H, 12.16+wall_t)
     add_boxShape(system, 5.15, H/2, wall_t, pos, 'textures/yellow_brick.jpg', [5,5])
 
-    # Add wall, 3rd floor wall, rigth hand side towards UMU library (negative z direction)
-    # pos = chrono.ChVectorD(16.3, 3/2*H-wall_t, 8.16+wall_t)
-    # add_boxShape(system, 3.6, H/2-wall_t, wall_t, pos, 'textures/yellow_brick.jpg', [3,3])
-
     # Add wall, 3rd floor wall, left hand side towards UMU library (negative z direction)
     pos = chrono.ChVectorD(18.3, 3/2*H-wall_t, 12.16+wall_t)
     add_boxShape(system, 1.5, H/2-wall_t, wall_t, pos, 'textures/white concrete.jpg', [3,3])
@@ -435,91 +439,8 @@ def MIT_walls(system, H):
         y_pos = H*floor + H/2
         pos = chrono.ChVectorD(10.5+2.8-0.23, y_pos, -17+2.2+2.2)
         add_boxShape(system, 1.77, H/2, wall_t, pos, texture[floor], [-4,-3])
-    
-    # # Main wall in positive x direction
-    # pos_1 = chrono.ChVectorD(13.775+wall_t, 0, -2.2) + chrono.ChVectorD(0, wall_h, 0)
-    # length = 10.58
-    # # Create a box
-    # body_wall = chrono.ChBody()
-    # body_wall.SetBodyFixed(True)
-    # body_wall.SetPos(chrono.ChVectorD(pos_1))
 
-    # qr = chrono.Q_from_AngAxis(alpha, n.GetNormalized())    # Rotate the cylinder
-    # quaternion = qr * body_wall.GetRot()
-    # body_wall.SetRot(quaternion)
-
-    # # Collision shape
-    # body_wall.GetCollisionModel().ClearModel()
-    # body_wall.GetCollisionModel().AddBox(wall_t, wall_h, length) # hemi sizes
-    # body_wall.GetCollisionModel().BuildModel()
-    # body_wall.SetCollide(True)
-    
-    # # Visualization shape
-    # body_wall_shape = chrono.ChBoxShape()
-    # body_wall_shape.GetBoxGeometry().Size = chrono.ChVectorD(wall_t, wall_h, length)
-    # body_wall_shape.SetColor(chrono.ChColor(0.4,0.4,0.5))
-    # body_wall.GetAssets().push_back(body_wall_shape)
-    
-    # body_wall_texture = chrono.ChTexture()
-    # body_wall_texture.SetTextureFilename(chrono.GetChronoDataFile(texture_wall))
-    # body_wall_texture.SetTextureScale(10,10)
-    # body_wall.GetAssets().push_back(body_wall_texture)
-    
-    # system.Add(body_wall)
-
-    # # Add oblique wall towards NA
-    # pos = chrono.ChVectorD(-5.6-wall_t, 3/2*H, 5.3)
-    # length = 0.545
-    # alpha = -(np.pi/4)
-    # # Create a box
-    # body_wall = chrono.ChBody()
-    # body_wall.SetBodyFixed(True)
-    # body_wall.SetPos(chrono.ChVectorD(pos))
-
-    # qr = chrono.Q_from_AngAxis(alpha, n.GetNormalized())    # Rotate the cylinder
-    # quaternion = qr * body_wall.GetRot()
-    # body_wall.SetRot(quaternion)
-    
-    # # Visualization shape
-    # body_wall_shape = chrono.ChBoxShape()
-    # body_wall_shape.GetBoxGeometry().Size = chrono.ChVectorD(wall_t, H/2, length)
-    # body_wall_shape.SetColor(chrono.ChColor(0.4,0.4,0.5))
-    # body_wall.GetAssets().push_back(body_wall_shape)
-    
-    # body_wall_texture = chrono.ChTexture()
-    # body_wall_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/white concrete.jpg'))
-    # body_wall_texture.SetTextureScale(10,10)
-    # body_wall.GetAssets().push_back(body_wall_texture)
-    
-    # system.Add(body_wall)
-
-    
-    # # Add oblique wall towards umu libary
-    # pos = chrono.ChVectorD(16.3, 3/2*H-wall_t, 0.34+8.16+wall_t)
-    # length = 3.6
-    # # Create a box
-    # body_wall = chrono.ChBody()
-    # body_wall.SetBodyFixed(True)
-    # body_wall.SetPos(chrono.ChVectorD(pos))
-
-    # qr = chrono.Q_from_AngAxis(np.pi*(0.5-0.03), n.GetNormalized())    # Rotate the cylinder
-    # quaternion = qr * body_wall.GetRot()
-    # body_wall.SetRot(quaternion)
-    
-    # # Visualization shape
-    # body_wall_shape = chrono.ChBoxShape()
-    # body_wall_shape.GetBoxGeometry().Size = chrono.ChVectorD(wall_t, H/2, length)
-    # body_wall_shape.SetColor(chrono.ChColor(0.4,0.4,0.5))
-    # body_wall.GetAssets().push_back(body_wall_shape)
-    
-    # body_wall_texture = chrono.ChTexture()
-    # body_wall_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/yellow_brick.jpg'))
-    # body_wall_texture.SetTextureScale(10,10)
-    # body_wall.GetAssets().push_back(body_wall_texture)
-    
-    # system.Add(body_wall)
-
-    ##Add oblique wall
+    #Add oblique walls
 
     #Add oblique wall towards umu libary
     pos_1 = chrono.ChVectorD(16.3, 3/2*H-wall_t, 0.34+8.16+wall_t)
