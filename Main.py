@@ -11,7 +11,7 @@
 #               use when creating your modules.
 #
 # Authors:      Felix Djuphammar, William Nordberg, Marcus Lindbergh, 
-#               Johan Jonsson, Franz Wikner
+#               Johan Jonsson, Franz Wikner, Niklas Edlund
 #
 #-------------------------------------------------------------------------------
 
