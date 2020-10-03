@@ -93,7 +93,7 @@ def build(MiroSystem, SPEEDMODE = False):
         MiroAPI.add_boxShape(MiroSystem, h_windowpane_size[0], h_windowpane_size[1]/2, h_windowpane_size[2], [5.25, pos_up[1] - 0.5, 4.98], rotZ=90, texture='wood_ikea_style.png')
         MiroAPI.add_boxShape(MiroSystem, h_windowpane_size[0], h_windowpane_size[1]/2, h_windowpane_size[2], [5.25, 2*H+3, 4.98], rotZ=90, texture='wood_ikea_style.png')
 
-        test_pos = np.array([posS[0]+0.5, 0, posS[2]])
+        test_pos = np.array([posS[0]+0.1, -0.16, posS[2]])        
         make_window(v_windowpane_size[0], v_windowpane_size[1], v_windowpane_size[2]+0.1, test_pos, 'south', 0.685, MiroSystem)
 
 
@@ -102,11 +102,11 @@ def make_window(size_vx, size_vy, size_vz, mid_pos, wall, spacing, MiroSystem): 
     # pos sets position 
     #and spacing sets the spacing between windowpanes
     H = 3.32
-    W = 4.6 * 2/3
+    W = 4.6
     dists = np.array([97,207,358,436,510,654,802,876,951,1102,1213])
-    dists = dists - dists[0]
-    dists = dists / dists[-1] * W
-    
+    dists = dists - (dists[-1] + dists[0])/2    
+    dists = dists / dists[-1] * (W-3*0.16)/2
+
     if wall == 'south':
         for i in range(1, 6, 2):
             lvl_height = np.array([0, i/2*H, 0])
@@ -119,7 +119,7 @@ def make_window(size_vx, size_vy, size_vz, mid_pos, wall, spacing, MiroSystem): 
 
 
 
-
+    
     
 
 
