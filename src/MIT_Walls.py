@@ -283,14 +283,14 @@ def MIT_walls(system, H):
     # Add support colums as a box
     beam_h = 3/2*H
     beam_w = 0.08
-    beam_pos_1 = chrono.ChVectorD(4, 0+2/3*beam_h, 5)     # Close left of stair
-    beam_pos_2 = chrono.ChVectorD(-0.8, 0+beam_h, 5)        # Left of stair
+    beam_pos_1 = chrono.ChVectorD(4, 0+beam_h, 5)     # Close left of stair
+    beam_pos_2 = chrono.ChVectorD(-0.8, 0+4/3*beam_h, 5)        # Left of stair
     beam_pos_3 = chrono.ChVectorD(8.5, 0+beam_h, 0.5)         # Close right of stair
     beam_pos_4 = chrono.ChVectorD(8.5, 0+beam_h, -4.3)        # Right of stair
     beam_pos_5 = chrono.ChVectorD(8.5, 0+beam_h, 5)         # Middle beam
 
-    add_boxShape(system, beam_w, 2/3*beam_h, beam_w, beam_pos_1, 'textures/white concrete.jpg', scale)
-    add_boxShape(system, beam_w, 2/6*beam_h, beam_w, beam_pos_2, 'textures/white concrete.jpg', scale)
+    add_boxShape(system, beam_w, beam_h, beam_w, beam_pos_1, 'textures/white concrete.jpg', scale)
+    add_boxShape(system, beam_w, 2/3*beam_h, beam_w, beam_pos_2, 'textures/white concrete.jpg', scale)
     add_boxShape(system, beam_w, beam_h, beam_w, beam_pos_3, 'textures/white concrete.jpg', scale)
     add_boxShape(system, beam_w, beam_h, beam_w, beam_pos_4, 'textures/white concrete.jpg', scale)
     add_boxShape(system, beam_w, beam_h, beam_w, beam_pos_5, 'textures/white concrete.jpg', scale)
