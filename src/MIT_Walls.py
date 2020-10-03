@@ -10,8 +10,8 @@ def build(system, SPEEDMODE = False):
     # and a visualization shape
     Height = 3.32                                   # Height between each floor
 
-    # center = np.array([6.5, 0, 3])
-    center = chrono.ChVectorD(6.5, 0, 3)            # Center position for the stair
+    center = np.array([6.5, 0, 3])
+    # center = chrono.ChVectorD(6.5, 0, 3)            # Center position for the stair
     MIT_stair(system, center, Height, SPEEDMODE)    # Add a spiral stair
     MIT_floors(system, Height, SPEEDMODE)           # Add floors
     MIT_walls(system, Height)                       # Add walls
@@ -24,8 +24,8 @@ def MIT_stair(system, center, H, SPEEDMODE):
     dh = (H-0.1)/stepNum    # Heigth between each step
     rad = 1/360*2*np.pi     # Degrees to radians
     texture = 'textures/white concrete.jpg' 
-    pos_stair = center + chrono.ChVectorD(0, stair_h/2, 0)  # Correction for stair position
-    pos_disk = center + chrono.ChVectorD(0, stair_h+0.025, 0)
+    pos_stair = center + np.array([0,stair_h/2, 0]) #chrono.ChVectorD(0, stair_h/2, 0)  # Correction for stair position
+    pos_disk = center + np.array([0, stair_h+0.025, 0])#chrono.ChVectorD(0, stair_h+0.025, 0)
     
     # Add center cylinder of stair
     MiroAPI.add_cylinderShape(system, stair_r, stair_h, stair_d, pos_stair, texture, [10,10])
@@ -40,9 +40,9 @@ def MIT_stair(system, center, H, SPEEDMODE):
         return
     
     # Top disk
-    add_cylinderShape(system, stair_r+0.01, 0.05, 1, pos_disk, 'textures/stone_floor.jpg', [1/8,1/8]) 
+    MiroAPI.add_cylinderShape(system, stair_r+0.01, 0.05, 1, pos_disk, 'textures/stone_floor.jpg', [1/8,1/8]) 
     # Add fake stair to base floor
-    add_cylinderShape(system, stair_r+1.7, 0.001, stair_d, center, 'textures/black.jpg', [1,1])
+    MiroAPI.add_cylinderShape(system, stair_r+1.7, 0.001, stair_d, center, 'textures/black.jpg', [1,1])
 
     # Add steps to 3rd floor
     for step in range(stepNum):
@@ -63,7 +63,7 @@ def MIT_stair(system, center, H, SPEEDMODE):
         h = step*dh                     
         theta_f = rad*(90 + 270*step/stepNum)       # Angle between each front step
         theta_b = rad*(90 + 270*(step+1)/stepNum)   # Angle between each back step
-        pos = center + chrono.ChVectorD(0, H, 0)
+        pos = center + np.array([0,H,0])#chrono.ChVectorD(0, H, 0)
 
         add_stairStep(system, pos, stair_r, h, theta_f, theta_b, dh, step, stepNum, True)
 
@@ -78,25 +78,35 @@ def add_stairStep(system, center, stair_r, h, theta_f, theta_b, dh, i, stepNum, 
     height = 0.1    # Step height
     
     # Create upper half of stair step
-    dir_f = chrono.ChVectorD(np.cos(theta_f), 0, np.sin(theta_f))       # Direction front
-    pos_f = center + dir_f*stair_r + chrono.ChVectorD(0, h+3/4*height, 0) # Start postiton front of step
+    dir_f = np.array([np.cos(theta_f),0,np.sin(theta_f)])
+    pos_f = center + dir_f*stair_r + np.array([0, h+3/4*height, 0])
+    # dir_f = chrono.ChVectorD(np.cos(theta_f), 0, np.sin(theta_f))       # Direction front
+    # pos_f = center + dir_f*stair_r + chrono.ChVectorD(0, h+3/4*height, 0) # Start postiton front of step
 
-    dir_b = chrono.ChVectorD(np.cos(theta_b), 0, np.sin(theta_b))       # Direction back
-    pos_b = center + dir_b*stair_r + chrono.ChVectorD(0, h+3/4*height, 0) # Start postiton back of step 
+    dir_b = np.array([np.cos(theta_b),0,np.sin(theta_b)])
+    pos_b = center + dir_b*stair_r + np.array([0, h+3/4*height, 0])
+    # dir_b = chrono.ChVectorD(np.cos(theta_b), 0, np.sin(theta_b))       # Direction back
+    # pos_b = center + dir_b*stair_r + chrono.ChVectorD(0, h+3/4*height, 0) # Start postiton back of step 
 
     if steps == True:
-        step_t = shp.step(pos_f, dir_f, pos_b, dir_b, width, 1/4*height, [0.05,0.03,0.03])
+        step_t = MiroAPI.stepShape(pos_f, dir_f, pos_b, dir_b, width, 1/4*height, [0.05,0.03,0.03])
         system.Add(step_t)
 
     # Create lower half of stair step
-    dir_f = chrono.ChVectorD(np.cos(theta_f), 0, np.sin(theta_f))   # Direction front
-    pos_f = center + dir_f*stair_r + chrono.ChVectorD(0, h, 0)      # Start postiton front of step
+    # dir_f = chrono.ChVectorD(np.cos(theta_f), 0, np.sin(theta_f))   # Direction front
+    # pos_f = center + dir_f*stair_r + chrono.ChVectorD(0, h, 0)      # Start postiton front of step
 
-    dir_b = chrono.ChVectorD(np.cos(theta_b), 0, np.sin(theta_b))   # Direction back
-    pos_b = center + dir_b*stair_r + chrono.ChVectorD(0, h, 0)      # Start postiton back of step
-    
+    # dir_b = chrono.ChVectorD(np.cos(theta_b), 0, np.sin(theta_b))   # Direction back
+    # pos_b = center + dir_b*stair_r + chrono.ChVectorD(0, h, 0)      # Start postiton back of step
+    dir_f = np.array([np.cos(theta_f), 0, np.sin(theta_f)])   # Direction front
+    pos_f = center + dir_f*stair_r + np.array([0, h, 0])     # Start postiton front of step
+
+    dir_b = np.array([np.cos(theta_b), 0, np.sin(theta_b)])   # Direction back
+    pos_b = center + dir_b*stair_r + np.array([0, h, 0])      # Start postiton back of step
+
+
     if steps == True:
-        step = shp.step(pos_f, dir_f, pos_b, dir_b, width, 3/4*height, [1, 1, 1])
+        step = MiroAPI.stepShape(pos_f, dir_f, pos_b, dir_b, width, 3/4*height, [1, 1, 1])
         system.Add(step)
 
     # Add stair handle
@@ -113,69 +123,86 @@ def add_stairHandle(system, width, dir_f, pos_f, dir_b, pos_b, dh, i, stepNum):
     rail_d = 1          # Density
     texture_rail = 'textures/white concrete.jpg'
 
-    dir_f.SetLength(width)
-    dir_b.SetLength(width)
+    dir_f = width*dir_f/np.linalg.norm(dir_f)
+    dir_b = width*dir_b/np.linalg.norm(dir_b)
+    # dir_f.SetLength(width)
+    # dir_b.SetLength(width)
     n = (dir_f+dir_b)/2   
-        
-    pos_handle = (pos_f+pos_b)/2 + (dir_f+dir_b)/2 + chrono.ChVectorD(0, 1.3, 0)  # Handle rail
-    pos_rail_1 = (pos_f+pos_b)/2 + (dir_f+dir_b)/2 + chrono.ChVectorD(0, 1, 0)    # Upper support rail
-    pos_rail_2 = (pos_f+pos_b)/2 + (dir_f+dir_b)/2 + chrono.ChVectorD(0, 0.3, 0)  # Lower support rail
 
-    dist = np.sqrt((dir_f.x-dir_b.x)**2 + (dir_f.y-dir_b.y)**2 + (dir_f.z-dir_b.z)**2)    # Calculate distance between dir_f and dir_b
+    pos_handle = (pos_f+pos_b)/2 + (dir_f+dir_b)/2 + np.array([0, 1.3, 0])  # Handle rail
+    pos_rail_1 = (pos_f+pos_b)/2 + (dir_f+dir_b)/2 + np.array([0, 1, 0])    # Upper support rail
+    pos_rail_2 = (pos_f+pos_b)/2 + (dir_f+dir_b)/2 + np.array([0, 0.3, 0])  # Lower support rail
+    # pos_handle = (pos_f+pos_b)/2 + (dir_f+dir_b)/2 + chrono.ChVectorD(0, 1.3, 0)  # Handle rail
+    # pos_rail_1 = (pos_f+pos_b)/2 + (dir_f+dir_b)/2 + chrono.ChVectorD(0, 1, 0)    # Upper support rail
+    # pos_rail_2 = (pos_f+pos_b)/2 + (dir_f+dir_b)/2 + chrono.ChVectorD(0, 0.3, 0)  # Lower support rail
+
+    dist = np.sqrt((dir_f[0]-dir_b[0])**2 + (dir_f[1]-dir_b[1])**2 + (dir_f[2]-dir_b[2])**2)    # Calculate distance between dir_f and dir_b
     alpha = np.pi/2
     if dh > 0:
         alpha = np.arctan((dist+0.07)/dh)
     
-    add_spiralRail(system, handle_r, handle_l, handle_d, pos_handle, alpha, n, texture_handle)
-
+    MiroAPI.add_cylinderShape(system, handle_r, handle_l, handle_d, pos_handle, texture_handle, rotAngle=alpha, rotAxis=n,rotDegrees=False )
+    #add_spiralRail(system, handle_r, handle_l, handle_d, pos_handle, texture_handle, rotAngle=alpha, rotAxis=n,rotDegrees=False )
+   
     if 0 < i and i < stepNum-1:
-        add_spiralRail(system, rail_r, rail_l, rail_d, pos_rail_1, alpha, n, texture_rail)
-        add_spiralRail(system, rail_r, rail_l, rail_d, pos_rail_2, alpha, n, texture_rail)
-    
-def add_spiralRail(system, radius, length, density, pos, alpha, n, texture):
-    
-    # Add spiral cylinder 
-    body_rail = chrono.ChBodyEasyCylinder(radius, length, density) # Rail size
-    body_rail.SetBodyFixed(True)
-    body_rail.SetPos(pos)
-    
-    qr = chrono.Q_from_AngAxis(alpha, n.GetNormalized())    # Rotate the cylinder
-    quaternion = qr * body_rail.GetRot()
-    body_rail.SetRot(quaternion)
+        MiroAPI.add_cylinderShape(system, rail_r, rail_l, rail_d, pos_rail_1, texture_rail, rotAngle=alpha, rotAxis=n,rotDegrees=False )
+        MiroAPI.add_cylinderShape(system, rail_r, rail_l, rail_d, pos_rail_2, texture_rail, rotAngle=alpha, rotAxis=n,rotDegrees=False )
 
-    # Collision shape
-    body_rail.GetCollisionModel().ClearModel()
-    body_rail.GetCollisionModel().AddCylinder(0.95*radius, 0.95*radius, length/2) # hemi sizes
-    body_rail.GetCollisionModel().BuildModel()
-    body_rail.SetCollide(True)
+        #add_spiralRail(system, rail_r, rail_l, rail_d, pos_rail_1, alpha, n, texture_rail)
+        #add_spiralRail(system, rail_r, rail_l, rail_d, pos_rail_2, alpha, n, texture_rail)
+    
+# def add_spiralRail(system, radius, length, density, pos, alpha, n, texture):
+    
+#     # Add spiral cylinder 
+#     body_rail = chrono.ChBodyEasyCylinder(radius, length, density) # Rail size
+#     body_rail.SetBodyFixed(True)
+#     body_rail.SetPos(pos)
+    
+#     qr = chrono.Q_from_AngAxis(alpha, n.GetNormalized())    # Rotate the cylinder
+#     quaternion = qr * body_rail.GetRot()
+#     body_rail.SetRot(quaternion)
 
-    # Body texture
-    body_rail_texture = chrono.ChTexture()
-    body_rail_texture.SetTextureFilename(chrono.GetChronoDataFile(texture))
-    body_rail.GetAssets().push_back(body_rail_texture)
+#     # Collision shape
+#     body_rail.GetCollisionModel().ClearModel()
+#     body_rail.GetCollisionModel().AddCylinder(0.95*radius, 0.95*radius, length/2) # hemi sizes
+#     body_rail.GetCollisionModel().BuildModel()
+#     body_rail.SetCollide(True)
 
-    system.Add(body_rail)
+#     # Body texture
+#     body_rail_texture = chrono.ChTexture()
+#     body_rail_texture.SetTextureFilename(chrono.GetChronoDataFile(texture))
+#     body_rail.GetAssets().push_back(body_rail_texture)
+
+#     system.Add(body_rail)
 
 def add_stairPosts(system, center, stair_r, h, theta_f, theta_b):
 
     width = 1.53
 
-    dir_f = chrono.ChVectorD(np.cos(theta_f), 0, np.sin(theta_f))   # Direction front of step
-    pos_f = center + dir_f*stair_r + chrono.ChVectorD(0, h, 0)     # Postiton front of step
+    dir_f = np.array([np.cos(theta_f), 0, np.sin(theta_f)])   # Direction front of step
+    pos_f = center + dir_f*stair_r + np.array([0, h, 0]) 
+    # dir_f = chrono.ChVectorD(np.cos(theta_f), 0, np.sin(theta_f))   # Direction front of step
+    # pos_f = center + dir_f*stair_r + chrono.ChVectorD(0, h, 0)     # Postiton front of step
 
-    dir_b = chrono.ChVectorD(np.cos(theta_b), 0, np.sin(theta_b))   # Direction back of step
-    pos_b = center + dir_b*stair_r + chrono.ChVectorD(0, h, 0)     # Postiton back of step
+    dir_b = np.array([np.cos(theta_b), 0, np.sin(theta_b)])   # Direction back of step
+    pos_b = center + dir_b*stair_r + np.array([0, h, 0]) 
+    # dir_b = chrono.ChVectorD(np.cos(theta_b), 0, np.sin(theta_b))   # Direction back of step
+    # pos_b = center + dir_b*stair_r + chrono.ChVectorD(0, h, 0)     # Postiton back of step
 
     # Add rail pole for stair
     post_r = 0.02   # Radius
     post_h = 1.3    # Height
     post_d = 1      # Density
     texture = 'textures/white concrete.jpg'
-    dir_f.SetLength(width)
-    dir_b.SetLength(width)
-    pos_pole = (pos_f+pos_b)/2 + (dir_f+dir_b)/2 + chrono.ChVectorD(0, post_h/2, 0)   # Position
+    dir_f = width*dir_f/np.linalg.norm(dir_f)
+    dir_b = width*dir_b/np.linalg.norm(dir_b)
+    # dir_f.SetLength(width)
+    # dir_b.SetLength(width)
+    # pos_pole = (pos_f+pos_b)/2 + (dir_f+dir_b)/2 + chrono.ChVectorD(0, post_h/2, 0)   # Position
+    pos_pole = (pos_f+pos_b)/2 + (dir_f+dir_b)/2 + np.array([0, post_h/2, 0])   # Position
 
-    add_cylinderShape(system, post_r, post_h, post_d, pos_pole, texture)
+    MiroAPI.add_cylinderShape(system, post_r, post_h, post_d, pos_pole, texture)
+
 
 def MIT_floors(system, H, SPEEDMODE):
 
@@ -193,24 +220,28 @@ def MIT_floors(system, H, SPEEDMODE):
     
     for floor in range(floorsNum):
         # Add floors
-        y_pos = floor*H - floor_t                              
-        floor_pos_1 = chrono.ChVectorD(-3.5, y_pos, 6.58)       # Add floors towards NA
-        floor_pos_2 = chrono.ChVectorD(10.45+2.11, y_pos, -4-0.42)    # Add floors towards technology house
+        y_pos = floor*H - floor_t
+        floor_pos_1 = np.array([-3.5, y_pos, 6.58])       # Add floors towards NA
+        floor_pos_2 = np.array([10.45+2.11, y_pos, -4-0.42])    # Add floors towards technology house
+        # floor_pos_1 = chrono.ChVectorD(-3.5, y_pos, 6.58)       # Add floors towards NA
+        # floor_pos_2 = chrono.ChVectorD(10.45+2.11, y_pos, -4-0.42)    # Add floors towards technology house
 
-        add_boxShape(system, floor_l, floor_t, floor_w, floor_pos_1, texture_floor[floor], [50,3.6])
-        add_boxShape(system, floor_w_2, floor_t, floor_l+0.58, floor_pos_2, texture_floor[floor], [18,28])
+        MiroAPI.add_boxShapeHemi(system, floor_l, floor_t, floor_w, floor_pos_1, texture_floor[floor], [50,3.6])
+        MiroAPI.add_boxShapeHemi(system, floor_w_2, floor_t, floor_l+0.58, floor_pos_2, texture_floor[floor], [18,28])
 
         if floor > 0 and SPEEDMODE == False:
             add_fence(system, H, postNum, floor_w, floor_w_2, floor, floor_t, handle_l)
     
     for roof in range(floorsNum):
         # Add roof 
-        y_pos = roof*H - 3*floor_t                              
-        roof_pos_1 = chrono.ChVectorD(-3.5, y_pos, 6.58)          # Add roof towards NA
-        roof_pos_2 = chrono.ChVectorD(10.45+2.11, y_pos, -4-0.42)       # Add roof towards technology house
+        y_pos = roof*H - 3*floor_t 
+        roof_pos_1 = np.array([-3.5, y_pos, 6.58])          # Add roof towards NA
+        roof_pos_2 = np.array([10.45+2.11, y_pos, -4-0.42]) # Add roof towards technology house                            
+        # roof_pos_1 = chrono.ChVectorD(-3.5, y_pos, 6.58)          # Add roof towards NA
+        # roof_pos_2 = chrono.ChVectorD(10.45+2.11, y_pos, -4-0.42)       # Add roof towards technology house
 
-        add_boxShape(system, floor_l, floor_t, floor_w, roof_pos_1, texture_roof, scale_roof)
-        add_boxShape(system, floor_w_2, floor_t, floor_l+0.58, roof_pos_2, texture_roof, scale_roof)
+        MiroAPI.add_boxShapeHemi(system, floor_l, floor_t, floor_w, roof_pos_1, texture_roof, scale_roof)
+        MiroAPI.add_boxShapeHemi(system, floor_w_2, floor_t, floor_l+0.58, roof_pos_2, texture_roof, scale_roof)
 
     # Add floor piece by the stair
     floor_x = 1.03
@@ -218,39 +249,35 @@ def MIT_floors(system, H, SPEEDMODE):
 
     for piece in range(floorsNum):
         y_pos = piece*H - floor_t*0.999
-        floor_pos = chrono.ChVectorD(7.5, y_pos+0.002, 4) 
+        floor_pos = np.array([7.5, y_pos+0.002, 4]) 
         
-        add_boxShape(system, floor_x, floor_t, floor_z, floor_pos, texture_floor[0], [4,2])
+        MiroAPI.add_boxShapeHemi(system, floor_x, floor_t, floor_z, floor_pos, texture_floor[0], [4,2])
     
     for piece in range(floorsNum):
         if piece > 0:
             y_pos = piece*H - 3*floor_t
-            floor_pos = chrono.ChVectorD(7.5, y_pos+0.002, 4) 
+            floor_pos = np.array([7.5, y_pos+0.002, 4]) 
             
-            add_boxShape(system, floor_x, floor_t, floor_z, floor_pos, texture_roof, scale_roof)
+            MiroAPI.add_boxShapeHemi(system, floor_x, floor_t, floor_z, floor_pos, texture_roof, scale_roof)
 
     # Add walkway towards umu library
     length = 10.5
     width = 2
     for i in range(2):
         y = i*H + H - floor_t
-        pos = chrono.ChVectorD(10, y, 10.16)
+        pos = np.array([10, y, 10.16])
 
-        add_boxShape(system, length, floor_t, width, pos, texture_floor[1], [48.9,6])
+        MiroAPI.add_boxShapeHemi(system, length, floor_t, width, pos, texture_floor[1], [48.9,6])
     
     for i in range(2):
         y = i*H + H - 3*floor_t
-        pos = chrono.ChVectorD(10, y, 10.16)
+        pos = np.array([10, y, 10.16])
 
-        add_boxShape(system, length, floor_t, width, pos, texture_roof, scale_roof)
+        MiroAPI.add_boxShapeHemi(system, length, floor_t, width, pos, texture_roof, scale_roof)
 
     # Add MIT entrence floor
-    pos = chrono.ChVectorD(6.2, 0-floor_t, 10.16)
-    add_boxShape(system, 6.5, floor_t, 2, pos, texture_floor[0], [30,6])
-
-    # Add MIT roof over entrence
-    # pos = chrono.ChVectorD(4.25, 0+H-2*floor_t, 10.16)
-    # add_boxShape(system, 2.25, 2*floor_t, 2, pos, texture_roof, scale_roof)
+    pos = np.array([6.2, 0-floor_t, 10.16])
+    MiroAPI.add_boxShapeHemi(system, 6.5, floor_t, 2, pos, texture_floor[0], [30,6])
 
     # Add horizontal beam along floors
     beam_length = 7.2
@@ -259,76 +286,76 @@ def MIT_floors(system, H, SPEEDMODE):
         beam_corr = floor_w+0.99*floor_t/2      # Na
         if floor > 0:
             y_pos = floor*H - 2*floor_t                             
-            floor_pos_1 = chrono.ChVectorD(-0.4, y_pos, 6.58-beam_corr)       # Towards NA
-            floor_pos_2 = chrono.ChVectorD(10.45+2.11-beam_corr_2, y_pos, -4)   # Towards technology
+            floor_pos_1 = np.array([-0.4, y_pos, 6.58-beam_corr])       # Towards NA
+            floor_pos_2 = np.array([10.45+2.11-beam_corr_2, y_pos, -4])   # Towards technology
 
-            add_boxShape(system, beam_length, 2*floor_t, floor_t/2, floor_pos_1, 'textures/white concrete.jpg')
-            add_boxShape(system, floor_t/2, 2*floor_t, beam_length, floor_pos_2, 'textures/white concrete.jpg')
+            MiroAPI.add_boxShapeHemi(system, beam_length, 2*floor_t, floor_t/2, floor_pos_1, 'textures/white concrete.jpg')
+            MiroAPI.add_boxShapeHemi(system, floor_t/2, 2*floor_t, beam_length, floor_pos_2, 'textures/white concrete.jpg')
 
 def MIT_walls(system, H):
 
     # Add main walls as a box 
     wall_t = 0.1
     wall_h = 3/2*H
-    wall_l = 8
+    # wall_l = 8
     texture_wall = 'textures/yellow_brick.jpg'
     scale = [10,10]   # Texture scale
 
-    n = chrono.ChVectorD(0,1,0)         # Normal vector for rotation
-    alpha = -np.arctan(211/1380-0.05)   # Rotation angle for positive x wall
     
-    # First main wall in the end of this function, don't ask why
-    pos_2 = chrono.ChVectorD(-5.3-wall_t, 0, -3+1.1) + chrono.ChVectorD(0, wall_h, 0)
-    pos_3_3 = chrono.ChVectorD(-4.5, 0+3/2*H, 8.16+wall_t)
-    pos_3_4 = chrono.ChVectorD(-4.5-wall_t, 5/2*H, 8.16+wall_t)
-    
+    pos_3_3 = np.array([-4.5, 0+3/2*H, 8.16+wall_t])
+    pos_3_4 = np.array([-4.5-wall_t, 5/2*H, 8.16+wall_t])
 
-    add_boxShape(system, wall_t, wall_h, wall_l-1.1, pos_2, 'textures/MITwall_South.jpg', [4,3]) # Negative x direction
-    add_boxShape(system, 11, H/2, wall_t, pos_3_3, texture_wall, [10,10]) # Positive z direction
-    add_boxShape(system, 11-wall_t, H/2, wall_t, pos_3_4, texture_wall, [10,10]) # Positive z direction
+    MiroAPI.add_boxShapeHemi(system, 11, H/2, wall_t, pos_3_3, texture_wall, [10,10]) # Positive z direction
+    MiroAPI.add_boxShapeHemi(system, 11-wall_t, H/2, wall_t, pos_3_4, texture_wall, [10,10]) # Positive z direction
     
     
     # Add support colums as a box
     beam_h = 3/2*H
     beam_w = 0.08
-    beam_pos_1 = chrono.ChVectorD(4, 0+beam_h, 5)     # Close left of stair
-    beam_pos_2 = chrono.ChVectorD(-0.8, 0+4/3*beam_h, 5)        # Left of stair
-    beam_pos_3 = chrono.ChVectorD(8.5, 0+beam_h, 0.5)         # Close right of stair
-    beam_pos_4 = chrono.ChVectorD(8.5, 0+beam_h, -4.3)        # Right of stair
-    beam_pos_5 = chrono.ChVectorD(8.5, 0+beam_h, 5)         # Middle beam
+    beam_pos_1 = np.array([4, 0+beam_h, 5])     # Close left of stair
+    beam_pos_2 = np.array([-0.8, 0+4/3*beam_h, 5])        # Left of stair
+    beam_pos_3 = np.array([8.5, 0+beam_h, 0.5])         # Close right of stair
+    beam_pos_4 = np.array([8.5, 0+beam_h, -4.3])        # Right of stair
+    beam_pos_5 = np.array([8.5, 0+beam_h, 5])         # Middle beam
 
-    add_boxShape(system, beam_w, beam_h, beam_w, beam_pos_1, 'textures/white concrete.jpg', scale)
-    add_boxShape(system, beam_w, 2/3*beam_h, beam_w, beam_pos_2, 'textures/white concrete.jpg', scale)
-    add_boxShape(system, beam_w, beam_h, beam_w, beam_pos_3, 'textures/white concrete.jpg', scale)
-    add_boxShape(system, beam_w, beam_h, beam_w, beam_pos_4, 'textures/white concrete.jpg', scale)
-    add_boxShape(system, beam_w, beam_h, beam_w, beam_pos_5, 'textures/white concrete.jpg', scale)
+    MiroAPI.add_boxShapeHemi(system, beam_w, beam_h, beam_w, beam_pos_1, 'textures/white concrete.jpg', scale)
+    MiroAPI.add_boxShapeHemi(system, beam_w, 2/3*beam_h, beam_w, beam_pos_2, 'textures/white concrete.jpg', scale)
+    MiroAPI.add_boxShapeHemi(system, beam_w, beam_h, beam_w, beam_pos_3, 'textures/white concrete.jpg', scale)
+    MiroAPI.add_boxShapeHemi(system, beam_w, beam_h, beam_w, beam_pos_4, 'textures/white concrete.jpg', scale)
+    MiroAPI.add_boxShapeHemi(system, beam_w, beam_h, beam_w, beam_pos_5, 'textures/white concrete.jpg', scale)
 
     # Beams along wall
     for beam in range(5):
         x = 12.75 + beam*0.46
         z = 8.16+0.05+wall_t - beam*4.47
-        beam_pos = chrono.ChVectorD(x, 0+beam_h, z)
-        # Create a box
-        beam = chrono.ChBody()
-        beam.SetBodyFixed(True)
-        beam.SetPos(chrono.ChVectorD(beam_pos))
+        beam_pos = np.array([x, 0+beam_h, z])
+        MiroAPI.add_boxShapeHemi(system, beam_w, beam_h, beam_w, beam_pos, 'textures/white concrete.jpg', scale)
 
-        qr = chrono.Q_from_AngAxis(alpha, n.GetNormalized())    # Rotation
-        quaternion = qr * beam.GetRot()
-        beam.SetRot(quaternion)
+        # # Create a box
+        # beam = chrono.ChBody()
+        # beam.SetBodyFixed(True)
+        # beam.SetPos(chrono.ChVectorD(beam_pos))
+
+        # qr = chrono.Q_from_AngAxis(alpha, n.GetNormalized())    # Rotation
+        # quaternion = qr * beam.GetRot()
+        # beam.SetRot(quaternion)
     
-        # Visualization shape
-        beam_shape = chrono.ChBoxShape()
-        beam_shape.GetBoxGeometry().Size = chrono.ChVectorD(beam_w, beam_h, beam_w)
-        beam_shape.SetColor(chrono.ChColor(0.4,0.4,0.5))
-        beam.GetAssets().push_back(beam_shape)
+        # # Visualization shape
+        # beam_shape = chrono.ChBoxShape()
+        # beam_shape.GetBoxGeometry().Size = chrono.ChVectorD(beam_w, beam_h, beam_w)
+        # beam_shape.SetColor(chrono.ChColor(0.4,0.4,0.5))
+        # beam.GetAssets().push_back(beam_shape)
         
-        beam_texture = chrono.ChTexture()
-        beam_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/grey concrete.jpg'))
-        beam_texture.SetTextureScale(10,10)
-        beam.GetAssets().push_back(beam_texture)
+        # beam_texture = chrono.ChTexture()
+        # beam_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/grey concrete.jpg'))
+        # beam_texture.SetTextureScale(10,10)
+        # beam.GetAssets().push_back(beam_texture)
         
-        system.Add(beam)
+        # system.Add(beam)
+
+
+    # allt ovan detta är transformerat till MiroAPI
+
 
     #-------------2nd floor---------------
     # Add wall, 2nd floor towards MIT place
@@ -442,6 +469,10 @@ def MIT_walls(system, H):
 
     #Add oblique walls
 
+    
+    n = chrono.ChVectorD(0,1,0)         # Normal vector for rotation
+    alpha = -np.arctan(211/1380-0.05)   # Rotation angle for positive x wall
+
     #Add oblique wall towards umu libary
     pos_1 = chrono.ChVectorD(16.3, 3/2*H-wall_t, 0.34+8.16+wall_t)
     dim_1 = chrono.ChVectorD(wall_t, H/2, 3.6)
@@ -539,6 +570,9 @@ def add_cylinderShape(system, radius, height, density, pos, texture, scale = [5,
 
     system.Add(body_cylinder)
 
+
+# fence function is transforemd to MiroAPI
+
 def add_fence(system, H, postNum, floor_w, floor_w_2, floor, floor_t, handle_l):
 
     # Add fence post, as a cylinder
@@ -546,23 +580,23 @@ def add_fence(system, H, postNum, floor_w, floor_w_2, floor, floor_t, handle_l):
     fence_h = 1.04          # Hight
     fence_d = 1             # Density
     texture = 'textures/white concrete.jpg'
-    fence_corr = chrono.ChVectorD(0, fence_h/2, 0) # Correction for fence post postition
+    fence_corr = np.array([0, fence_h/2, 0]) # Correction for fence post postition
 
     # Add handle for each floor
     handle_r = 0.0175         # Radius
-    handle_d = 1            # Density
-    n_x = chrono.ChVectorD(1, 0, 0)     # Normalvector in x direction
-    n_z = chrono.ChVectorD(0, 0, 1)     # Normalvector in z direction
+    # handle_d = 1            # Density
+    n_x = np.array([1, 0, 0])     # Normalvector in x direction
+    n_z = np.array([0, 0, 1])     # Normalvector in z direction
     # Handle
-    pos_rail_1 = chrono.ChVectorD(-0.75, H+fence_h*0.925, 6.58-floor_w)         # Fence 3rd floor left of stair
-    pos_rail_2 = chrono.ChVectorD(10.45+2.11-floor_w_2, H+fence_h*0.925, -4.4)       # Fence 3rd floor
-    pos_rail_3 = chrono.ChVectorD(10.45+2.11-floor_w_2, 2*H+fence_h*0.925, -4.4)     # Fence 4th floor
-    pos_rail_4 = chrono.ChVectorD(6.5, 2*H+fence_h*0.925, 4.2)                  # Fence by the stair 4th floor
+    pos_rail_1 = np.array([-0.75, H+fence_h*0.925, 6.58-floor_w])         # Fence 3rd floor left of stair
+    pos_rail_2 = np.array([10.45+2.11-floor_w_2, H+fence_h*0.925, -4.4])       # Fence 3rd floor
+    pos_rail_3 = np.array([10.45+2.11-floor_w_2, 2*H+fence_h*0.925, -4.4])     # Fence 4th floor
+    pos_rail_4 = np.array([6.5, 2*H+fence_h*0.925, 4.2])                  # Fence by the stair 4th floor
     # Rail
-    pos_rail_5 = chrono.ChVectorD(-0.75, H+3/4*fence_h, 6.58-floor_w)           # Fence 3rd floor left of stair
-    pos_rail_6 = chrono.ChVectorD(10.45+2.11-floor_w_2, H+3/4*fence_h, -4.4)         # Fence 3rd floor
-    pos_rail_7 = chrono.ChVectorD(10.45+2.11-floor_w_2, 2*H+3/4*fence_h, -4.4)       # Fence 4th floor
-    pos_rail_8 = chrono.ChVectorD(6.5, 2*H+3/4*fence_h, 4.2)                    # Fence by the stair 4th floor
+    pos_rail_5 = np.array([-0.75, H+3/4*fence_h, 6.58-floor_w])           # Fence 3rd floor left of stair
+    pos_rail_6 = np.array([10.45+2.11-floor_w_2, H+3/4*fence_h, -4.4])         # Fence 3rd floor
+    pos_rail_7 = np.array([10.45+2.11-floor_w_2, 2*H+3/4*fence_h, -4.4])       # Fence 4th floor
+    pos_rail_8 = np.array([6.5, 2*H+3/4*fence_h, 4.2])                    # Fence by the stair 4th floor
 
     pos_h = [pos_rail_1, pos_rail_2, pos_rail_3, pos_rail_4]
     pos_r = [pos_rail_5, pos_rail_6, pos_rail_7, pos_rail_8]
@@ -575,63 +609,69 @@ def add_fence(system, H, postNum, floor_w, floor_w_2, floor, floor_t, handle_l):
         pos_rail = pos_h[num]
         n = dirr[num]
         length = handle_length[num]
+        
+        MiroAPI.add_cylinderShape(system, handle_r, length, 1, pos_rail, 'textures/wood_floor.jpg', rotAngle=np.pi/2,rotAxis=n,rotDegrees=False)
+
+
+        # body = chrono.ChBodyEasyCylinder(handle_r, length, handle_d) # Cylinder size
+        # body.SetBodyFixed(True)
+        # body.SetPos(pos_rail)
             
-        body = chrono.ChBodyEasyCylinder(handle_r, length, handle_d) # Cylinder size
-        body.SetBodyFixed(True)
-        body.SetPos(pos_rail)
-            
-        qr = chrono.Q_from_AngAxis(np.pi/2, n.GetNormalized())    # Rotate cylinder
-        quaternion = qr * body.GetRot()
-        body.SetRot(quaternion)
+        # qr = chrono.Q_from_AngAxis(np.pi/2, n.GetNormalized())    # Rotate cylinder
+        # quaternion = qr * body.GetRot()
+        # body.SetRot(quaternion)
 
-        # Collision shape
-        body.GetCollisionModel().ClearModel()
-        body.GetCollisionModel().AddCylinder(handle_r, handle_l, handle_d) # hemi sizes
-        body.GetCollisionModel().BuildModel()
-        body.SetCollide(True)
+        # # Collision shape
+        # body.GetCollisionModel().ClearModel()
+        # body.GetCollisionModel().AddCylinder(handle_r, handle_l, handle_d) # hemi sizes
+        # body.GetCollisionModel().BuildModel()
+        # body.SetCollide(True)
 
-        # Body texture
-        body_texture = chrono.ChTexture()
-        body_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/wood_floor.jpg'))
-        body.GetAssets().push_back(body_texture)
+        # # Body texture
+        # body_texture = chrono.ChTexture()
+        # body_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/wood_floor.jpg'))
+        # body.GetAssets().push_back(body_texture)
 
-        system.Add(body)
+        # system.Add(body)
+
     # Support rail
     for num in range(len(pos_r)):
         pos_rail = pos_r[num]
         n = dirr[num]
         length = handle_length[num]
+
+        MiroAPI.add_cylinderShape(system, fence_r, length, 1, pos_rail, 'textures/white concrete.jpg', rotAngle=np.pi/2,rotAxis=n,rotDegrees=False)
+
+        # body = chrono.ChBodyEasyCylinder(fence_r, length, handle_d) # Cylinder size
+        # body.SetBodyFixed(True)
+        # body.SetPos(pos_rail)
             
-        body = chrono.ChBodyEasyCylinder(fence_r, length, handle_d) # Cylinder size
-        body.SetBodyFixed(True)
-        body.SetPos(pos_rail)
-            
-        qr = chrono.Q_from_AngAxis(np.pi/2, n.GetNormalized())    # Rotate cylinder
-        quaternion = qr * body.GetRot()
-        body.SetRot(quaternion)
+        # qr = chrono.Q_from_AngAxis(np.pi/2, n.GetNormalized())    # Rotate cylinder
+        # quaternion = qr * body.GetRot()
+        # body.SetRot(quaternion)
 
-        # Collision shape
-        body.GetCollisionModel().ClearModel()
-        body.GetCollisionModel().AddCylinder(handle_r, handle_l, handle_d) # hemi sizes
-        body.GetCollisionModel().BuildModel()
-        body.SetCollide(True)
+        # # Collision shape
+        # body.GetCollisionModel().ClearModel()
+        # body.GetCollisionModel().AddCylinder(handle_r, handle_l, handle_d) # hemi sizes
+        # body.GetCollisionModel().BuildModel()
+        # body.SetCollide(True)
 
-        # Body texture
-        body_texture = chrono.ChTexture()
-        body_texture.SetTextureFilename(chrono.GetChronoDataFile(texture))
-        body.GetAssets().push_back(body_texture)
+        # # Body texture
+        # body_texture = chrono.ChTexture()
+        # body_texture.SetTextureFilename(chrono.GetChronoDataFile(texture))
+        # body.GetAssets().push_back(body_texture)
 
-        system.Add(body)
+        # system.Add(body)
 
     for post in range(postNum):
         y_pos = floor*H - floor_t
-        pos_l = chrono.ChVectorD((-0.7-handle_l/2)+post*dl, H-floor_t, 6.58-floor_w) + fence_corr  # Left side stair  
-        pos_r = chrono.ChVectorD(10.45+2.11-floor_w_2, y_pos, (-4.4-handle_l/2)+post*dl) + fence_corr # Right side stair
+        pos_l = np.array([(-0.7-handle_l/2)+post*dl, H-floor_t, 6.58-floor_w]) + fence_corr  # Left side stair  
+        pos_r = np.array([10.45+2.11-floor_w_2, y_pos, (-4.4-handle_l/2)+post*dl]) + fence_corr # Right side stair
 
-        add_cylinderShape(system, fence_r, fence_h, fence_d , pos_r, texture)
-        add_cylinderShape(system, fence_r, fence_h, fence_d , pos_l, texture)
+        MiroAPI.add_cylinderShape(system, fence_r, fence_h, fence_d , pos_r, texture)
+        MiroAPI.add_cylinderShape(system, fence_r, fence_h, fence_d , pos_l, texture)
 
     for post in range(3):
-        pos = chrono.ChVectorD(6.5, 2*H-floor_t, 3.5+post*dl) + fence_corr
+        pos = np.array([6.5, 2*H-floor_t, 3.5+post*dl]) + fence_corr
 
-        add_cylinderShape(system, fence_r, fence_h, fence_d , pos, texture)
+        MiroAPI.add_cylinderShape(system, fence_r, fence_h, fence_d , pos, texture)
