@@ -10,6 +10,20 @@ def ChVecify(vec):
         ChVec = chrono.ChVectorD(vec)
     return ChVec
 
+def rotateBody(body, rotX, rotY, rotZ, rotOrder, rotDegrees=True):
+    if(rotDegrees):
+        rotX = np.deg2rad(rotX)
+        rotY = np.deg2rad(rotY)
+        rotZ = np.deg2rad(rotZ)
+
+    for dim in rotOrder:
+        angle = (dim == 'x')*rotX + (dim == 'y')*rotY + (dim == 'z')*rotZ
+        if angle:
+            axis = chrono.ChVectorD((dim == 'x')*1, (dim == 'y')*1, (dim == 'z')*1)
+            q = chrono.ChQuaternionD()
+            q.Q_from_AngAxis(angle, axis)
+            body.SetRot(q*body.GetRot())
+
 
 def add_boxShapeHemi(MiroSystem, size_x, size_y, size_z, pos, texture='test.jpg', scale=[4,3], Collide=True, Fixed=True, rotX=0, rotY=0, rotZ=0, rotOrder=['x','y','z'], rotDegrees=True):
     add_boxShape(MiroSystem, 2*size_x, 2*size_y, 2*size_z, pos, texture, scale, Collide, Fixed, rotX, rotY, rotZ, rotOrder, rotDegrees)
@@ -19,12 +33,6 @@ def add_boxShape(MiroSystem, size_x, size_y, size_z, pos, texture='test.jpg', sc
     # Convert position to chrono vector, supports using chvector as input as well
     ChPos = ChVecify(pos)
     
-    # Convert rotation to radians
-    if(rotDegrees):
-        rotX = np.deg2rad(rotX)
-        rotY = np.deg2rad(rotY)
-        rotZ = np.deg2rad(rotZ)
-
     # Filter 'textures/' out of the texture name, it's added later
     if len(texture) > len('textures/'):
         if texture[0:len('textures/')] == 'textures/':
@@ -35,14 +43,7 @@ def add_boxShape(MiroSystem, size_x, size_y, size_z, pos, texture='test.jpg', sc
     body_box.SetBodyFixed(Fixed)
     body_box.SetPos(ChPos)
 
-    for dim in rotOrder:
-        angle = (dim == 'x')*rotX + (dim == 'y')*rotY + (dim == 'z')*rotZ
-        if angle:
-            axis = chrono.ChVectorD((dim == 'x')*1, (dim == 'y')*1, (dim == 'z')*1)
-            print([axis.x, axis.y, axis.z])
-            q = chrono.ChQuaternionD()
-            q.Q_from_AngAxis(angle, axis)
-            body_box.SetRot(q*body_box.GetRot())
+    rotateBody(body_box, rotX, rotY, rotZ, rotOrder, rotDegrees)
 
     # Collision shape
     body_box.GetCollisionModel().ClearModel()
@@ -83,6 +84,8 @@ def add_cylinderShape(system, radius, height, density, pos, texture='test.jpg', 
     body_cylinder = chrono.ChBodyEasyCylinder(radius, height, density)
     body_cylinder.SetBodyFixed(Fixed)
     body_cylinder.SetPos(ChPos)
+
+    rotateBody(body_cylinder, rotX, rotY, rotZ, rotOrder, rotDegrees)
 
     # Collision shape
     body_cylinder.GetCollisionModel().ClearModel()
