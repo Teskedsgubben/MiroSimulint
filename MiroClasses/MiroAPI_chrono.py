@@ -35,6 +35,15 @@ def add_boxShape(MiroSystem, size_x, size_y, size_z, pos, texture='test.jpg', sc
     body_box.SetBodyFixed(Fixed)
     body_box.SetPos(ChPos)
 
+    for dim in rotOrder:
+        angle = (dim == 'x')*rotX + (dim == 'y')*rotY + (dim == 'z')*rotZ
+        if angle:
+            axis = chrono.ChVectorD((dim == 'x')*1, (dim == 'y')*1, (dim == 'z')*1)
+            print([axis.x, axis.y, axis.z])
+            q = chrono.ChQuaternionD()
+            q.Q_from_AngAxis(angle, axis)
+            body_box.SetRot(q*body_box.GetRot())
+
     # Collision shape
     body_box.GetCollisionModel().ClearModel()
     body_box.GetCollisionModel().AddBox(size_x/2, size_y/2, size_z/2) # hemi sizes
