@@ -53,23 +53,24 @@ def add_boxShape(MiroSystem, size_x, size_y, size_z, pos, texture='test.jpg', sc
     rotateBody(body_box, rotX, rotY, rotZ, rotOrder, rotAngle, ChRotAxis, rotDegrees)
 
     # Collision shape
-    body_box.GetCollisionModel().ClearModel()
-    body_box.GetCollisionModel().AddBox(size_x/2, size_y/2, size_z/2) # hemi sizes
-    body_box.GetCollisionModel().BuildModel()
+    if(Collide):
+        body_box.GetCollisionModel().ClearModel()
+        body_box.GetCollisionModel().AddBox(size_x/2, size_y/2, size_z/2) # hemi sizes
+        body_box.GetCollisionModel().BuildModel()
     body_box.SetCollide(Collide)
     
     # Visualization shape
-    if(Collide):
-        body_box_shape = chrono.ChBoxShape()
-        body_box_shape.GetBoxGeometry().Size = chrono.ChVectorD(size_x/2, size_y/2, size_z/2)
-        body_box_shape.SetColor(chrono.ChColor(0.4,0.4,0.5))
-        body_box.GetAssets().push_back(body_box_shape)
+    body_box_shape = chrono.ChBoxShape()
+    body_box_shape.GetBoxGeometry().Size = chrono.ChVectorD(size_x/2, size_y/2, size_z/2)
+    body_box_shape.SetColor(chrono.ChColor(0.4,0.4,0.5))
+    body_box.GetAssets().push_back(body_box_shape)
     
-    print('textures/'+texture)
-    body_box_texture = chrono.ChTexture()
-    body_box_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/'+texture))
-    body_box_texture.SetTextureScale(scale[0], scale[1])
-    body_box.GetAssets().push_back(body_box_texture)
+    # Body texture
+    if texture:
+        body_box_texture = chrono.ChTexture()
+        body_box_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/'+texture))
+        body_box_texture.SetTextureScale(scale[0], scale[1])
+        body_box.GetAssets().push_back(body_box_texture)
     
     MiroSystem.Add(body_box)
 
@@ -91,16 +92,18 @@ def add_cylinderShape(system, radius, height, density, pos, texture='test.jpg', 
     rotateBody(body_cylinder, rotX, rotY, rotZ, rotOrder, rotAngle, ChRotAxis, rotDegrees)
 
     # Collision shape
-    body_cylinder.GetCollisionModel().ClearModel()
-    body_cylinder.GetCollisionModel().AddCylinder(radius, radius, height/2) # hemi sizes
-    body_cylinder.GetCollisionModel().BuildModel()
+    if(Collide):
+        body_cylinder.GetCollisionModel().ClearModel()
+        body_cylinder.GetCollisionModel().AddCylinder(radius, radius, height/2) # hemi sizes
+        body_cylinder.GetCollisionModel().BuildModel()
     body_cylinder.SetCollide(Collide)
 
     # Body texture
-    body_cylinder_texture = chrono.ChTexture()
-    body_cylinder_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/'+texture))
-    body_cylinder_texture.SetTextureScale(scale[0], scale[1])
-    body_cylinder.GetAssets().push_back(body_cylinder_texture)
+    if texture:
+        body_cylinder_texture = chrono.ChTexture()
+        body_cylinder_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/'+texture))
+        body_cylinder_texture.SetTextureScale(scale[0], scale[1])
+        body_cylinder.GetAssets().push_back(body_cylinder_texture)
 
     system.Add(body_cylinder)
 
