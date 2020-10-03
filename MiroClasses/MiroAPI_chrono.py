@@ -40,11 +40,6 @@ def add_boxShape(MiroSystem, size_x, size_y, size_z, pos, texture='test.jpg', sc
     ChPos = ChVecify(pos)
     ChRotAxis = ChVecify(rotAxis)
     
-    # Filter 'textures/' out of the texture name, it's added later
-    if len(texture) > len('textures/'):
-        if texture[0:len('textures/')] == 'textures/':
-            texture = texture[len('textures/'):]
-
     # Create a box
     body_box = chrono.ChBody()
     body_box.SetBodyFixed(Fixed)
@@ -67,6 +62,10 @@ def add_boxShape(MiroSystem, size_x, size_y, size_z, pos, texture='test.jpg', sc
     
     # Body texture
     if texture:
+        # Filter 'textures/' out of the texture name, it's added later
+        if len(texture) > len('textures/'):
+            if texture[0:len('textures/')] == 'textures/':
+                texture = texture[len('textures/'):]
         body_box_texture = chrono.ChTexture()
         body_box_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/'+texture))
         body_box_texture.SetTextureScale(scale[0], scale[1])
@@ -79,11 +78,6 @@ def add_cylinderShape(system, radius, height, density, pos, texture='test.jpg', 
     ChPos = ChVecify(pos)
     ChRotAxis = ChVecify(rotAxis)
 
-    # Filter 'textures/' out of the texture name, it's added later
-    if len(texture) > len('textures/'):
-        if texture[0:len('textures/')] == 'textures/':
-            texture = texture[len('textures/'):]
-    
     # Create a cylinder
     body_cylinder = chrono.ChBodyEasyCylinder(radius, height, density)
     body_cylinder.SetBodyFixed(Fixed)
@@ -100,6 +94,10 @@ def add_cylinderShape(system, radius, height, density, pos, texture='test.jpg', 
 
     # Body texture
     if texture:
+        # Filter 'textures/' out of the texture name, it's added later
+        if len(texture) > len('textures/'):
+            if texture[0:len('textures/')] == 'textures/':
+                texture = texture[len('textures/'):]
         body_cylinder_texture = chrono.ChTexture()
         body_cylinder_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/'+texture))
         body_cylinder_texture.SetTextureScale(scale[0], scale[1])
