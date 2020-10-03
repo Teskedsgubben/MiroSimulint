@@ -5,7 +5,6 @@ def ChVecify(vec):
     if type(vec) == type([]):
         ChVec = chrono.ChVectorD(float(vec[0]), float(vec[1]), float(vec[2]))
     elif type(vec) == type(np.array([])):
-        print(vec[0],', ', vec[1],', ', vec[2])
         ChVec = chrono.ChVectorD(float(vec[0]), float(vec[1]), float(vec[2]))
     else:
         ChVec = chrono.ChVectorD(vec)
