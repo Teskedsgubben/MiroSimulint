@@ -88,7 +88,7 @@ def add_cylinderShape(system, radius, height, density, pos, texture='test.jpg', 
     body_cylinder.SetBodyFixed(Fixed)
     body_cylinder.SetPos(ChPos)
 
-    rotateBody(body_cylinder, rotX, rotY, rotZ, rotOrder, rotAngle, rotAxis, rotDegrees)
+    rotateBody(body_cylinder, rotX, rotY, rotZ, rotOrder, rotAngle, ChRotAxis, rotDegrees)
 
     # Collision shape
     body_cylinder.GetCollisionModel().ClearModel()
