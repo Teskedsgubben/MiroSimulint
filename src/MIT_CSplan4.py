@@ -1,4 +1,5 @@
 from MiroClasses import MiroAPI_chrono as MiroAPI
+import pychrono.core as chrono
 
 def build(MiroSystem, SPEEDMODE = False):
     H = 3.32
@@ -7,5 +8,47 @@ def build(MiroSystem, SPEEDMODE = False):
     if(SPEEDMODE):        
         MiroAPI.add_boxShape(MiroSystem, 11.8, H, wall_t, topWall_pos, 'MITwall_West.jpg')
     else:
-        MiroAPI.add_boxShape(MiroSystem, 11.8, H, wall_t, topWall_pos, 'MITwall_West.jpg')
-        MiroAPI.add_boxShape(MiroSystem, 1, 1, 1, topWall_pos)
+        corner_windowpane0 = [-5.29, 5/2.125*H, 4.99]
+        first_windowpane0 = chrono.ChVectorD(corner_windowpane0[0]+0.10, corner_windowpane0[1], corner_windowpane0[2])
+        corner_windowpane1 = [-0.7, 5/2.125*H, 4.99]
+        first_windowpane1 = chrono.ChVectorD(corner_windowpane1[0]+0.25, corner_windowpane1[1], corner_windowpane1[2])
+
+        h_windowpane_size = [0.05, 2.3, 0.01]  #horizontal window pane size
+        v_windowpane_size = [0.05, 3, 0.01]     #vertical window pane size
+        
+        pos_down = [topWall_pos[0], topWall_pos[1] - 1.26, topWall_pos[2]]
+        pos_up = [topWall_pos[0], topWall_pos[1] + 1.16, topWall_pos[2]]
+
+        #concrete part under and over windows
+        MiroAPI.add_boxShape(MiroSystem, 11.8, 0.8, 0.2, pos_down, texture='white concrete.jpg', scale=[9, 12])
+        MiroAPI.add_boxShape(MiroSystem, 11.8, 1, 0.2, pos_up, texture='white concrete.jpg', scale=[9, 12])
+        #vertical windowpanes smaller window size
+        MiroAPI.add_boxShape(MiroSystem, h_windowpane_size[0], h_windowpane_size[1], h_windowpane_size[2], corner_windowpane0, texture='wood_ikea_style.png')
+        #MiroAPI.add_boxShape(MiroSystem, h_windowpane_size[0], h_windowpane_size[1], h_windowpane_size[2], first_windowpane)
+        spacingA = 0.61
+        for k in range(0, 8):
+            tmp = chrono.ChVectorD(spacingA * k, 0, 0)
+            MiroAPI.add_boxShape(MiroSystem, h_windowpane_size[0], h_windowpane_size[1], h_windowpane_size[2], tmp + first_windowpane0, texture='wood_ikea_style.png')
+            if k == 3:
+                MiroAPI.add_boxShape(MiroSystem, h_windowpane_size[0], h_windowpane_size[1], h_windowpane_size[2],  chrono.ChVectorD(spacingA/2, 0, 0) + tmp + first_windowpane0, texture='wood_ikea_style.png')
+        
+        #horizontal windowpanes
+        MiroAPI.add_boxShape(MiroSystem, v_windowpane_size[0], v_windowpane_size[1], v_windowpane_size[2], topWall_pos, rotX=90, rotDegrees=True)
+
+        #vertical windowpanes larger size
+        MiroAPI.add_boxShape(MiroSystem, h_windowpane_size[0], h_windowpane_size[1], h_windowpane_size[2], corner_windowpane1, texture='wood_ikea_style.png')
+        MiroAPI.add_boxShape(MiroSystem, h_windowpane_size[0], h_windowpane_size[1], h_windowpane_size[2], first_windowpane1, texture='wood_ikea_style.png')
+
+        spacingB = 0.685
+        for k in range(0, 7):
+            tmp = chrono.ChVectorD(spacingB * k, 0, 0)
+            MiroAPI.add_boxShape(MiroSystem, h_windowpane_size[0], h_windowpane_size[1], h_windowpane_size[2], tmp + first_windowpane1, texture='wood_ikea_style.png')
+
+            if k == 1:
+                MiroAPI.add_boxShape(MiroSystem, h_windowpane_size[0], h_windowpane_size[1], h_windowpane_size[2],chrono.ChVectorD(spacingB/2, 0, 0) + tmp + first_windowpane1, texture='wood_ikea_style.png')
+
+            if k == 4:
+                MiroAPI.add_boxShape(MiroSystem, h_windowpane_size[0], h_windowpane_size[1], h_windowpane_size[2],chrono.ChVectorD(spacingB/2, 0, 0) + tmp + first_windowpane1, texture='wood_ikea_style.png')
+
+            if k == 6:
+                MiroAPI.add_boxShape(MiroSystem, h_windowpane_size[0], h_windowpane_size[1], h_windowpane_size[2], chrono.ChVectorD(+0.25, 0, 0) + tmp + first_windowpane1, texture='wood_ikea_style.png')
