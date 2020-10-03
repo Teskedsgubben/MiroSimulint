@@ -68,12 +68,6 @@ def add_boxShape(MiroSystem, size_x, size_y, size_z, pos, texture='test.jpg', sc
 def add_cylinderShape(system, radius, height, density, pos, texture='test.jpg', scale=[1,1], Collide=True, Fixed=True, rotX=0, rotY=0, rotZ=0, rotOrder=['x','y','z'], rotDegrees=True):
     # Convert position to chrono vector, supports using chvector as input as well
     ChPos = ChVecify(pos)
-    
-    # Convert rotation to radians
-    if(rotDegrees):
-        rotX = np.deg2rad(rotX)
-        rotY = np.deg2rad(rotY)
-        rotZ = np.deg2rad(rotZ)
 
     # Filter 'textures/' out of the texture name, it's added later
     if len(texture) > len('textures/'):
