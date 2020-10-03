@@ -10,11 +10,17 @@ def ChVecify(vec):
         ChVec = chrono.ChVectorD(vec)
     return ChVec
 
-def rotateBody(body, rotX, rotY, rotZ, rotOrder, rotAngle, rotAxis, rotDegrees=True):
+def rotateBody(body, rotX, rotY, rotZ, rotOrder, rotAngle, ChRotAxis, rotDegrees=True):
     if(rotDegrees):
         rotX = np.deg2rad(rotX)
         rotY = np.deg2rad(rotY)
         rotZ = np.deg2rad(rotZ)
+        rotAngle = np.deg2rad(rotAngle)
+    
+    if rotAngle:
+        q = chrono.ChQuaternionD()
+        q.Q_from_AngAxis(rotAngle, ChRotAxis)
+        body.SetRot(q*body.GetRot())
 
     for dim in rotOrder:
         angle = (dim == 'x')*rotX + (dim == 'y')*rotY + (dim == 'z')*rotZ
@@ -32,6 +38,7 @@ def add_boxShape(MiroSystem, size_x, size_y, size_z, pos, texture='test.jpg', sc
     '''system, size_x, size_y, size_z, pos, texture, scale = [5,5], hitbox = True/False'''
     # Convert position to chrono vector, supports using chvector as input as well
     ChPos = ChVecify(pos)
+    ChRotAxis = ChVecify(rotAxis)
     
     # Filter 'textures/' out of the texture name, it's added later
     if len(texture) > len('textures/'):
@@ -43,7 +50,7 @@ def add_boxShape(MiroSystem, size_x, size_y, size_z, pos, texture='test.jpg', sc
     body_box.SetBodyFixed(Fixed)
     body_box.SetPos(ChPos)
 
-    rotateBody(body_box, rotX, rotY, rotZ, rotOrder, rotAngle, rotAxis, rotDegrees)
+    rotateBody(body_box, rotX, rotY, rotZ, rotOrder, rotAngle, ChRotAxis, rotDegrees)
 
     # Collision shape
     body_box.GetCollisionModel().ClearModel()
