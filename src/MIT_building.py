@@ -9,23 +9,23 @@ from src import MIT_Entrance
 from src import MIT_Props
 from src import MIT_CSplan4
 
-def build_MIT(ChSystem, SPEEDMODE = False):
+def build_MIT(MiroSystem, SPEEDMODE = False):
     # Create the room floor: a simple fixed rigid body with a collision shape
     # and a visualization shape
-    MIT_Walls.build(ChSystem, SPEEDMODE)
-    MIT_Stage.build(ChSystem, SPEEDMODE)
-    MIT_Tables.build(ChSystem, SPEEDMODE)
-    MIT_Entrance.build(ChSystem, SPEEDMODE)
-    MIT_CSplan4.build(ChSystem, SPEEDMODE)
+    MIT_Walls.build(MiroSystem, SPEEDMODE)
+    MIT_Stage.build(MiroSystem, SPEEDMODE)
+    MIT_Tables.build(MiroSystem, SPEEDMODE)
+    MIT_Entrance.build(MiroSystem, SPEEDMODE)
+    MIT_CSplan4.build(MiroSystem, SPEEDMODE)
 
     
-    mit_carpet_floor(ChSystem)
-    roof(ChSystem)
+    mit_carpet_floor(MiroSystem)
+    roof(MiroSystem)
     if not SPEEDMODE:
-        MIT_Props.AddProps(ChSystem)
+        MIT_Props.AddProps(MiroSystem)
 
 
-def mit_carpet_floor(system):
+def mit_carpet_floor(MiroSystem):
     # Add MIT floor as a box
     MIT_floor_x = (4.5+4.8+4.5)/2
     MIT_floor_z = (4.5+4.8+4.5)/2
@@ -50,9 +50,9 @@ def mit_carpet_floor(system):
     body_floor_texture.SetTextureScale(23, 18)
     body_floor.GetAssets().push_back(body_floor_texture)
     
-    system.Add(body_floor)
+    MiroSystem.Add(body_floor)
 
-def roof(system):
+def roof(MiroSystem):
     frame_h = 1.0
     dy = 2/3
     xspan = [-5.25, 8.35]
@@ -74,8 +74,8 @@ def roof(system):
     sideN.SetRot(qr)
     sideS.SetPos(chrono.ChVectorD(xspan[0]-0.05,  yspan[0]+frame_h + (yspan[1]-yspan[0]-frame_h)/2, zspan[1]+0.1))
     sideN.SetPos(chrono.ChVectorD(xspan[1]+0.25,  yspan[0]+frame_h + (yspan[1]-yspan[0]-frame_h)/2, zspan[1]+0.1))
-    system.Add(sideS)
-    system.Add(sideN)
+    MiroSystem.Add(sideS)
+    MiroSystem.Add(sideN)
 
     beams = 4
     dx = (xspan[1] - xspan[0])/(beams-1)
@@ -84,7 +84,7 @@ def roof(system):
         p2 = chrono.ChVectorD(xspan[0] + dx*b + 0.06, yspan[1]-0.12, zspan[1]-0.06)
         d1 = chrono.ChVectorD(0,dec,-1)
         d2 = chrono.ChVectorD(0,dec,-1)
-        system.Add(shp.step(p1,d1, p2,d2, (zspan[1]-zspan[0])*(np.sqrt(1+dec**2)), 0.2))
+        MiroSystem.Add(shp.step(p1,d1, p2,d2, (zspan[1]-zspan[0])*(np.sqrt(1+dec**2)), 0.2))
     
 
     # Beam texture
@@ -105,7 +105,7 @@ def roof(system):
         step_comp_shape.GetBoxGeometry().Size = chrono.ChVectorD(0.05, (yspan[1] - yspan[0] - frame_h)/2, 0.05)
         step_comp.GetAssets().push_back(step_comp_shape)
         step_comp.GetAssets().push_back(beam_texture)
-        system.Add(step_comp)
+        MiroSystem.Add(step_comp)
 
     beams = 5
     dy = (yspan[1]-yspan[0]-frame_h)/(beams-1)
@@ -120,7 +120,7 @@ def roof(system):
         step_comp_shape.GetBoxGeometry().Size = chrono.ChVectorD((xspan[1]-xspan[0])/2+0.06, 0.06, 0.06)
         step_comp.GetAssets().push_back(step_comp_shape)
         step_comp.GetAssets().push_back(beam_texture)
-        system.Add(step_comp)
+        MiroSystem.Add(step_comp)
 
     beams = 5
     h_0 = yspan[1]+0.12*dec
@@ -137,7 +137,7 @@ def roof(system):
         step_comp_shape.GetBoxGeometry().Size = chrono.ChVectorD((xspan[1]-xspan[0])/2+0.06, 0.06, 0.06)
         step_comp.GetAssets().push_back(step_comp_shape)
         step_comp.GetAssets().push_back(beam_texture)
-        system.Add(step_comp)
+        MiroSystem.Add(step_comp)
 
 
     # Roof frame
@@ -162,12 +162,12 @@ def roof(system):
     wallW.GetAssets().push_back(wallW_shape)
     wallW.GetAssets().push_back(wall_texture)
     
-    system.Add(wallW)
+    MiroSystem.Add(wallW)
 
     # East wall
     wallE = wallW.Clone()
     wallE.SetPos(chrono.ChVectorD((xspan[0]+xspan[1])/2, yspan[0]+frame_h/2, zspan[0]))
-    system.Add(wallE)
+    MiroSystem.Add(wallE)
 
 
     # South wall
@@ -187,12 +187,12 @@ def roof(system):
     wallS.GetAssets().push_back(wallS_shape)
     wallS.GetAssets().push_back(wall_texture)
     
-    system.Add(wallS)
+    MiroSystem.Add(wallS)
 
     # North wall
     wallN = wallS.Clone()
     wallN.SetPos(chrono.ChVectorD(xspan[1]+0.15,yspan[0]+frame_h/2,(zspan[1]+zspan[0])/2))  
-    system.Add(wallN)
+    MiroSystem.Add(wallN)
 
     # MA roof
     roofMA_width = 6.6
@@ -214,7 +214,7 @@ def roof(system):
     roofMA_texture.SetTextureScale(40, 80) 
     roofMA.GetAssets().push_back(roofMA_texture)
     
-    system.Add(roofMA)
+    MiroSystem.Add(roofMA)
     
     # MC roof
     roofMC_width = 3.165
@@ -236,7 +236,7 @@ def roof(system):
     roofMC_texture.SetTextureScale(80, 10) 
     roofMC.GetAssets().push_back(roofMC_texture)
     
-    system.Add(roofMC)
+    MiroSystem.Add(roofMC)
 
     # Computer Science roof
     roofCS = chrono.ChBody()
@@ -257,7 +257,7 @@ def roof(system):
     roofCS_texture.SetTextureScale(80, 10) 
     roofCS.GetAssets().push_back(roofCS_texture)
     
-    system.Add(roofCS)
+    MiroSystem.Add(roofCS)
 
 
 
