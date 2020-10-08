@@ -1,9 +1,10 @@
-import pychrono.core as chrono
-import pychrono.irrlicht as chronoirr
+from MiroClasses.MiroAPI_selector import SelectedAPI as MiroAPI
 import numpy as np
+import sys
 import time
 import os
- 
+
+
 class MiroSystem():
     def __init__(self): 
         # The path to the Chrono data directory containing various assets (meshes, textures, data files)
@@ -16,8 +17,7 @@ class MiroSystem():
         #  Create the simulation system and add items
         #
         
-        self.ChSystem = chrono.ChSystemNSC()
-        chrono.SetChronoDataPath(os.getcwd() + "/")
+        self.system_list = MiroAPI.SetupSystem(sys.argv)
         self.modules = {}
         self.sensors = {}
         self.links = {}
@@ -30,20 +30,8 @@ class MiroSystem():
         self.cycle = False
         self.fps = 300
         
-        # Set the default outward/inward shape margins for collision detection,
-        # this is epecially important for very large or very small objects.
-        chrono.ChCollisionModel.SetDefaultSuggestedEnvelope(0.0000001)
-        chrono.ChCollisionModel.SetDefaultSuggestedMargin(0.0001)
-        
-        # Maybe you want to change some settings for the solver. For example you
-        # might want to use SetSolverMaxIterations to set the number of iterations
-        # per timestep, etc.
-        
-        #self.ChSystem.SetSolverType(chrono.ChSolver.Type_BARZILAIBORWEIN) # precise, more slow
-        self.ChSystem.SetSolverMaxIterations(70)
-        
     def Set_Speedmode(self, SPEEDMODE = True):
-        '''Sets is speedmode is to be used. This removes many visual items to speed up the simulation.'''
+        '''Sets if speedmode is to be used. This removes many visual items to speed up the simulation.'''
         self.SPEEDMODE = SPEEDMODE
 
     def Set_Environment(self, Environment):
@@ -58,9 +46,9 @@ class MiroSystem():
             self.Environment.Get_Notifier().Set_Idle()
 
         cam = self.camviews['default']
-        self.cam_pos = chrono.ChVectorD(cam['pos'][0], cam['pos'][1], cam['pos'][2])
-        self.cam_to_obs = chrono.ChVectorD(cam['dir'][0], cam['dir'][1], cam['dir'][2])
-        self.cam_to_obs.SetLength(cam['lah'])
+        self.cam_pos = np.array(cam['pos'])
+        self.cam_to_obs = np.array(cam['dir'])/np.linalg.norm(np.array(cam['dir']))
+        self.cam_to_obs = self.cam_to_obs*cam['lah']
         self.obs_pos = self.cam_pos + self.cam_to_obs
     
     def Get_Environment(self):
@@ -69,8 +57,8 @@ class MiroSystem():
     def Get_Target(self):
         return self.Environment.Get_Target()
 
-    def Get_ChSystem(self):
-        return self.ChSystem
+    def Get_APIsystem(self):
+        return self.system_list
     
     def Set_Perspective(self, camname, follow_module_name = False, follow_position = [1.5, 0.75, 0], follow_distance = 0, cycle = False, cycle_laptime = 4):
         '''Sets the camera perspective configuration for the simulation. Available perspectives depend on the MiroEnvironment used.'''
@@ -84,18 +72,18 @@ class MiroSystem():
                 if follow_module_name in self.modules:
                     self.follow = True
                     self.followmod = self.modules[follow_module_name]
-                    self.cam_to_obs = -chrono.ChVectorD(follow_position[0], follow_position[1], follow_position[2])
+                    self.cam_to_obs = -np.array(follow_position)
                     self.obs_pos = self.followmod.GetCenterOfMass()
                     self.cam_pos = self.obs_pos - self.cam_to_obs
                     if follow_distance > 0:
-                        self.cam_to_obs.SetLength(follow_distance)
+                        self.cam_to_obs = self.cam_to_obs/np.linalg.norm(self.cam_to_obs)*follow_distance
                 else:
                     print('Camera Error: "'+follow_module_name+'" is not a recognized module and cannot be followed, using default')
         elif camname in self.camviews:
             cam = self.camviews[camname]
-            self.cam_pos = chrono.ChVectorD(cam['pos'][0], cam['pos'][1], cam['pos'][2])
-            self.cam_to_obs = chrono.ChVectorD(cam['dir'][0], cam['dir'][1], cam['dir'][2])
-            self.cam_to_obs.SetLength(cam['lah'])
+            self.cam_pos = np.array(cam['pos'])
+            self.cam_to_obs = np.array(cam['dir'])/np.linalg.norm(np.array(cam['dir']))
+            self.cam_to_obs = self.cam_to_obs*cam['lah']
             self.obs_pos = self.cam_pos + self.cam_to_obs
         else:
             if cycle:
@@ -104,13 +92,21 @@ class MiroSystem():
                 print('Camera Error: "'+camname+'" is not a recognized camera position, using default')
         
 
-    def Add_Camview(self, name, position = [0,0,0], direction = [1,0,0], distance = 1):
+    def Add_Camview(self, name, position = [0,0,0], direction = [1,0,0], distance = 1, look_at_point = False):
         '''Add your own camera perspective to the environment. \n
         name: string 'perspective name'\n
         position: camera coordinates in [x,y,z]\n
         direction: aim of the camera in [x,y,z]\n
         distance: number of how far away the camera should look\n
+        look_at_point: can be used to override direction and distance to set a specific viewing point\n
         Use Set_Perspective('your name') to use the camera position.'''
+        if look_at_point:
+            pos = np.array(position)
+            point = np.array(look_at_point)
+            diff = point - pos
+            direction = [diff[0], diff[1], diff[2]]
+            distance = np.linalg.norm(diff)
+        
         self.camviews.update({
             name: {
                 'pos': position,
@@ -123,14 +119,11 @@ class MiroSystem():
         '''This sets the camera during simulation. For internal usage when the simulation is being run, 
         use SetPerspective to configure the camera before running the simulation.'''
         if self.cycle:
-            q = chrono.Q_from_AngAxis(self.cycle_angle/self.fps, chrono.ChVectorD(0,1,0))
-            self.cam_to_obs = q.Rotate(self.cam_to_obs)
+            self.cam_to_obs = MiroAPI.rotateVector(self.cam_to_obs, self.cycle_angle/self.fps, [0,1,0], rotDegrees=False)
         if self.follow:
             self.obs_pos = self.followmod.GetCenterOfMass()
         self.cam_pos = self.obs_pos - self.cam_to_obs
-        position = chronoirr.vector3df(self.cam_pos.x, self.cam_pos.y, self.cam_pos.z)
-        looker = chronoirr.vector3df(self.obs_pos.x, self.obs_pos.y, self.obs_pos.z)
-        self.simulation.AddTypicalCamera(position, looker)
+        MiroAPI.SetCamera(self.system_list, self.cam_pos, self.obs_pos)
 
     def Add_MiroModule(self, module, name, position = False, vel = False):
         '''Adds a MiroModule to the MiroSystem with a custom name. Can set an initial position and velocity.'''
@@ -157,11 +150,9 @@ class MiroSystem():
         refMod = self.modules[ref_module]
         moveMod.SetPosition(refMod.GetReferencePoint())
 
-    def Add_Object(self, Object):
-        '''Adds a ChBody or similar object to the ChSystem under the MiroSystem.'''
-        self.ChSystem.Add(Object)
     def Add(self, Object):
-        self.Add_Object(Object)
+        '''Adds a ChBody or similar object to the ChSystem under the MiroSystem.'''
+        MiroAPI.AddObjectByAPI(self.system_list, Object)
 
     def Initialize_Config(self, config):
         if "resolution" in config:
@@ -227,120 +218,8 @@ class MiroSystem():
         "frame save interval" = 1\n
         "record": False\n
         '''
-        # ---------------------------------------------------------------------
-        #
-        #  Create an Irrlicht application to visualize the system
-        #
         self.Initialize_Config(config)
-        
-        self.simulation = chronoirr.ChIrrApp(self.ChSystem, 'MiroSimulation', chronoirr.dimension2du(self.res[0], self.res[1]))
-        self.simulation.SetVideoframeSave(self.record)
-        self.simulation.AddTypicalSky()
-        self.Set_Camera()
-        self.Set_Lights(True)
-        
-                    # ==IMPORTANT!== Use this function for adding a ChIrrNodeAsset to all items
-                    # in the system. These ChIrrNodeAsset assets are 'proxies' to the Irrlicht meshes.
-                    # If you need a finer control on which item really needs a visualization proxy in
-                    # Irrlicht, just use application.AssetBind(myitem); on a per-item basis.
-        
-        self.simulation.AssetBindAll()
-        
-                    # ==IMPORTANT!== Use this function for 'converting' into Irrlicht meshes the assets
-                    # that you added to the bodies into 3D shapes, they can be visualized by Irrlicht!
-        
-        self.simulation.AssetUpdateAll()
-        
-                    # If you want to show shadows because you used "AddLightWithShadow()'
-                    # you must remember this:
-        self.simulation.AddShadowAll() 
-        # ---------------------------------------------------------------------
-        #
-        #  Run the simulation
-        #
-        
-        dt = 1/self.fps # per frame
-        substeps = self.subframes
-
-        self.simulation.SetTimestep(dt/substeps)
-        self.simulation.SetTryRealtime(True)
-        self.simulation.SetVideoframeSaveInterval(self.framesave_interval)
-        
-        if self.start_paused:
-            self.simulation.SetPaused(True)
-            paused = True
-        else:
-            paused = False
-        
-        for sensor_ID, sensor in self.sensors.items():
-            sensor.Initialize(sensor_ID+'.txt', self.simulation, self.log)
-
-        self.simulation.GetDevice().run()
-        self.simulation.BeginScene()
-        self.simulation.DrawAll()
-        self.simulation.DoStep()
-        self.simulation.EndScene()
-
-        if self.print:
-            self.PrintModuleInfo()
-        
-        start = time.time()
-        
-        while(self.simulation.GetDevice().run() and start + self.delay > time.time()):
-            self.simulation.BeginScene()
-            self.simulation.DrawAll()
-            for _ in range(0,substeps):
-                self.simulation.DoStep()
-            self.simulation.EndScene()
-
-            if self.follow and not self.simulation.GetPaused():
-                self.Set_Camera()
-        
-        for _, module in self.modules.items():
-            module.Release()
-        
-        
-        if self.pre_pause:
-            print('\n--- Press SPACE to release! ---')
-            self.simulation.SetPaused(True)
-            paused = True
-            if self.notifier:
-                self.Environment.Get_Notifier().Set_Ready()
-
-        while(self.simulation.GetDevice().run()):
-            # for _, link in self.links.items():
-            #     if abs(link.Get_react_force().Length()) > 30000:
-            #         link.SetBroken(True)
-
-            self.simulation.BeginScene()
-            self.simulation.DrawAll()
-            for _ in range(0,substeps):
-                self.simulation.DoStep()
-                if not paused:
-                    for _, sensor in self.sensors.items():
-                        sensor.LogData()
-            self.simulation.EndScene()
-
-            if (self.follow or self.cycle) and not paused:
-                self.Set_Camera()
-        
-            if self.notifier and not paused and self.simulation.GetPaused():
-                paused = True
-                self.Environment.Get_Notifier().Set_Ready()
-            if self.notifier and paused and not self.simulation.GetPaused():
-                paused = False
-                self.Environment.Get_Notifier().Set_Idle()
+        MiroAPI.RunSimulation(self)
 
 
-    def Set_Lights(self, ambients = True):
-        for light in self.Environment.Get_Lightsources():
-            add_light = True
-            if light[6] and not ambients: # if light is Ambient but ambients are off
-                add_light = False
-            if add_light:
-                pos = chronoirr.vector3df(light[0][0], light[0][1], light[0][2])
-                if light[7]:
-                    aim = chronoirr.vector3df(light[1][0], light[1][1], light[1][2])
-                    self.simulation.AddLightWithShadow(pos, aim, light[2], light[3], light[4], light[5])
-                else:
-                    self.simulation.AddLight(pos, light[2])
+    

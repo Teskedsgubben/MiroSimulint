@@ -18,7 +18,6 @@ class MiroNotifier():
         MiroAPI.add_boxShape(system, self.width, self.height, 0.05, self.position, 'textures/notifboard.png', rotX=self.tilt_angle, rotY=self.turn_angle, rotDegrees=False)
         self.bulb = MiroAPI.add_sphereShape(system, self.radius, self.position+self.bulb_pos, 'textures/notifbulb.png', rotX=self.tilt_angle+np.pi/2, rotY=self.turn_angle, rotDegrees=False)
 
-
     def Set_Idle(self):
         MiroAPI.rotateBody(self.bulb, rotAngle=180, rotAxis=self.bulb_pos)
     def Set_Ready(self):

@@ -1,9 +1,5 @@
-import pychrono.core as chrono
+from MiroClasses.MiroAPI_selector import SelectedAPI as MiroAPI
 import numpy as np
-
-from src import Shapes as shp
-
-from MiroClasses import MiroAPI_chrono as MiroAPI
 
 def build(system, SPEEDMODE = False):
     # Create the room: simple fixed rigid bodys with a collision shape
@@ -360,134 +356,134 @@ def MIT_walls(system, H):
     #-------------2nd floor---------------
     # Add wall, 2nd floor towards MIT place
     bWall_height = H/2-wall_t
-    pos = chrono.ChVectorD(-1.82, 0+bWall_height, 5+wall_t)
-    add_boxShape(system, 3.48, bWall_height, wall_t, pos, 'textures/storage_wall.jpg', [12,15])
+    pos = np.array([-1.82, 0+bWall_height, 5+wall_t])
+    MiroAPI.add_boxShapeHemi(system, 3.48, bWall_height, wall_t, pos, 'textures/storage_wall.jpg', [12,15])
 
     # Add wall, 2nd floor towards NA (positive z direction)
-    pos = chrono.ChVectorD(-7, H/2, 8.16+wall_t)
-    add_boxShape(system, 8.75-wall_t, H/2, wall_t, pos, 'textures/yellow_brick.jpg', [5,5])
+    pos = np.array([-7, H/2, 8.16+wall_t])
+    MiroAPI.add_boxShapeHemi(system, 8.75-wall_t, H/2, wall_t, pos, 'textures/yellow_brick.jpg', [5,5])
 
     # Add entrence wall (positive x direction)
-    pos = chrono.ChVectorD(12.7+wall_t, 0+H/2-0.1, 10.18)
-    add_boxShape(system, wall_t, H/2-0.1, 1.9, pos, 'textures/yellow_brick.jpg', [5,5])
+    pos = np.array([12.7+wall_t, 0+H/2-0.1, 10.18])
+    MiroAPI.add_boxShapeHemi(system, wall_t, H/2-0.1, 1.9, pos, 'textures/yellow_brick.jpg', [5,5])
 
     # Add entrence wall (negative x direction)
-    pos = chrono.ChVectorD(-0.4, 0+H/2-0.16, 9.86)
-    add_boxShape(system, wall_t, H/2-0.16, 1.5, pos, 'textures/door_cs.jpg', [4,3])
+    pos = np.array([-0.4, 0+H/2-0.16, 9.86])
+    MiroAPI.add_boxShapeHemi(system, wall_t, H/2-0.16, 1.5, pos, 'textures/door_cs.jpg', [4,3])
 
     # Add entrence corridor (negative x direction)
-    pos = chrono.ChVectorD(0.65, 0+H/2-0.1, 11.41)
-    add_boxShape(system, 1, H/2-0.1, wall_t, pos, 'textures/white concrete.jpg', [5,5])
+    pos = np.array([0.65, 0+H/2-0.1, 11.41])
+    MiroAPI.add_boxShapeHemi(system, 1, H/2-0.1, wall_t, pos, 'textures/white concrete.jpg', [5,5])
 
     # Add 2nd entrence wall (negative x direction)
-    pos = chrono.ChVectorD(1.6, 0+H/2-0.1, 6.5+wall_t+0.01+0.05)
-    add_boxShape(system, wall_t, H/2-0.1, 1.5+wall_t+0.05, pos, 'textures/yellow_brick.jpg', [5,5])
+    pos = np.array([1.6, 0+H/2-0.1, 6.5+wall_t+0.01+0.05])
+    MiroAPI.add_boxShapeHemi(system, wall_t, H/2-0.1, 1.5+wall_t+0.05, pos, 'textures/yellow_brick.jpg', [5,5])
 
     #-------------3rd floor---------------
     # Add wall, 3rd floor (negative x direction) MIT info screen
-    pos = chrono.ChVectorD(6.5-wall_t, 0+3/2*H-0.16, 10.16+wall_t)
-    add_boxShape(system, wall_t, H/2-0.16, 2-wall_t, pos, 'textures/yellow_brick.jpg', [5,5])
+    pos = np.array([6.5-wall_t, 0+3/2*H-0.16, 10.16+wall_t])
+    MiroAPI.add_boxShapeHemi(system, wall_t, H/2-0.16, 2-wall_t, pos, 'textures/yellow_brick.jpg', [5,5])
 
     # Add wall, 3rd floor towards NA 1 (negative z direction)
-    pos = chrono.ChVectorD(-7.6, 0+3/2*H, 5.65)
-    add_boxShape(system, 1.75, H/2, wall_t, pos, 'textures/white concrete.jpg', [10,7])
+    pos = np.array([-7.6, 0+3/2*H, 5.65])
+    MiroAPI.add_boxShapeHemi(system, 1.75, H/2, wall_t, pos, 'textures/white concrete.jpg', [10,7])
 
     # Add wall, 3rd floor towards NA 2 (negative z direction)
-    pos = chrono.ChVectorD(-11.3, 0+3/2*H, 5.65)
-    add_boxShape(system, 0.25, H/2, wall_t, pos, 'textures/yellow_brick.jpg', [1,1], False)
+    pos = np.array([-11.3, 0+3/2*H, 5.65])
+    MiroAPI.add_boxShapeHemi(system, 0.25, H/2, wall_t, pos, 'textures/yellow_brick.jpg', [1,1], False)
 
     # Add wall, 3rd floor corridor towards NTK (negative x direction)
     for wall in range(2):
         x = -11.05 + wall*(1.71+wall_t)
-        pos = chrono.ChVectorD(x, 0+3/2*H, 5.25)
-        add_boxShape(system, wall_t, H/2, 0.4, pos, 'textures/yellow_brick.jpg', [1,1], False)
+        pos = np.array([x, 0+3/2*H, 5.25])
+        MiroAPI.add_boxShapeHemi(system, wall_t, H/2, 0.4, pos, 'textures/yellow_brick.jpg', [1,1], False)
 
     # Add wall, 3rd floor NTK door (negative z direction)
-    pos = chrono.ChVectorD(-10.2, 0+3/2*H, 5)
-    add_boxShape(system, 0.85, H/2, wall_t, pos, 'textures/door_ntk.jpg', [-4,-3], False)
+    pos = np.array([-10.2, 0+3/2*H, 5])
+    MiroAPI.add_boxShapeHemi(system, 0.85, H/2, wall_t, pos, 'textures/door_ntk.jpg', [-4,-3], False)
 
     # Add wall, 3rd floor NA corridor end (negative x direction)
-    pos = chrono.ChVectorD(-11.55, 3/2*H-0.16 , 6.95)
-    add_boxShape(system, wall_t, H/2-0.16, 1.25, pos, 'textures/mit_3rd_na2.jpg', [4,3])
+    pos = np.array([-11.55, 3/2*H-0.16 , 6.95])
+    MiroAPI.add_boxShapeHemi(system, wall_t, H/2-0.16, 1.25, pos, 'textures/mit_3rd_na2.jpg', [4,3])
 
     # Add wall, 3rd floor towards MIT fountain
-    pos = chrono.ChVectorD(11.65, 3/2*H, 12.16+wall_t)
-    add_boxShape(system, 5.15, H/2, wall_t, pos, 'textures/yellow_brick.jpg', [5,5])
+    pos = np.array([11.65, 3/2*H, 12.16+wall_t])
+    MiroAPI.add_boxShapeHemi(system, 5.15, H/2, wall_t, pos, 'textures/yellow_brick.jpg', [5,5])
 
     # Add wall, 3rd floor wall, left hand side towards UMU library (negative z direction)
-    pos = chrono.ChVectorD(18.3, 3/2*H-wall_t, 12.16+wall_t)
-    add_boxShape(system, 1.5, H/2-wall_t, wall_t, pos, 'textures/white concrete.jpg', [3,3])
+    pos = np.array([18.3, 3/2*H-wall_t, 12.16+wall_t])
+    MiroAPI.add_boxShapeHemi(system, 1.5, H/2-wall_t, wall_t, pos, 'textures/white concrete.jpg', [3,3])
 
     # Add wall, 3rd floor UMU library end (negative x direction)
-    pos = chrono.ChVectorD(19.9, 3/2*H-0.16 , 10.56)
-    add_boxShape(system, wall_t, H/2-0.16, 1.6, pos, 'textures/mit_3rd_sam.jpg', [-4,-3])
+    pos = np.array([19.9, 3/2*H-0.16 , 10.56])
+    MiroAPI.add_boxShapeHemi(system, wall_t, H/2-0.16, 1.6, pos, 'textures/mit_3rd_sam.jpg', [-4,-3])
 
     #-------------4th floor---------------
     # Add wall, 4th floor towards MIT place, see MIT_CSplan4.py    
 
     # Add wall, 4th floor flower pot (Negative x direction)
-    pos = chrono.ChVectorD(6.5-wall_t+0.01, 5/2*H, 7.08+wall_t+0.01)
-    add_boxShape(system, wall_t, H/2, 2.08+wall_t, pos, 'textures/white concrete.jpg', [5,5])
+    pos = np.array([6.5-wall_t+0.01, 5/2*H, 7.08+wall_t+0.01])
+    MiroAPI.add_boxShapeHemi(system, wall_t, H/2, 2.08+wall_t, pos, 'textures/white concrete.jpg', [5,5])
 
     # Add wall, 4th floor data cooridor (negative x direction) 
-    pos = chrono.ChVectorD(5.5-wall_t, 0+5/2*H , 10.66+wall_t)
-    add_boxShape(system, wall_t, H/2, 1.5-wall_t, pos, 'textures/door_cs.jpg', [4,3])
+    pos = np.array([5.5-wall_t, 0+5/2*H , 10.66+wall_t])
+    MiroAPI.add_boxShapeHemi(system, wall_t, H/2, 1.5-wall_t, pos, 'textures/door_cs.jpg', [4,3])
 
     # Add 4th floor wall (positive x direction)
-    pos = chrono.ChVectorD(12.7+wall_t, 0+5/2*H, 10.18)
-    add_boxShape(system, wall_t, H/2, 1.9, pos, 'textures/yellow_brick.jpg', [2,2])
+    pos = np.array([12.7+wall_t, 0+5/2*H, 10.18])
+    MiroAPI.add_boxShapeHemi(system, wall_t, H/2, 1.9, pos, 'textures/yellow_brick.jpg', [2,2])
 
     # Add wall, 4th floor towards NA (negative z direction)
-    pos = chrono.ChVectorD(-9.3-wall_t, 0+5/2*H, 5-wall_t)
-    add_boxShape(system, 4-wall_t, H/2, wall_t, pos, 'textures/yellow_brick.jpg', [10,7], False)
+    pos = np.array([-9.3-wall_t, 0+5/2*H, 5-wall_t])
+    MiroAPI.add_boxShapeHemi(system, 4-wall_t, H/2, wall_t, pos, 'textures/yellow_brick.jpg', [10,7], False)
 
     # Add wall, 4th floor wall towards MIT fountain
-    pos = chrono.ChVectorD(9, 5/2*H, 12.16+wall_t)
-    add_boxShape(system, 3.5, H/2, wall_t, pos, 'textures/white concrete.jpg', [5,5])
+    pos = np.array([9, 5/2*H, 12.16+wall_t])
+    MiroAPI.add_boxShapeHemi(system, 3.5, H/2, wall_t, pos, 'textures/white concrete.jpg', [5,5])
 
     #----------------Other----------------
     # Add white wall extension, technology
-    pos = chrono.ChVectorD(9.9, 3/2*H, -8.8-wall_t)
-    add_boxShape(system, 1.4, 3/2*H, wall_t, pos, 'textures/white concrete.jpg', [5,5])
+    pos = np.array([9.9, 3/2*H, -8.8-wall_t])
+    MiroAPI.add_boxShapeHemi(system, 1.4, 3/2*H, wall_t, pos, 'textures/white concrete.jpg', [5,5])
 
     # Add wall towards technology building  (negative x direction)
-    pos = chrono.ChVectorD(8.5-wall_t+2.8, 0+3/2*H, -11.8-wall_t+1.1)
-    add_boxShape(system, wall_t, 3/2*H, 1.9-wall_t, pos, 'textures/white concrete.jpg', [10,10])
+    pos = np.array([8.5-wall_t+2.8, 0+3/2*H, -11.8-wall_t+1.1])
+    MiroAPI.add_boxShapeHemi(system, wall_t, 3/2*H, 1.9-wall_t, pos, 'textures/white concrete.jpg', [10,10])
 
     # Add elevator shaft
     for floor in range(3):
         y_pos = H*floor + H/2
-        pos = chrono.ChVectorD(10.7, y_pos, 12.1)
-        add_boxShape(system, 2.034, H/2, wall_t, pos, 'textures/elevator.png', [4,3])
+        pos = np.array([10.7, y_pos, 12.1])
+        MiroAPI.add_boxShapeHemi(system, 2.034, H/2, wall_t, pos, 'textures/elevator.png', [4,3])
 
     # Add end wall, towards technology
     texture = ['textures/mit_4th.jpg', 'textures/mit_4th.jpg', 'textures/mit_4th.jpg']
     for floor in range(3):
         y_pos = H*floor + H/2
-        pos = chrono.ChVectorD(10.5+2.8-0.23, y_pos, -17+2.2+2.2)
-        add_boxShape(system, 1.77, H/2, wall_t, pos, texture[floor], [-4,-3])
+        pos = np.array([10.5+2.8-0.23, y_pos, -17+2.2+2.2])
+        MiroAPI.add_boxShapeHemi(system, 1.77, H/2, wall_t, pos, texture[floor], [-4,-3])
 
     #Add oblique walls
 
     
-    n = chrono.ChVectorD(0,1,0)         # Normal vector for rotation
+    n = np.array([0,1,0])         # Normal vector for rotation
     alpha = -np.arctan(211/1380-0.05)   # Rotation angle for positive x wall
 
     #Add oblique wall towards umu libary
-    pos_1 = chrono.ChVectorD(16.3, 3/2*H-wall_t, 0.34+8.16+wall_t)
-    dim_1 = chrono.ChVectorD(wall_t, H/2, 3.6)
+    pos_1 = np.array([16.3, 3/2*H-wall_t, 0.34+8.16+wall_t])
+    dim_1 = np.array([wall_t, H/2, 3.6])
     ang_1 = np.pi*(0.5-0.03)
     sca_1 = [10,10]
 
     #Add oblique wall towards NA
-    pos_2 = chrono.ChVectorD(-5.6-wall_t, 3/2*H, 5.3)
-    dim_2 = chrono.ChVectorD(wall_t, H/2, 0.545)
+    pos_2 = np.array([-5.6-wall_t, 3/2*H, 5.3])
+    dim_2 = np.array([wall_t, H/2, 0.545])
     ang_2 = -(np.pi/4)
 
     #Main wall in positive x direction
-    pos_3 = chrono.ChVectorD(13.775+wall_t, 0, -2.2) + chrono.ChVectorD(0, wall_h, 0)
+    pos_3 = np.array([13.775+wall_t, 0, -2.2]) + np.array([0, wall_h, 0])
     ang_3 = alpha
-    dim_3 = chrono.ChVectorD(wall_t, wall_h, 10.58)
+    dim_3 = np.array([wall_t, wall_h, 10.58])
 
     pos_ob = [pos_1, pos_2, pos_3]
     dim = [dim_1, dim_2, dim_3]
@@ -496,79 +492,7 @@ def MIT_walls(system, H):
     scale = [sca_1, sca_1, sca_1]
     for i in range(len(pos_ob)):
         # Create a box
-        body_wall = chrono.ChBody()
-        body_wall.SetBodyFixed(True)
-        body_wall.SetCollide(True)
-        body_wall.SetPos(chrono.ChVectorD(pos_ob[i]))
-
-        qr = chrono.Q_from_AngAxis(ang[i], n.GetNormalized())    # Rotate the cylinder
-        quaternion = qr * body_wall.GetRot()
-        body_wall.SetRot(quaternion)
-        
-        # Visualization shape
-        body_wall_shape = chrono.ChBoxShape()
-        body_wall_shape.GetBoxGeometry().Size = chrono.ChVectorD(dim[i])
-        body_wall_shape.SetColor(chrono.ChColor(0.4,0.4,0.5))
-        body_wall.GetAssets().push_back(body_wall_shape)
-
-        body_wall.GetCollisionModel().ClearModel()
-        body_wall.GetCollisionModel().AddBox(dim[i].x, dim[i].y, dim[i].z) # hemi sizes
-        body_wall.GetCollisionModel().BuildModel()
-        
-        body_wall_texture = chrono.ChTexture()
-        body_wall_texture.SetTextureFilename(chrono.GetChronoDataFile(textures[i]))
-        body_wall_texture.SetTextureScale(scale[i][0], scale[i][1])
-        body_wall.GetAssets().push_back(body_wall_texture)
-        
-        system.Add(body_wall)
-
-def add_boxShape(system, size_x, size_y, size_z, pos, texture, scale = [5,5], hitbox = True):
-    '''system, size_x, size_y, size_z, pos, texture, scale = [5,5], hitbox = True/False'''
-
-    # Create a box
-    body_box = chrono.ChBody()
-    body_box.SetBodyFixed(True)
-    body_box.SetPos(chrono.ChVectorD(pos))
-
-    # Collision shape
-    body_box.GetCollisionModel().ClearModel()
-    body_box.GetCollisionModel().AddBox(size_x, size_y, size_z) # hemi sizes
-    body_box.GetCollisionModel().BuildModel()
-    body_box.SetCollide(hitbox)
-    
-    # Visualization shape
-    body_box_shape = chrono.ChBoxShape()
-    body_box_shape.GetBoxGeometry().Size = chrono.ChVectorD(size_x, size_y, size_z)
-    body_box_shape.SetColor(chrono.ChColor(0.4,0.4,0.5))
-    body_box.GetAssets().push_back(body_box_shape)
-    
-    body_box_texture = chrono.ChTexture()
-    body_box_texture.SetTextureFilename(chrono.GetChronoDataFile(texture))
-    body_box_texture.SetTextureScale(scale[0], scale[1])
-    body_box.GetAssets().push_back(body_box_texture)
-    
-    system.Add(body_box)
-
-def add_cylinderShape(system, radius, height, density, pos, texture, scale = [5,5]):
-
-    # Create a cylinder
-    body_cylinder = chrono.ChBodyEasyCylinder(radius, height, density)
-    body_cylinder.SetBodyFixed(True)
-    body_cylinder.SetPos(chrono.ChVectorD(pos))
-
-    # Collision shape
-    body_cylinder.GetCollisionModel().ClearModel()
-    body_cylinder.GetCollisionModel().AddCylinder(radius, radius, height/2) # hemi sizes
-    body_cylinder.GetCollisionModel().BuildModel()
-    body_cylinder.SetCollide(True)
-
-    # Body texture
-    body_cylinder_texture = chrono.ChTexture()
-    body_cylinder_texture.SetTextureFilename(chrono.GetChronoDataFile(texture))
-    body_cylinder_texture.SetTextureScale(scale[0], scale[1])
-    body_cylinder.GetAssets().push_back(body_cylinder_texture)
-
-    system.Add(body_cylinder)
+        MiroAPI.add_boxShapeHemi(system, dim[i][0], dim[i][1], dim[i][2], pos_ob[i], rotAngle=ang[i], rotAxis=n, rotDegrees=False, texture=textures[i], scale = scale[i])
 
 
 # fence function is transforemd to MiroAPI

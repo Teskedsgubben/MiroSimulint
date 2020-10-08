@@ -1,51 +1,33 @@
-import pychrono.core as chrono
+from MiroClasses.MiroAPI_selector import SelectedAPI as MiroAPI
 import numpy as np
 
 from MiroClasses import MiroNotifier as MN
 from MiroClasses import MiroComponent as MC
 
-def dartboard(ChSystem, target):
+def robotcourse(MiroSystem, target):
+    course_comp = MC.MiroComponent()
+        
+    # Import .obj file from object_files directory and set color [R, G, B]
+    course_comp.ImportObj('Bana_robottavlingen.obj', color = [0.7, 0.7, 0.7])
+
+    course_comp.MoveToPosition([target[0], target[1], target[2]])
+
+    MiroSystem.Add(course_comp.GetBody())
+
+def dartboard(MiroSystem, target):
     h = 0.15
     eps = 0.0025
     size = 1
-    pos_a = chrono.ChVectorD(target[0], target[1]-eps, target[2])
-    pos_b = chrono.ChVectorD(target[0], target[1]-(h+2*eps)/2, target[2])
+    pos_a = np.array([target[0], target[1]-eps, target[2]])
+    pos_b = np.array([target[0], target[1]-(h+2*eps)/2, target[2]])
     
     # Create dartboard layer
-    targetBox = chrono.ChBodyEasyCylinder(size, eps, 1000)
-    targetBox.SetBodyFixed(True)
-    targetBox.SetPos(chrono.ChVectorD(pos_a))
-    targetBox.SetCollide(False)
-    
-    # Body texture
-    targetBox_texture = chrono.ChTexture()
-    targetBox_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/target_dart.png'))
-    targetBox_texture.SetTextureScale(-1, 1)
-    targetBox.GetAssets().push_back(targetBox_texture)
-    
-    ChSystem.Add(targetBox)
+    MiroAPI.add_cylinderShape(MiroSystem, size, eps, 1000, pos_a, 'target_dart.png', Collide=False, scale=[-1,1])
 
     # Create Hitbox
-    targetFrame = chrono.ChBodyEasyCylinder(size, h, 1000)
-    targetFrame.SetBodyFixed(True)
+    MiroAPI.add_cylinderShape(MiroSystem, size, h, 1000, pos_b, 'black_smere.jpg', scale=[8,-1])
 
-    # Collision shape
-    targetFrame.SetCollide(True)
-    targetFrame.GetCollisionModel().ClearModel()
-    targetFrame.GetCollisionModel().AddCylinder(size, size, h/2)
-    targetFrame.GetCollisionModel().BuildModel()
-
-    # Frame texture
-    targetFrame_texture = chrono.ChTexture()
-    targetFrame_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/black_smere.jpg'))
-    targetFrame_texture.SetTextureScale(8, -1)
-    targetFrame.GetAssets().push_back(targetFrame_texture)
-
-    targetFrame.SetPos(chrono.ChVectorD(pos_b))
-
-    ChSystem.Add(targetFrame)
-
-def trialsurface(ChSystem, target):
+def trialsurface(MiroSystem, target):
     nx = 10
     dz = 1.4
     diag = 0.2
@@ -54,316 +36,78 @@ def trialsurface(ChSystem, target):
     box_side = diag/np.sqrt(2)
     h = diag/2
 
-    thunk = chrono.ChBodyEasyBox(box_side, box_side, dz, 2500)
-    thunk.SetBodyFixed(True)
-    thunk.SetCollide(True)
-    thunk.SetRot(chrono.Q_from_AngAxis(np.deg2rad(45), chrono.ChVectorD(0,0,1)))
-    thunk.SetPos(chrono.ChVectorD(target[0] - (nx - 1)*diag/2, target[1]-h, target[2]))
-
-    thunk.GetCollisionModel().ClearModel()
-    thunk.GetCollisionModel().AddBox(box_side/2, box_side/2, dz/2) # hemi sizes
-    thunk.GetCollisionModel().BuildModel()
-
-    texture = chrono.ChTexture()
-    texture.SetTextureFilename(chrono.GetChronoDataFile('textures/white concrete.jpg'))
-    texture.SetTextureScale(4, 3)
-    thunk.GetAssets().push_back(texture)
-
-    ChSystem.Add(thunk)
-
-    for i in range(1, nx):
-        newthunk = thunk.Clone()
-        newthunk.SetPos(chrono.ChVectorD(target[0] - (nx - 1 - 2*i)*diag/2, target[1]-h, target[2]))
-
-        newthunk.GetCollisionModel().ClearModel()
-        newthunk.GetCollisionModel().AddBox(box_side/2, box_side/2, dz/2) # hemi sizes
-        newthunk.GetCollisionModel().BuildModel()
-
-        ChSystem.Add(newthunk)
+    for i in range(nx):
+        pos = np.array([target[0] - (nx - 1 - 2*i)*diag/2, target[1]-h, target[2]])
+        MiroAPI.add_boxShape(MiroSystem, box_side, box_side, dz, pos, rotZ=45, texture='white concrete.jpg')
 
     th = 1.2*h
-    table = chrono.ChBodyEasyBox(nx*diag+2*eps, th, dz+2*eps, 2500)
-    table.SetBodyFixed(True)
-    table.SetCollide(True)
-    table.SetPos(chrono.ChVectorD(target[0], target[1]-h-th/2, target[2]))
-
-    table.GetCollisionModel().ClearModel()
-    table.GetCollisionModel().AddBox(nx*diag/2+eps, th/2, dz/2+eps) # hemi sizes
-    table.GetCollisionModel().BuildModel()
-
-    texture = chrono.ChTexture()
-    texture.SetTextureFilename(chrono.GetChronoDataFile('textures/wood_ikea_style.png'))
-    texture.SetTextureScale(28, 3)
-    table.GetAssets().push_back(texture)
-
-    ChSystem.Add(table)
+    pos = np.array([target[0], target[1]-h-th/2, target[2]])
+    MiroAPI.add_boxShape(MiroSystem, nx*diag+2*eps, th, dz+2*eps, pos, texture='wood_ikea_style.png')
 
     r = 0.03
     h = target[1]-th-h
     d = 0.1
     # [+, +]
-    table_leg = chrono.ChBodyEasyCylinder(r, h, 2500)
-    table_leg.SetPos(chrono.ChVectorD(target[0] + nx*diag/2 - d, h/2, target[2] + dz/2 -d))
-    table_leg.SetBodyFixed(True)
-
-    # Collision shape
-    table_leg.SetCollide(True)
-    table_leg.GetCollisionModel().ClearModel()
-    table_leg.GetCollisionModel().AddCylinder(r, r, h/2)
-    table_leg.GetCollisionModel().BuildModel()
-
-    # Frame texture
-    texture = chrono.ChTexture()
-    texture.SetTextureFilename(chrono.GetChronoDataFile('textures/chrome.png'))
-    texture.SetTextureScale(2, 2)
-    table_leg.GetAssets().push_back(texture)
-
-    ChSystem.Add(table_leg)
+    pos = np.array([target[0] + nx*diag/2 - d, h/2, target[2] + dz/2 -d])
+    MiroAPI.add_cylinderShape(MiroSystem, r, h, 2500, pos, 'chrome.png', scale=[2,2])
 
     # [-, +]
-    table_leg = table_leg.Clone()
-    table_leg.SetPos(chrono.ChVectorD(target[0] - nx*diag/2 + d, h/2, target[2] + dz/2 -d))
-    table_leg.GetCollisionModel().ClearModel()
-    table_leg.GetCollisionModel().AddCylinder(r, r, h/2)
-    table_leg.GetCollisionModel().BuildModel()
-
-    ChSystem.Add(table_leg)
+    pos = np.array([target[0] - nx*diag/2 + d, h/2, target[2] + dz/2 -d])
+    MiroAPI.add_cylinderShape(MiroSystem, r, h, 2500, pos, 'chrome.png', scale=[2,2])
 
     # [-, -]
-    table_leg = table_leg.Clone()
-    table_leg.SetPos(chrono.ChVectorD(target[0] - nx*diag/2 + d, h/2, target[2] - dz/2 +d))
-    table_leg.GetCollisionModel().ClearModel()
-    table_leg.GetCollisionModel().AddCylinder(r, r, h/2)
-    table_leg.GetCollisionModel().BuildModel()
-
-    ChSystem.Add(table_leg)
+    pos = np.array([target[0] - nx*diag/2 + d, h/2, target[2] - dz/2 +d])
+    MiroAPI.add_cylinderShape(MiroSystem, r, h, 2500, pos, 'chrome.png', scale=[2,2])
 
     # [+, -]
-    table_leg = table_leg.Clone()
-    table_leg.SetPos(chrono.ChVectorD(target[0] + nx*diag/2 - d, h/2, target[2] - dz/2 +d))
-    table_leg.GetCollisionModel().ClearModel()
-    table_leg.GetCollisionModel().AddCylinder(r, r, h/2)
-    table_leg.GetCollisionModel().BuildModel()
-
-    ChSystem.Add(table_leg)
-
-    
+    pos = np.array([target[0] + nx*diag/2 - d, h/2, target[2] - dz/2 +d])
+    MiroAPI.add_cylinderShape(MiroSystem, r, h, 2500, pos, 'chrome.png', scale=[2,2])    
     
 
-def sodacan(ChSystem, target, text = 'schrodbull.png', angle = 0, SPEEDMODE = False):
+def sodacan(MiroSystem, target, text = 'schrodbull.png', angle = 0, SPEEDMODE = False):
     h = 0.22
     r = 0.04
+    eps = 0.003
+    epsvec = np.array([0, eps/2, 0])
     
-    pos_can = chrono.ChVectorD(target[0], target[1]+h/2, target[2])
+    pos_can = np.array([target[0], target[1]+h/2+eps, target[2]])
 
     # Create Can Hitbox
-    can = chrono.ChBodyEasyCylinder(r, h, 50)
-    can.SetBodyFixed(False)
+    can = MiroAPI.add_cylinderShape(MiroSystem, r, h, 50, pos_can, rotY=angle, texture=text, Fixed=False, scale=[1,-1])
 
-    # Collision shape
-    can.SetCollide(True)
-    can.GetCollisionModel().ClearModel()
-    can.GetCollisionModel().AddCylinder(r, r, h/2)
-    can.GetCollisionModel().BuildModel()
+    # Create lid and bottom
+    pos_lid = np.array([target[0], target[1]+eps*3/2+h, target[2]])
+    lid = MiroAPI.add_cylinderShape(MiroSystem, r, eps, 150, pos_lid, rotY=angle, texture='sodacan_lid.png', Fixed=False, scale=[1,1])
+    
+    pos_bot = np.array([target[0], target[1]+eps/2, target[2]])
+    bot = MiroAPI.add_cylinderShape(MiroSystem, r, eps, 200, pos_bot, rotY=angle, texture='sodacan_bot.png', Fixed=False, scale=[1,1])
 
-    # Frame texture
-    can_texture = chrono.ChTexture()
-    can_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/'+text))
-    can_texture.SetTextureScale(1, -1)
-    can.GetAssets().push_back(can_texture)
+    MiroSystem.Add(MiroAPI.LinkBodies_Hinge(can, lid, pos_lid-epsvec, [0, 1,0]))
+    MiroSystem.Add(MiroAPI.LinkBodies_Hinge(can, bot, pos_bot+epsvec, [0,-1,0]))
 
-    can.SetPos(chrono.ChVectorD(pos_can))
+def painting(MiroSystem, pos, text = 'DemoBengan.png', rot = 0, dims = [1, 0.6]):
+    MiroAPI.add_boxShapeHemi(MiroSystem, dims[0], dims[1], 0.05, pos, rotY=rot, texture=text, Collide=False)
 
-    if angle != 0:
-        can.SetRot(chrono.Q_from_AngAxis(np.deg2rad(angle), chrono.ChVectorD(0,1,0)))
-
-    # can.SetPos_dt(chrono.ChVectorD(0,1,10))
-
-    ChSystem.Add(can)
-
-    if not SPEEDMODE:
-        eps = 0.003
-        padding = 0.002
-        epsvec = chrono.ChVectorD(0,eps/2,0)
-        can.Move(epsvec)
-        can.Move(epsvec)
-        pos_bot = chrono.ChVectorD(target[0], target[1]+eps/2, target[2])
-        pos_lid = chrono.ChVectorD(target[0], target[1]+eps*3/2+h, target[2])
-
-        # Create top
-        lid = chrono.ChBodyEasyCylinder(r, eps, 150)
-        lid.SetPos(chrono.ChVectorD(pos_lid))
-        lid.SetBodyFixed(False)
-        lid.SetCollide(False)
-
-        # Collision shape
-        lid.SetCollide(True)
-        lid.GetCollisionModel().ClearModel()
-        lid.GetCollisionModel().AddCylinder(r+padding, r+padding, eps/2)
-        lid.GetCollisionModel().BuildModel()
-        
-        # Body texture
-        lid_texture = chrono.ChTexture()
-        lid_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/sodacan_lid.png'))
-        lid_texture.SetTextureScale(1, 1)
-        lid.GetAssets().push_back(lid_texture)
-        
-        ChSystem.Add(lid)
-
-        # Create bottom
-        bot = chrono.ChBodyEasyCylinder(r, eps, 200)
-        bot.SetPos(chrono.ChVectorD(pos_bot))
-        bot.SetBodyFixed(False)
-        bot.SetCollide(False)
-
-        # Collision shape
-        bot.SetCollide(True)
-        bot.GetCollisionModel().ClearModel()
-        bot.GetCollisionModel().AddCylinder(r+padding, r+padding, eps/2)
-        bot.GetCollisionModel().BuildModel()
-        
-        # Body texture
-        bot_texture = chrono.ChTexture()
-        bot_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/sodacan_bot.png'))
-        bot_texture.SetTextureScale(1, 1)
-        bot.GetAssets().push_back(bot_texture)
-        
-        ChSystem.Add(bot)
-        
-        
-        rot_lid = can.GetRot() * chrono.Q_from_AngAxis( np.pi/2,chrono.ChVectorD(1,0,0))
-        rot_bot = can.GetRot() * chrono.Q_from_AngAxis(-np.pi/2,chrono.ChVectorD(1,0,0))
-
-        lidlink = chrono.ChLinkRevolute()
-        mframe_lid = chrono.ChFrameD(pos_lid-epsvec, rot_lid)
-        lidlink.Initialize(can, lid, mframe_lid)
-
-        botlink = chrono.ChLinkRevolute()
-        mframe_bot = chrono.ChFrameD(pos_bot+epsvec, rot_bot)
-        botlink.Initialize(can, bot, mframe_bot)
-
-        ChSystem.Add(lidlink)
-        ChSystem.Add(botlink)
-
-def painting(ChSystem, pos, text = 'DemoBengan.png', rot = 0, dims = [1, 0.6]):
-    canvas = chrono.ChBody()
-    canvas.SetBodyFixed(True)
-    canvas.SetCollide(False)
-    canvas.SetPos(chrono.ChVectorD(pos[0], pos[1], pos[2]))
-    canvas.SetRot(chrono.Q_from_AngAxis(np.deg2rad(rot),chrono.ChVectorD(0,1,0)))
-
-    # Visualization shape
-    canvas_shape = chrono.ChBoxShape()
-    canvas_shape.GetBoxGeometry().Size = chrono.ChVectorD(dims[0], dims[1], 0.05)
-    canvas.GetAssets().push_back(canvas_shape)
-    canvas_texture = chrono.ChTexture(chrono.GetChronoDataFile('textures/'+text))
-    canvas_texture.SetTextureScale(4, 3)
-    canvas.GetAssets().push_back(canvas_texture)
-    ChSystem.Add(canvas)
-
-def pokeball(ChSystem, pos, rot = 0):
+def pokeball(MiroSystem, pos, rot = 0):
     r = 0.05
 
-    ball = chrono.ChBodyEasySphere(r, 500)
-    ball.SetBodyFixed(False)
-    ball.SetPos(chrono.ChVectorD(pos[0], pos[1]+r, pos[2]))
-    ball.SetRot(chrono.Q_from_AngAxis(rot,chrono.ChVectorD(0,1,0)))
+    MiroAPI.add_sphereShape(MiroSystem, r, [pos[0], pos[1]+r, pos[2]], texture='pokeball.jpg', density = 100, Fixed=False, rotY=rot)
 
-    # Collision shape
-    ball.SetCollide(True)
-    ball.GetCollisionModel().ClearModel()
-    ball.GetCollisionModel().AddSphere(r)
-    ball.GetCollisionModel().BuildModel()
-
-    ball_texture = chrono.ChTexture(chrono.GetChronoDataFile('textures/pokeball.jpg'))
-    ball_texture.SetTextureScale(1, 1)
-    ball.GetAssets().push_back(ball_texture)
-    ChSystem.Add(ball)
-
-def coin(ChSystem, target, angle = 0):
+def coin(MiroSystem, target, angle = 0):
     h = 0.0012
     r = 0.012
     
-    pos_coin = chrono.ChVectorD(target[0], target[1]+h/2, target[2])
+    pos_coin = np.array([target[0], target[1]+h/2, target[2]])
+    MiroAPI.add_cylinderShape(MiroSystem, r, h, 150, pos_coin, rotY=angle, texture='gammal5kr.png', Fixed=False, scale=[1,-1])
 
-    # Create Can Hitbox
-    coin = chrono.ChBodyEasyCylinder(r, h, 50)
-    coin.SetBodyFixed(False)
-
-    # Collision shape
-    coin.SetCollide(True)
-    coin.GetCollisionModel().ClearModel()
-    coin.GetCollisionModel().AddCylinder(r, r, h/2)
-    coin.GetCollisionModel().BuildModel()
-
-    # Frame texture
-    coin_texture = chrono.ChTexture()
-    coin_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/gammal5kr.png'))
-    coin_texture.SetTextureScale(1, -1)
-    coin.GetAssets().push_back(coin_texture)
-
-    coin.SetPos(chrono.ChVectorD(pos_coin))
-
-    if angle != 0:
-        coin.SetRot(chrono.Q_from_AngAxis(np.deg2rad(angle), chrono.ChVectorD(0,1,0)))
-
-    ChSystem.Add(coin)
-
-def MIT_door(ChSystem, pos, rot = 0):
+def MIT_door(MiroSystem, pos, rot = 0):
     b = 1.0
     h = 2.1
 
-    door = chrono.ChBody()
-    door.SetBodyFixed(True)
-    door.SetCollide(False)
-    door.SetPos(chrono.ChVectorD(pos[0], pos[1]+h/2, pos[2]))
-    door.SetRot(chrono.Q_from_AngAxis(np.deg2rad(rot),chrono.ChVectorD(0,1,0)))
+    pos = [pos[0], pos[1]+h/2, pos[2]]
+    MiroAPI.add_boxShape(MiroSystem, b, h, 0.16, pos, rotY=rot, texture='MIT_door.png', Collide=False)
 
-    # Visualization shape
-    door_shape = chrono.ChBoxShape()
-    door_shape.GetBoxGeometry().Size = chrono.ChVectorD(b/2, h/2, 0.08)
-    door.GetAssets().push_back(door_shape)
-    door_texture = chrono.ChTexture(chrono.GetChronoDataFile('textures/MIT_door.png'))
-    door_texture.SetTextureScale(4, 3)
-    door.GetAssets().push_back(door_texture)
-    ChSystem.Add(door)
-
-def dino(ChSystem, pos, rot = 0, scale = 0.1):
-    dino_comp = MC.MiroComponent()
-    dino_comp.SetImportDir('src/')
-    dino_comp.ImportObj('tyra.obj',[0.4,0.2,0.6], scale)
-    dino = dino_comp.GetBody()
-    dino.SetBodyFixed(True)
-    dino.SetCollide(False)
-    dino.SetPos(chrono.ChVectorD(pos[0], pos[1]+1.35*scale, pos[2]))
-    # dino.SetPos_dt(chrono.ChVectorD(0, 2, 5))
-    dino.SetRot(chrono.Q_from_AngAxis(np.deg2rad(rot),chrono.ChVectorD(0,1,0))*dino.GetRot())
-    
-    # dino.SetBodyFixed(False)
-    # dino.SetCollide(True)
-    # dino.GetCollisionModel().ClearModel()
-    # # colmod = chrono.ChCollisionModel()
-    # # colmod.AddSphere()
-    # # Right leg
-    # dino.GetCollisionModel().AddCylinder(0.2*scale, 0.25*scale, 0.5*scale, chrono.ChVectorD(-0.5*scale,-0.8*scale,-0.8*scale))
-    # # Left leg
-    # dino.GetCollisionModel().AddCylinder(0.2*scale, 0.25*scale, 0.5*scale, chrono.ChVectorD(0.5*scale,-0.8*scale,0.0*scale))
-    # # Body
-    # rot = 1.4
-    # bodmat = chrono.ChMatrix33D(
-    #     chrono.ChVectorD( 1,           0, np.sin(rot)),
-    #     chrono.ChVectorD( 0, np.cos(rot),-np.sin(rot)),
-    #     chrono.ChVectorD( 0, np.sin(rot), np.cos(rot))
-    # )
-    # dino.GetCollisionModel().AddCylinder(0.4*scale, 0.65*scale, 1*scale, chrono.ChVectorD(-0.1*scale,0.1*scale,-0.25*scale),bodmat)
-    # # Head
-    # dino.GetCollisionModel().AddSphere(0.4*scale, chrono.ChVectorD(-0.2*scale,0.9*scale,-1.35*scale))
-    # dino.GetCollisionModel().BuildModel()
-    # dino.SetShowCollisionMesh(True)
-
-    ChSystem.Add(dino)
-
-def floorvent(ChSystem, target, SPEEDMODE = False):
+def floorvent(MiroSystem, target, SPEEDMODE = False):
     h = 0.85
     r = 0.30
 
@@ -371,62 +115,10 @@ def floorvent(ChSystem, target, SPEEDMODE = False):
     h3 = 0.04
     h2 = h - h1 - h3
     
-    pos_base = chrono.ChVectorD(target[0], target[1]+h1/2, target[2])
-    pos_vent = chrono.ChVectorD(target[0], target[1]+h2/2+h1, target[2])
-    pos_topp = chrono.ChVectorD(target[0], target[1]+h3/2+h1+h2, target[2])
+    pos_base = np.array([target[0], target[1]+h1/2, target[2]])
+    pos_vent = np.array([target[0], target[1]+h2/2+h1, target[2]])
+    pos_topp = np.array([target[0], target[1]+h3/2+h1+h2, target[2]])
 
-    # Create Base Hitbox
-    base = chrono.ChBodyEasyCylinder(r-0.02, h1, 1500)
-    base.SetBodyFixed(True)
-
-    # Collision shape
-    base.SetCollide(True)
-    base.GetCollisionModel().ClearModel()
-    base.GetCollisionModel().AddCylinder(r, r, h/2, chrono.ChVectorD(0,(h-h1)/2,0))
-    base.GetCollisionModel().BuildModel()
-
-    # Frame texture
-    base_texture = chrono.ChTexture()
-    base_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/vents_surface.jpg'))
-    base_texture.SetTextureScale(1, 1)
-    base.GetAssets().push_back(base_texture)
-
-    base.SetPos(chrono.ChVectorD(pos_base))
-
-
-    # Create Top part Hitbox
-    vent = chrono.ChBodyEasyCylinder(r, h2, 1500)
-    vent.SetBodyFixed(True)
-
-    # Collision shape is in base
-    vent.SetCollide(False)
-
-    # Frame texture
-    vent_texture = chrono.ChTexture()
-    vent_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/vents.jpg'))
-    vent_texture.SetTextureScale(2, 1)
-    vent.GetAssets().push_back(vent_texture)
-
-    vent.SetPos(chrono.ChVectorD(pos_vent))
-
-
-    # Create Top part Hitbox
-    topp = chrono.ChBodyEasyCylinder(r, h3, 1500)
-    topp.SetBodyFixed(True)
-
-    # Collision shape is in base
-    topp.SetCollide(False)
-
-    # Frame texture
-    topp_texture = chrono.ChTexture()
-    topp_texture.SetTextureFilename(chrono.GetChronoDataFile('textures/vents_surface.jpg'))
-    topp_texture.SetTextureScale(1, -1)
-    topp.GetAssets().push_back(topp_texture)
-
-    topp.SetPos(chrono.ChVectorD(pos_topp))
-
-
-    # Add to system
-    ChSystem.Add(base)
-    ChSystem.Add(vent)
-    ChSystem.Add(topp)
+    MiroAPI.add_cylinderShape(MiroSystem, r-0.02, h1, 1500, pos_base, texture='vents_surface.jpg')
+    MiroAPI.add_cylinderShape(MiroSystem, r, h2, 1500, pos_vent, texture='vents.jpg')
+    MiroAPI.add_cylinderShape(MiroSystem, r, h3, 1500, pos_topp, texture='vents_surface.jpg')

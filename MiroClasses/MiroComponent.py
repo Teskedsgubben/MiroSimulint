@@ -1,4 +1,4 @@
-import pychrono.core as chrono
+from MiroClasses.MiroAPI_selector import SelectedAPI as MiroAPI
 import numpy as np
 import os.path
 
@@ -22,8 +22,7 @@ class MiroComponent():
         loadfile = filename[0:filename.find('.obj')]+'_scale'+str(scale)+'.obj'
         if not os.path.isfile(loadfile):
             self.ScaleObjFile(filename, loadfile, scale)
-        self.body = chrono.ChBodyEasyMesh(loadfile, density, True, True)
-        self.body.AddAsset(chrono.ChColorAsset(chrono.ChColor(color[0], color[1], color[2])))
+        self.body = MiroAPI.LoadFromObj(loadfile, density=density, color=color)
 
     def ScaleObjFile(self, filename_to_scale, output_name, scale = 0.001):
         '''Rescales a .obj, default is from mm to m'''
@@ -78,78 +77,65 @@ class MiroComponent():
         print('Object scaled, sizes:\n   x: '+str(xdim['max']-xdim['min'])+', y: '+str(ydim['max']-ydim['min'])+', z: '+str(zdim['max']-zdim['min']))
 
     def GetMass(self):
-        return self.body.GetMass()
+        return MiroAPI.GetMass(self.body)
         
-    def AddToSystem(self, Miro_System):
-        self.msystem = Miro_System
-        Miro_System.Add_Object(self.body)
+    def AddToSystem(self, MiroSystem):
+        self.msystem = MiroSystem
+        MiroSystem.Add(self.body)
 
     def AddLinkPoint(self, name, normal, coord):
         if type(coord) == type([]):
-            coord = chrono.ChVectorD(coord[0], coord[1], coord[2])
+            coord = np.array(coord)
         self.linkpoints.update({name: coord})
-        linkdir = chrono.ChVectorD(normal[0], normal[1], normal[2])
-        if linkdir.Length() > 0:
-            linkdir.Normalize()
+        linkdir = np.array(normal)
+        if np.linalg.norm(linkdir) > 0:
+            linkdir = linkdir/np.linalg.norm(linkdir)
         self.linkdirs.update({name: linkdir})
 
     def GetPosition(self):
-        return self.body.GetPos()
+        return MiroAPI.GetBodyPosition(self.body)
 
     def GetLinkPoint(self, name):
-        return self.body.GetPos() + self.linkpoints[name]
+        return self.GetPosition() + self.linkpoints[name]
 
     def GetLinkDir(self, name):
         return self.linkdirs[name]
         
     def GetLinkPointXYZ(self, name):
-        lp = self.body.GetPos() + self.linkpoints[name]
-        return [lp.x, lp.y, lp.z]
+        lp = self.GetPosition() + self.linkpoints[name]
+        return lp
     
     def GetBody(self):
         return self.body
 
     def MoveBy(self, delta_pos):
-        if type(delta_pos) == type([]):
-            delta_pos = chrono.ChVectorD(delta_pos[0], delta_pos[1], delta_pos[2])
-        self.body.Move(delta_pos)
+        MiroAPI.MoveBodyBy(self.body, delta_pos)
 
     def MoveToPosition(self, pos):
-        if type(pos) == type([]):
-            pos = chrono.ChVectorD(pos[0], pos[1], pos[2])
-        self.body.Move(pos - self.body.GetPos())
+        MiroAPI.MoveBodyBy(self.body, pos - self.GetPosition())
 
     def MoveToMatch(self, pointname, other_component, other_pointname, dist = 0):
         '''Moves the component to match the provided linkpoint position with the position of a 
         linkpoint on the other component. Distance is calculated in the direction of the 
         linkpoint on the other, non-moving component.'''
-        marg = other_component.GetLinkDir(other_pointname).GetNormalized()
-        marg.SetLength(dist)
-        self.body.Move(other_component.GetLinkPoint(other_pointname) - self.GetLinkPoint(pointname) + marg)
+        marg = other_component.GetLinkDir(other_pointname)
+        marg = marg*dist
+        move = other_component.GetLinkPoint(other_pointname) - self.GetLinkPoint(pointname) + marg
+        MiroAPI.MoveBodyBy(self.body, move)
 
     def Rotate(self, rotation, quaternion = False):
-        '''Rotates from Euler angles or provided quaterion. The functions RotateX, RotateY, RotateZ or RotateAxis are easier to use.'''
-        if not quaternion:
-            rot_x = np.pi/180 * rotation[0]
-            rot_y = np.pi/180 * rotation[1]
-            rot_z = np.pi/180 * rotation[2]
-
-            quaternion = chrono.Q_from_Euler123(chrono.ChVectorD(rot_x, rot_y, rot_z))
-        
-        q_rotation = quaternion * self.body.GetRot()
-        self.body.SetRot(q_rotation)
-
-        for name, link in self.linkpoints.items():
-            self.linkpoints.update({name: quaternion.Rotate(link)})
-        for name, link in self.linkdirs.items():
-            self.linkdirs.update({name: quaternion.Rotate(link)})
+        '''Shorthand for rotating X,Y,Z that rotates in that specific order. The functions RotateX, RotateY, RotateZ or RotateAxis are easier to use.'''
+        self.RotateX(rotation[0])
+        self.RotateY(rotation[1])
+        self.RotateZ(rotation[2])
     
     def RotateAxis(self, theta, axis):
         '''Rotates the component an angle theta degrees around axis in global coordinates.'''
-        angle = theta/180*np.pi
-        ax = chrono.ChVectorD(axis[0], axis[1], axis[2])
-        qr = chrono.Q_from_AngAxis(angle, ax.GetNormalized())
-        self.Rotate(False, qr)
+        MiroAPI.rotateBody(self.body, rotAngle=theta, rotAxis=axis)
+        for name, linkp in self.linkpoints.items():
+            self.linkpoints.update({name: MiroAPI.rotateVector(linkp, rotAngle=theta, rotAxis=axis)})
+        for name, linkd in self.linkdirs.items():
+            self.linkdirs.update({name: MiroAPI.rotateVector(linkd, rotAngle=theta, rotAxis=axis)})
 
     def RotateX(self, theta):
         self.RotateAxis(theta, [1,0,0])
@@ -159,109 +145,77 @@ class MiroComponent():
         self.RotateAxis(theta, [0,0,1])
 
     def SetVelocity(self, vel):
-        vel_x = vel[0]
-        vel_y = vel[1]
-        vel_z = vel[2]
-
-        self.body.SetPos_dt(chrono.ChVectorD(vel_x, vel_y, vel_z))
+        MiroAPI.SetBodyVelocity(self.body, vel)
 
     def SetCollisionAsBox(self, size_x, size_y, size_z, offset = [0,0,0]):
-        mass = self.GetBody().GetMass()
-        dr = chrono.ChVectorD(offset[0], offset[1], offset[2])
-        
-        inertia_brick_xx = (size_y**2 + size_z**2)*mass/3
-        inertia_brick_yy = (size_x**2 + size_z**2)*mass/3
-        inertia_brick_zz = (size_x**2 + size_y**2)*mass/3
-        self.GetBody().SetInertiaXX(chrono.ChVectorD(inertia_brick_xx,inertia_brick_yy,inertia_brick_zz))   
-        self.GetBody().GetCollisionModel().ClearModel()
-        self.GetBody().GetCollisionModel().AddBox(size_x/2, size_y/2, size_z/2, dr)
-        self.GetBody().GetCollisionModel().BuildModel()
+        mass = self.GetMass()
+        dims = [size_x, size_y, size_z]
+        MiroAPI.SetCollisionModel_Box(self.GetBody(), dims, mass, offset)
 
     def SetCollisionAsEllipsoid(self, radius_x, radius_y, radius_z, offset = [0,0,0]):
-        mass = self.GetBody().GetMass()
-        dr = chrono.ChVectorD(offset[0], offset[1], offset[2])
-        
-        inertia_brick_xx = (radius_y**2 + radius_z**2)*mass/5
-        inertia_brick_yy = (radius_x**2 + radius_z**2)*mass/5
-        inertia_brick_zz = (radius_x**2 + radius_y**2)*mass/5
-        self.GetBody().SetInertiaXX(chrono.ChVectorD(inertia_brick_xx,inertia_brick_yy,inertia_brick_zz))   
-        self.GetBody().GetCollisionModel().ClearModel()
-        self.GetBody().GetCollisionModel().AddEllipsoid(radius_x/2, radius_y/2, radius_z/2, dr)
-        self.GetBody().GetCollisionModel().BuildModel()
+        mass = self.GetMass()
+        dims = [radius_x, radius_y, radius_z]
+        MiroAPI.SetCollisionModel_Ellipsoid(self.GetBody(), dims, mass, offset)
 
     def SetCollisionAsSphere(self, radius, offset = [0,0,0]):
-        mass = self.GetBody().GetMass()
-        dr = chrono.ChVectorD(offset[0], offset[1], offset[2])
-        
-        inertia_brick = radius**2*mass*2/5
-        self.GetBody().SetInertiaXX(chrono.ChVectorD(inertia_brick, inertia_brick, inertia_brick))   
-        self.GetBody().GetCollisionModel().ClearModel()
-        self.GetBody().GetCollisionModel().AddSphere(radius, dr)
-        self.GetBody().GetCollisionModel().BuildModel()
+        mass = self.GetMass()
+        dims = [radius, radius, radius]
+        MiroAPI.SetCollisionModel_Ellipsoid(self.GetBody(), dims, mass, offset)
 
 # Sensor class extends component class
 class MiroSensor(MiroComponent):
-    def Initialize(self, output_file_name, simulation, logging = True):
+    def Initialize(self, output_file_name, MiroSystem):
         self.filename = output_file_name
         self.filestream = open(self.filename, "w")
         self.filestream.truncate(0)
-        self.logging = logging
+        self.logging = MiroSystem.log
     
     def LogData(self):
         return
 
 
 class MiroSensor_Accelerometer(MiroSensor):
-    def Initialize(self, output_file_name, simulation, logging = True):
-        self.filename = output_file_name
-        self.filestream = open(self.filename, "w")
-        self.filestream.truncate(0)
-        self.logging = logging
-        self.dt = simulation.GetTimestep()
+    def Initialize(self, output_file_name, MiroSystem):
+        super().Initialize(output_file_name, MiroSystem)
+        self.dt = 1/(MiroSystem.fps * MiroSystem.subframes)
 
     def SetPollingRate(self, Hz):
         self.Hz = Hz
 
     def LogData(self):
         if(self.logging):
-            acc = self.GetBody().GetPos_dtdt()
+            acc = MiroAPI.GetBodyAcceleration(self.GetBody())
             g = - 9.8
             # Rescales so all instances of momentary acceleration act under 1/300 seconds
             if hasattr(self, 'Hz'):
-                acc.Scale(self.Hz * self.dt)
+                acc = acc*(self.Hz * self.dt)
                 g = g*(self.Hz * self.dt)
-            data = str(acc.x)+' '+str(acc.y - g)+' '+str(acc.z)+'\n'
+            data = str(acc[0])+' '+str(acc[1] - g)+' '+str(acc[2])+'\n'
             self.filestream.write(data)
 
 class MiroSensor_Speedometer(MiroSensor):
     def LogData(self):
         if(self.logging):
-            vel = self.GetBody().GetPos_dt()
-            data = str(vel.x)+' '+str(vel.y)+' '+str(vel.z)+'\n'
+            vel = MiroAPI.GetBodyVelocity(self.GetBody())
+            data = str(vel[0])+' '+str(vel[1])+' '+str(vel[2])+'\n'
             self.filestream.write(data)
 
 class MiroSensor_Odometer(MiroSensor):
-    def Initialize(self, output_file_name, simulation, logging = True):
-        self.filename = output_file_name
-        self.filestream = open(self.filename, "w")
-        self.filestream.truncate(0)
-        self.logging = logging
-        self.start = chrono.ChVectorD(self.body.GetPos())
+    def Initialize(self, output_file_name, MiroSystem):
+        super().Initialize(output_file_name, MiroSystem)
+        self.start = MiroAPI.GetBodyPosition(self.GetBody())
 
     def LogData(self):
         if(self.logging):
-            pos = self.GetBody().GetPos() - self.start
-            data = str(pos.x)+' '+str(pos.y)+' '+str(pos.z)+'\n'
+            pos = MiroAPI.GetBodyPosition(self.GetBody()) - self.start
+            data = str(pos[0])+' '+str(pos[1])+' '+str(pos[2])+'\n'
             self.filestream.write(data)
 
 # Booster class extends Sensor class
 class MiroBooster(MiroSensor):
-    def Initialize(self, output_file_name, simulation, logging = True):
-        self.filename = output_file_name
-        self.filestream = open(self.filename, "w")
-        self.filestream.truncate(0)
-        self.logging = logging
-        self.dt = simulation.GetTimestep()
+    def Initialize(self, output_file_name, MiroSystem):
+        super().Initialize(output_file_name, MiroSystem)
+        self.dt = 1/(MiroSystem.fps * MiroSystem.subframes)
         if not hasattr(self, 'fuel'):
             self.fuel = 100
         if not hasattr(self, 'cons'):
@@ -278,10 +232,11 @@ class MiroBooster(MiroSensor):
         '''Fuel consumption per simulated second '''
         self.cons = consumption
 
-    def SetForce(self, force):
-        self.force = force
+    def SetForce(self, force_strength):
+        self.force = force_strength
 
     def SetFuel(self, total_fuel):
+        '''Total fuel is duration in ms if consumption is not modified'''
         self.fuel = total_fuel
 
     def CheckTrigger(self):
@@ -289,21 +244,17 @@ class MiroBooster(MiroSensor):
             if not self.trigger:
                 self.triggered = True
             else:
-                pos = self.body.GetPos()
-                vel = self.body.GetPos_dt()
-                acc = self.body.GetPos_dtdt()
-                position = [pos.x, pos.y, pos.z]
-                velocity = [vel.x, vel.y, vel.z]
-                acceleration = [acc.x, acc.y, acc.z]
+                position = MiroAPI.GetBodyPosition(self.GetBody())
+                velocity = MiroAPI.GetBodyVelocity(self.GetBody())
+                acceleration = MiroAPI.GetBodyAcceleration(self.GetBody())
                 if self.trigger(position, velocity, acceleration):
                     self.triggered = True
-                    self.F = chrono.ChForce()
-                    self.F.SetF_y(chrono.ChFunction_Const(self.force))
-                    self.body.AddForce(self.F)
+                    self.F = MiroAPI.AddBodyForce(self.GetBody(), self.force, [0,1,0], new=True)
         elif self.fuel > 0:
+            MiroAPI.AddBodyForce(self.GetBody(), self.force, [0,1,0], new=False)
             self.fuel = self.fuel - self.cons*self.dt
         elif not self.expended:
-            self.body.RemoveForce(self.F)
+            MiroAPI.RemoveBodyForce(self.GetBody(), self.F)
             self.expended = True
             
     def LogData(self):

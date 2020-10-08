@@ -1,5 +1,4 @@
-import pychrono.core as chrono
-import pychrono.irrlicht as chronoirr
+from MiroClasses.MiroAPI_selector import SelectedAPI as MiroAPI
 import numpy as np
 
 from MiroClasses import MiroModule as MM

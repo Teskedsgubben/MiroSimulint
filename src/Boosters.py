@@ -1,4 +1,4 @@
-import pychrono.core as chrono
+from MiroClasses.MiroAPI_selector import SelectedAPI as MiroAPI
 import numpy as np
 
 from MiroClasses import MiroComponent as mc
@@ -17,32 +17,18 @@ def MCB01(trigger_function, pulses = 1, rot = [0,0,0], pos = [0,0,0], Fixed = Fa
     size_h = 0.05
     size_r = 0.0075
     density_brick = 0.02/(np.pi*size_r**2*size_h)   # kg/m^3
-
-    body_brick = chrono.ChBodyEasyCylinder(size_r, size_h, density_brick)
-    body_brick.SetBodyFixed(False)
-    body_brick.SetCollide(True)
-
-    # Collision shape
-    body_brick.GetCollisionModel().ClearModel()
-    body_brick.GetCollisionModel().AddCylinder(size_r, size_r, size_h/2) # hemi sizes
-    body_brick.GetCollisionModel().BuildModel()
-
-    # Apply texture
-    texture = chrono.ChTexture()
-    texture.SetTextureFilename(chrono.GetChronoDataFile('textures/booster.png'))
-    texture.SetTextureScale(1, -1)
-    body_brick.AddAsset(texture)
+    booster_body = MiroAPI.add_cylinderShape(False, size_r, size_h, density_brick, pos, 'booster.png', scale=[1,-1], Fixed=False)
 
     # Generate MiroComponent with above ChBody
-    BOOSTER = mc.MiroBooster(body_brick)
+    BOOSTER = mc.MiroBooster(booster_body)
     BOOSTER.SetTrigger(trigger_function)
     BOOSTER.SetFuel(400*pulses)
     BOOSTER.SetForce(0.5)
 
-    BOOSTER.AddLinkPoint('A', [ 1, 0, 0], chrono.ChVectorD( size_r, size_h/2-0.01, 0))
-    BOOSTER.AddLinkPoint('B', [ 1, 0, 0], chrono.ChVectorD( size_r,-size_h/2+0.01, 0))
-    BOOSTER.AddLinkPoint('C', [ 0, 0, 1], chrono.ChVectorD( 0, size_h/2-0.01, size_r))
-    BOOSTER.AddLinkPoint('D', [ 0, 0, 1], chrono.ChVectorD( 0,-size_h/2+0.01, size_r))
+    BOOSTER.AddLinkPoint('A', [ 1, 0, 0], [size_r, size_h/2-0.01, 0])
+    BOOSTER.AddLinkPoint('B', [ 1, 0, 0], [size_r,-size_h/2+0.01, 0])
+    BOOSTER.AddLinkPoint('C', [ 0, 0, 1], [0, size_h/2-0.01, size_r])
+    BOOSTER.AddLinkPoint('D', [ 0, 0, 1], [0,-size_h/2+0.01, size_r])
     
     BOOSTER.Rotate(rot)
     BOOSTER.MoveToPosition(pos)

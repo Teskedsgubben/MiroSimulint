@@ -1,5 +1,4 @@
-from MiroClasses import MiroAPI_chrono as MiroAPI
-import pychrono.core as chrono
+from MiroClasses.MiroAPI_selector import SelectedAPI as MiroAPI
 import numpy as np
 
 def build(MiroSystem, SPEEDMODE = False):
@@ -9,7 +8,7 @@ def build(MiroSystem, SPEEDMODE = False):
     posE = np.array([1.6, 3/2*H, -8.9])
     posS = np.array([-5.4, 3/2*H, -1.9]) #3/2 * H
 
-    if(SPEEDMODE):        
+    if(not SPEEDMODE):        
         MiroAPI.add_boxShape(MiroSystem, 11.8, H, wall_t, posW, 'MITwall_West.jpg')
         MiroAPI.add_boxShape(MiroSystem, 2*6.9, 3*H, wall_t, posE, 'textures/MITwall_East.jpg', [-4,-3])
         MiroAPI.add_boxShape(MiroSystem, wall_t, 3*H, 2*6.9, posS, 'textures/MITwall_South.jpg', [4,3])
