@@ -18,6 +18,8 @@ class Module():
         # Extra bodies or links for props, not to be counted into module
         self.hidden_bodies = []
         self.hidden_links = []
+        self.use_helpers = True
+        self.warning_print = True
 
     def PrintInfo(self):
         print('  Sensors: '+str(len(self.sensors.keys())))
@@ -116,13 +118,21 @@ class Module():
     
     def MarkLinkpoint(self, component_name, linkpoint_name, color = 'red', marking_radius = 0.01):
         '''Add a colored sphere to the linkpoint of a component to identify it during simulation. \nUse 'red', 'blue' or 'green'.'''
+        if not self.use_helpers:
+            return
+
         if color != 'blue' and color != 'green':
             color = 'red'
+        
+        if MiroAPI.API == 'AGX' and self.warning_print:
+            print('Warning: MiroModule.MarkLinkPoint is not stable in the AGX api, may cause unstable systems. Consider using MiroModule.DisableHelpers().')
+        
         texture = 'textures/markpattern_'+color+'.png'
+        backup_color = [(color=='red')*1, (color=='green')*1, (color=='blue')*1]
 
         comp = self.components[component_name]
         pos = comp.GetLinkPoint(linkpoint_name)
-        ball = MiroAPI.add_sphereShape(False, marking_radius, pos, texture=texture, Collide=False, Fixed=False)
+        ball = MiroAPI.add_sphereShape(False, marking_radius, pos, texture=texture, Collide=False, Fixed=False, color=backup_color)
         link = MiroAPI.LinkBodies_Hinge(comp.GetBody(), ball, pos, [0,1,0])
 
         self.hidden_bodies.append(ball)
@@ -165,7 +175,7 @@ class Module():
             linkdir = linkdirA + linkdirB
             linkdir = linkdir/np.linalg.norm(linkdir)
             if show_warning:
-                print('Warning: Non-facing links. The links between '+name_A+'.'+point_A+' and '+name_B+'.'+point_B+' are not facing eachother, check linkpoint and object orientation.')            
+                print('Warning: Non-facing links. The links between '+name_A+'.'+point_A+' and '+name_B+'.'+point_B+' are not facing eachother, check linkpoint and object orientation. Consider removing with MiroModule.RemoveHelpers() before running.')            
 
         hinge_link = MiroAPI.LinkBodies_Hinge(comp_A.GetBody(), comp_B.GetBody(), linkpos, linkdir)
         
@@ -189,7 +199,7 @@ class Module():
         
         self.links.update({name: spring_link})
 
-        if marking_radius > 0:
+        if marking_radius > 0 and self.use_helpers:
             self.MarkLinkpoint(name_A, point_A, marking_radius=marking_radius)
             self.MarkLinkpoint(name_B, point_B, marking_radius=marking_radius)
 
@@ -278,3 +288,18 @@ class Module():
     def RotateComponentsZ(self, theta):
         '''Rotates all components in the module theta degrees about the Z-axis.'''
         self.RotateComponents(theta, [0,0,1])
+
+    def DisableHelpers(self, only_suppress_warning = False, remove_existing=True, remove_future=True):
+        '''This removes all visual help objects, including marked linkpoints and spring attachments.\n
+        Set only_suppress_warnings=True as input to turn off the warning print but keep the helper objects.\n
+        You can also control if you do not want to remove existing helpers, or only stop adding future helpers
+        after this command is executed.'''
+        if only_suppress_warning:
+            self.warning_print = False
+        else:
+            if remove_existing:
+                self.hidden_bodies = []
+                self.hidden_links = []
+            if remove_future:
+                self.use_helpers = False
+        

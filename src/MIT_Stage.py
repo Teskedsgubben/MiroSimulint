@@ -59,4 +59,4 @@ def back_stage(system):
     size_width = 0.05
     size_height = 2.5
 
-    MiroAPI.add_boxShape(system,size_len,size_height,size_width,in_screen_pos, texture='tf-logo.jpg', scale=[-4,-3], rotY=45)
+    MiroAPI.add_boxShape(system,size_len,size_height,size_width,in_screen_pos, texture='tf-logo.jpg', scale=[4, 3], rotY=45)

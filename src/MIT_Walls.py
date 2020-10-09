@@ -197,7 +197,7 @@ def add_stairPosts(system, center, stair_r, h, theta_f, theta_b):
     # pos_pole = (pos_f+pos_b)/2 + (dir_f+dir_b)/2 + chrono.ChVectorD(0, post_h/2, 0)   # Position
     pos_pole = (pos_f+pos_b)/2 + (dir_f+dir_b)/2 + np.array([0, post_h/2, 0])   # Position
 
-    MiroAPI.add_cylinderShape(system, post_r, post_h, post_d, pos_pole, texture)
+    MiroAPI.add_cylinderShape(system, post_r, post_h, post_d, pos_pole, texture, rotDegrees=False)
 
 
 def MIT_floors(system, H, SPEEDMODE):
@@ -492,7 +492,7 @@ def MIT_walls(system, H):
     scale = [sca_1, sca_1, sca_1]
     for i in range(len(pos_ob)):
         # Create a box
-        MiroAPI.add_boxShapeHemi(system, dim[i][0], dim[i][1], dim[i][2], pos_ob[i], rotAngle=ang[i], rotAxis=n, rotDegrees=False, texture=textures[i], scale = scale[i])
+        MiroAPI.add_boxShapeHemi(system, dim[i][0], dim[i][1], dim[i][2], pos_ob[i], rotY=ang[i], rotDegrees=False, texture=textures[i], scale = scale[i])
 
 
 # fence function is transforemd to MiroAPI

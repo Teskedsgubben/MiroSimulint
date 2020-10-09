@@ -8,7 +8,7 @@ from src import MIT_Entrance
 from src import MIT_Props
 from src import MIT_CSplan4
 
-from src import Robotcourse
+# from src import Robotcourse
 
 def build_MIT(MiroSystem, SPEEDMODE = False):
     # Create the room floor: a simple fixed rigid body with a collision shape
@@ -22,7 +22,7 @@ def build_MIT(MiroSystem, SPEEDMODE = False):
     # Robotcourse.build(MiroSystem, SPEEDMODE)
 
     mit_carpet_floor(MiroSystem)
-    roof(MiroSystem)
+    # roof(MiroSystem)
     if not SPEEDMODE:
         MIT_Props.AddProps(MiroSystem)
 

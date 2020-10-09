@@ -4,6 +4,8 @@ import sys
 import time
 import os
 
+def MiroSetup(SetupFunction):
+    MiroAPI.PreSetup(sys.argv, SetupFunction)
 
 class MiroSystem():
     def __init__(self): 
@@ -16,19 +18,27 @@ class MiroSystem():
         #
         #  Create the simulation system and add items
         #
-        
-        self.system_list = MiroAPI.SetupSystem(sys.argv)
+        self.system_list = MiroAPI.SetupSystem()
         self.modules = {}
         self.sensors = {}
         self.links = {}
 
         self.SPEEDMODE = False
         self.notifier = False
+        self.released = False
         
         # Camera properties
         self.follow = False
         self.cycle = False
         self.fps = 300
+
+        self.camviews = {
+            'default': {
+                'pos': [0, 3, 0],
+                'dir': [1,0,0],
+                'lah': 3
+            }
+        }
         
     def Set_Speedmode(self, SPEEDMODE = True):
         '''Sets if speedmode is to be used. This removes many visual items to speed up the simulation.'''
@@ -38,7 +48,7 @@ class MiroSystem():
         
         self.Environment = Environment
         self.Environment.Initialize(self, self.SPEEDMODE)
-        self.camviews = self.Environment.Get_Camviews()
+        self.camviews.update(self.Environment.Get_Camviews())
 
         if self.Environment.Has_Notifier():
             self.notifier = True
@@ -125,6 +135,9 @@ class MiroSystem():
         self.cam_pos = self.obs_pos - self.cam_to_obs
         MiroAPI.SetCamera(self.system_list, self.cam_pos, self.obs_pos)
 
+    def Add_MiroComponent(self, component, position = False, vel = False):
+        component.AddToSystem(self)
+
     def Add_MiroModule(self, module, name, position = False, vel = False):
         '''Adds a MiroModule to the MiroSystem with a custom name. Can set an initial position and velocity.'''
         if(position):
@@ -137,6 +150,12 @@ class MiroSystem():
         for s_name, sensor in module.GetSensorList().items():
             sensor_ID = name+'_'+s_name
             self.sensors.update({sensor_ID: sensor})
+
+    def Release_MiroModules(self):
+        if not self.released:
+            for _, module in self.modules.items():
+                module.Release()
+        self.released = True
     
     def PrintModuleInfo(self):
         print('\n--- Module Information ---')
@@ -151,7 +170,7 @@ class MiroSystem():
         moveMod.SetPosition(refMod.GetReferencePoint())
 
     def Add(self, Object):
-        '''Adds a ChBody or similar object to the ChSystem under the MiroSystem.'''
+        '''Adds a ChBody/agxRigidBody or similar to the underlying system.'''
         MiroAPI.AddObjectByAPI(self.system_list, Object)
 
     def Initialize_Config(self, config):

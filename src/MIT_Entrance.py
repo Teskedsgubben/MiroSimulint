@@ -118,29 +118,28 @@ def FullEntrance(MiroSystem, pos_south, pos_north):
     dw = 0.96
 
     p = np.array([pos_north[0]+w/2-dw, 1.51, z])
-    MiroAPI.add_boxShape(MiroSystem, w, 3.02, 0.16, p, 'yellow_brick.jpg', scale=[2,9])
+    MiroAPI.add_boxShape(MiroSystem, w, 3.02, 0.16, p, 'yellow_brick.jpg', scale=[2,9], color=[0.6,0.4,0.0])
 
     p = np.array([pos_south[0]-dw, 1.51, z])
-    MiroAPI.add_boxShape(MiroSystem, w, 3.02, 0.16, p, 'yellow_brick.jpg', scale=[2,9])
+    MiroAPI.add_boxShape(MiroSystem, w, 3.02, 0.16, p, 'yellow_brick.jpg', scale=[2,9], color=[0.6,0.4,0.0])
 
     # Cement pillars outside
     r = 0.12
     p = np.array([pos_south[0]-1, 1.51, z - r + (depth-inner_depth)*(3/4)])
-    MiroAPI.add_cylinderShape(MiroSystem, r, 3.02, 1000, p, 'white concrete.jpg')
+    MiroAPI.add_cylinderShape(MiroSystem, r, 3.02, 1000, p, 'white concrete.jpg', color=[0.8,0.8,0.8])
 
-    
     p = np.array([pos_north[0]+1-0.96, 1.51, z - r + (depth-inner_depth)*(3/4)])
-    MiroAPI.add_cylinderShape(MiroSystem, r, 3.02, 1000, p, 'white concrete.jpg')
+    MiroAPI.add_cylinderShape(MiroSystem, r, 3.02, 1000, p, 'white concrete.jpg', color=[0.8,0.8,0.8])
     
     p = np.array([pos_south[0]+1.6, 1.51, z - r + (depth-inner_depth)])
-    MiroAPI.add_cylinderShape(MiroSystem, r, 3.02, 1000, p, 'white concrete.jpg')
+    MiroAPI.add_cylinderShape(MiroSystem, r, 3.02, 1000, p, 'white concrete.jpg', color=[0.8,0.8,0.8])
     
     p = np.array([pos_north[0]-1.6-0.96, 1.51, z - r + (depth-inner_depth)])
-    MiroAPI.add_cylinderShape(MiroSystem, r, 3.02, 1000, p, 'white concrete.jpg')
+    MiroAPI.add_cylinderShape(MiroSystem, r, 3.02, 1000, p, 'white concrete.jpg', color=[0.8,0.8,0.8])
 
 def greenpole(MiroSystem, d, l, spin, tilt, pos):
     p = np.array(pos)
-    return MiroAPI.add_boxShape(MiroSystem, d, l, d, p, 'MITentrance.png', rotY=spin, rotZ=tilt, rotOrder=['z','y'], scale=[0.5,50])
+    return MiroAPI.add_boxShape(MiroSystem, d, l, d, p, 'MITentrance.png', rotY=spin, rotZ=tilt, rotOrder=['z','y'], scale=[0.5,50], color=[0.02, 0.1, 0.01])
 
 def normal_door(MiroSystem, d, l, spin, pos):
     top = pos[1]
@@ -165,21 +164,21 @@ def normal_door(MiroSystem, d, l, spin, pos):
 
     # poles through door
     pb = [pos[0] + np.cos(np.deg2rad(spin))*(l-d/2)*0.86, mid+h*(1/3), pos[2] - np.sin(np.deg2rad(spin))*(l-d/2)*0.86]
-    MiroAPI.add_cylinderShape(MiroSystem, r/2, dist, 2500, pb, 'chrome.png', rotY=spin-90, rotZ=90, rotOrder=['z','y'], Collide=False, scale=[2,2])
-    pb[1] = mid-h*(1/3)
-    MiroAPI.add_cylinderShape(MiroSystem, r/2, dist, 2500, pb, 'chrome.png', rotY=spin-90, rotZ=90, rotOrder=['z','y'], Collide=False, scale=[2,2])
+    MiroAPI.add_cylinderShape(MiroSystem, r/2, dist, 2500, pb, 'textures/chrome.png', rotY=spin-90, rotZ=90, rotOrder=['x','z','y'], Collide=False, scale=[2,2], color=[0.9,0.9,0.9])
+    pb[1] = mid-h*(1/3)                                                    # rotY=-spin, rotX=90                         
+    MiroAPI.add_cylinderShape(MiroSystem, r/2, dist, 2500, pb, 'chrome.png', rotY=spin-90, rotZ=90, rotOrder=['z','y'], Collide=False, scale=[2,2], color=[0.9,0.9,0.9])
     
     # disks on door
-    MiroAPI.add_cylinderShape(MiroSystem, r*1.2, 0.01, 2500, pb, 'brushsteel.png', rotY=spin-90, rotZ=90, rotOrder=['z','y'], Collide=False, scale=[2,2])
+    MiroAPI.add_cylinderShape(MiroSystem, r*1.2, 0.01, 2500, pb, 'brushsteel.png', rotY=spin-90, rotZ=90, rotOrder=['z','y'], Collide=False, scale=[2,2], color=[0.85,0.85,0.85])
     pb[1] = mid+h*(1/3)
-    MiroAPI.add_cylinderShape(MiroSystem, r*1.2, 0.01, 2500, pb, 'brushsteel.png', rotY=spin-90, rotZ=90, rotOrder=['z','y'], Collide=False, scale=[2,2])
+    MiroAPI.add_cylinderShape(MiroSystem, r*1.2, 0.01, 2500, pb, 'brushsteel.png', rotY=spin-90, rotZ=90, rotOrder=['z','y'], Collide=False, scale=[2,2], color=[0.85,0.85,0.85])
     
     # handle bars
     ph1 = [pb[0] + np.cos(np.deg2rad(spin+90))*(dist/2), mid, pb[2] - np.sin(np.deg2rad(spin+90))*(dist/2)]
     ph2 = [pb[0] - np.cos(np.deg2rad(spin+90))*(dist/2), mid, pb[2] + np.sin(np.deg2rad(spin+90))*(dist/2)]
 
-    MiroAPI.add_cylinderShape(MiroSystem, r, h, 2500, ph1, 'chrome.png', scale=[2,2])
-    MiroAPI.add_cylinderShape(MiroSystem, r, h, 2500, ph2, 'chrome.png', scale=[2,2])
+    MiroAPI.add_cylinderShape(MiroSystem, r, h, 2500, ph1, 'chrome.png', scale=[2,2], color=[0.9,0.9,0.9])
+    MiroAPI.add_cylinderShape(MiroSystem, r, h, 2500, ph2, 'chrome.png', scale=[2,2], color=[0.9,0.9,0.9])
     
 def revolute_door(MiroSystem, d, l, spin, pos):
     l=l-0.03
@@ -211,13 +210,13 @@ def revolute_door(MiroSystem, d, l, spin, pos):
     p = np.array([pos[0]-(l+0.03+thick/2), pos[1], pos[2]])
     p[0] = p[0] - np.sin(np.deg2rad(angle))*wid/2
     p[2] = p[2] - np.cos(np.deg2rad(angle))*wid/2
-    MiroAPI.add_boxShape(MiroSystem, thick, top-bot+d, wid, p, 'MITentrance.png', rotY=angle)
+    MiroAPI.add_boxShape(MiroSystem, thick, top-bot+d, wid, p, 'MITentrance.png', rotY=angle, color=[0.02, 0.1, 0.01])
         
     p[2] = p[2] + np.cos(np.deg2rad(angle))*wid
-    MiroAPI.add_boxShape(MiroSystem, thick, top-bot+d, wid, p, 'MITentrance.png', rotY=-angle)
+    MiroAPI.add_boxShape(MiroSystem, thick, top-bot+d, wid, p, 'MITentrance.png', rotY=-angle, color=[0.02, 0.1, 0.01])
 
     p[0] = p[0] + np.sin(np.deg2rad(angle))*wid + 2*(l+0.03+thick/2)
-    MiroAPI.add_boxShape(MiroSystem, thick, top-bot+d, wid, p, 'MITentrance.png', rotY=angle)
+    MiroAPI.add_boxShape(MiroSystem, thick, top-bot+d, wid, p, 'MITentrance.png', rotY=angle, color=[0.02, 0.1, 0.01])
 
     p[2] = p[2] - np.cos(np.deg2rad(angle))*wid
-    MiroAPI.add_boxShape(MiroSystem, thick, top-bot+d, wid, p, 'MITentrance.png', rotY=-angle)
+    MiroAPI.add_boxShape(MiroSystem, thick, top-bot+d, wid, p, 'MITentrance.png', rotY=-angle, color=[0.02, 0.1, 0.01])

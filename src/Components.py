@@ -13,9 +13,9 @@ density = {
 def DUMMY(rot = [0,0,0], pos = [0,0,0], Fixed = False, radius = 0.025):
     body_ball = MiroAPI.add_sphereShape(False, radius, pos, texture='test_texture.png', scale=[0.07,0.07], Collide=False)
 
-    # Generate MiroComponent with above ChBody
+    # Generate MiroComponent with above body
     COMPONENT = mc.MiroComponent(body_ball)
-    COMPONENT.AddLinkPoint('A', [ 0, 0, 0], [0, 0, 0])
+    COMPONENT.AddLinkPoint('A', [0,0,0], [0,0,0])
     COMPONENT.Rotate(rot)
     COMPONENT.MoveToPosition(pos)
 
@@ -49,7 +49,6 @@ def MC0XX(M1, M2, M3, rot = [0,0,0], pos = [0,0,0], Fixed = False):
     COMPONENT.AddLinkPoint('K', [ 1, 0,0], [ size_x/2,  0, 0])
     
     COMPONENT.Rotate(rot)
-    COMPONENT.MoveToPosition(pos)
 
     return COMPONENT
 
@@ -148,7 +147,6 @@ def MC1XX(M1, M2, M3, rot = [0,0,0], pos = [0,0,0], Fixed = False):
     COMPONENT.AddLinkPoint('H', [ 0, 1, 0], [ (size_x/2-M3), size_y/2, 0])
     
     COMPONENT.Rotate(rot)
-    COMPONENT.MoveToPosition(pos)
 
     return COMPONENT
 
@@ -220,7 +218,6 @@ def MC2XX(M1, M2, rot = [0,0,0], pos = [0,0,0], Fixed = False):
     COMPONENT.AddLinkPoint('F', [ 0, 0,-1], [ 0, 0,-size_r])
     
     COMPONENT.Rotate(rot)
-    COMPONENT.MoveToPosition(pos)
 
     return COMPONENT
 
@@ -311,7 +308,6 @@ def MC3XX(M1, M2, M3, rot = [0,0,0], pos = [0,0,0], Fixed = False):
     COMPONENT.AddLinkPoint('F', [ 0, 1, 0], [ 0, size_y/2, 0])
     
     COMPONENT.Rotate(rot)
-    COMPONENT.MoveToPosition(pos)
 
     return COMPONENT
 
@@ -381,7 +377,6 @@ def MC4XX(M1, M2, M3, rot = [0,0,0], pos = [0,0,0], Fixed = False):
     COMPONENT.AddLinkPoint('I', [ 0, 0, 1], [ size_x/2, (size_y/2-0.01), (size_z/2-0.01)])
 
     COMPONENT.Rotate(rot)
-    COMPONENT.MoveToPosition(pos)
 
     return COMPONENT
 
@@ -511,7 +506,6 @@ def MC5XX(M1, M2, M3, rot = [0,0,0], pos = [0,0,0], Fixed = False):
     COMPONENT.AddLinkPoint('F', [ 0, 0,-1], [ 0, 0,-size_rz])
     
     COMPONENT.Rotate(rot)
-    COMPONENT.MoveToPosition(pos)
 
     return COMPONENT
 
@@ -539,7 +533,6 @@ def MC906(rot = [0,0,0], pos = [0,0,0], Fixed = False):
     COMPONENT.AddLinkPoint('F', [0, 1, 0], [0, size_y/2, -size_z/4])
     
     COMPONENT.Rotate(rot)
-    COMPONENT.MoveToPosition(pos)
 
     return COMPONENT
 
@@ -561,6 +554,5 @@ def MC907(rot = [0,0,0], pos = [0,0,0], Fixed = False):
     COMPONENT.AddLinkPoint('E', [0, 1, 0], [          0,  size_y/2,           0])
     
     COMPONENT.Rotate(rot)
-    COMPONENT.MoveToPosition(pos)
 
     return COMPONENT

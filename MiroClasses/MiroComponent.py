@@ -84,9 +84,7 @@ class MiroComponent():
         MiroSystem.Add(self.body)
 
     def AddLinkPoint(self, name, normal, coord):
-        if type(coord) == type([]):
-            coord = np.array(coord)
-        self.linkpoints.update({name: coord})
+        self.linkpoints.update({name: np.array(coord)})
         linkdir = np.array(normal)
         if np.linalg.norm(linkdir) > 0:
             linkdir = linkdir/np.linalg.norm(linkdir)
@@ -123,18 +121,23 @@ class MiroComponent():
         move = other_component.GetLinkPoint(other_pointname) - self.GetLinkPoint(pointname) + marg
         MiroAPI.MoveBodyBy(self.body, move)
 
-    def Rotate(self, rotation, quaternion = False):
+    def Rotate(self, rotation):
         '''Shorthand for rotating X,Y,Z that rotates in that specific order. The functions RotateX, RotateY, RotateZ or RotateAxis are easier to use.'''
-        self.RotateX(rotation[0])
-        self.RotateY(rotation[1])
-        self.RotateZ(rotation[2])
+        if rotation[0]:
+            self.RotateX(rotation[0])
+        if rotation[1]:
+            self.RotateY(rotation[1])
+        if rotation[2]:
+            self.RotateZ(rotation[2])
     
     def RotateAxis(self, theta, axis):
         '''Rotates the component an angle theta degrees around axis in global coordinates.'''
         MiroAPI.rotateBody(self.body, rotAngle=theta, rotAxis=axis)
         for name, linkp in self.linkpoints.items():
+            linkp_new = MiroAPI.rotateVector(linkp, rotAngle=theta, rotAxis=axis)
             self.linkpoints.update({name: MiroAPI.rotateVector(linkp, rotAngle=theta, rotAxis=axis)})
         for name, linkd in self.linkdirs.items():
+            linkd_new = MiroAPI.rotateVector(linkd, rotAngle=theta, rotAxis=axis)
             self.linkdirs.update({name: MiroAPI.rotateVector(linkd, rotAngle=theta, rotAxis=axis)})
 
     def RotateX(self, theta):

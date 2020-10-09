@@ -10,7 +10,7 @@ def build(ChSystem, SPEEDMODE = False):
 
 def second_floor(MiroSystem):
     start_table_pos = np.array([-3.8, 0, -7.6])  # The position for the table in x and z direction
-    num_table_z = 2     # Tabels along the z axis 
+    num_table_z = 0     # Tabels along the z axis 
     num_table_x = 3     # Tabels along the x axis
     #The table size and position in y direction.                              
     size_table_x = 1.2
