@@ -11,17 +11,23 @@
 # Python interpreter, unless you have specifically made sure
 # to install all dependencies into the same environment.
 
-# Set to 'chrono' or 'agx'
-API = 'chrono'
+# Set to 'PyChrono' or 'AGX'
 
-if API == 'agx':
-    import MiroClasses.MiroAPI_agx as agxAPI
-    SelectedAPI = agxAPI
-elif API == 'chrono':
-    import MiroClasses.MiroAPI_chrono as chronoAPI
-    SelectedAPI = chronoAPI
+import os
+if(os.path.isfile('MiroClasses/MiroAPI_local.py')):
+    from MiroClasses import MiroAPI_local
+    SelectedAPI = MiroAPI_local.SelectedAPI
 else:
-    import sys
-    sys.exit('API configuration invalid, open MiroClasses -> MiroAPI_selector to fix.')
+    API = 'PyChrono'
+
+    if API == 'AGX':
+        import MiroClasses.MiroAPI_agx as agxAPI
+        SelectedAPI = agxAPI
+    elif API == 'PyChrono':
+        import MiroClasses.MiroAPI_chrono as chronoAPI
+        SelectedAPI = chronoAPI
+    else:
+        import sys
+        sys.exit('API configuration invalid, open MiroClasses -> MiroAPI_selector to fix.')
 
 

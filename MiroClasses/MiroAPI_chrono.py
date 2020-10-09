@@ -1,9 +1,10 @@
-# try:
-import pychrono.core as chrono
-import pychrono.irrlicht as chronoirr
-# except:
-#     import sys
-#     sys.exit('PyChrono could not be imported. Check that the correct Pyhton interpreter is selected and that the MiroSim conda environment is activated. View guidelines for details.')
+import sys
+try:
+    import pychrono.core as chrono
+    import pychrono.irrlicht as chronoirr
+except:
+    import sys
+    sys.exit('PyChrono could not be imported. Check that the correct Pyhton interpreter is selected and that the MiroSim conda environment is activated. View guidelines for details.')
 import numpy as np
 import os
 import time
@@ -50,11 +51,17 @@ def rotateBody(body, rotX=0, rotY=0, rotZ=0, rotOrder=['x', 'y', 'z'], rotAngle=
             q = chrono.ChQuaternionD()
             q.Q_from_AngAxis(angle, axis)
             body.SetRot(q*body.GetRot())
-# System setup
-def SetupSystem(args):
+
+
+# First function to be called
+def PreSetup(args, SetupFunction):
     chrono.SetChronoDataPath(os.getcwd() + "/")
+    SetupFunction()
+
+# System setup
+def SetupSystem():
     ChSystem = chrono.ChSystemNSC()
-    ChSimulation = chronoirr.ChIrrApp(ChSystem, 'MiroSimulation', chronoirr.dimension2du(1000, 800))
+    ChSimulation = chronoirr.ChIrrApp(ChSystem, 'MiroSimulation', chronoirr.dimension2du(1720, 920))
     # Set the default outward/inward shape margins for collision detection,
     # this is epecially important for very large or very small objects.
     chrono.ChCollisionModel.SetDefaultSuggestedEnvelope(0.0000001)
@@ -69,10 +76,10 @@ def SetupSystem(args):
     return [ChSystem, ChSimulation]
 
 # Shapes
-def add_boxShapeHemi(MiroSystem, size_x, size_y, size_z, pos, texture='test.jpg', scale=[4,3], Collide=True, Fixed=True, rotX=0, rotY=0, rotZ=0, rotOrder=['x','y','z'], rotAngle=0, rotAxis=[1,0,0], rotDegrees=True):
-    add_boxShape(MiroSystem, 2*size_x, 2*size_y, 2*size_z, pos, texture, scale, Collide, Fixed, rotX, rotY, rotZ, rotOrder, rotAngle, rotAxis, rotDegrees)
+def add_boxShapeHemi(MiroSystem, hemi_size_x, hemi_size_y, hemi_size_z, pos, texture='test.jpg', scale=[4,3], Collide=True, Fixed=True, rotX=0, rotY=0, rotZ=0, rotOrder=['x','y','z'], rotAngle=0, rotAxis=[1,0,0], rotDegrees=True, mass=False, density=1000, dynamic=False, color=[0.5, 0.5, 0.5]):
+    add_boxShape(MiroSystem, 2*hemi_size_x, 2*hemi_size_y, 2*hemi_size_z, pos, texture, scale, Collide, Fixed, rotX, rotY, rotZ, rotOrder, rotAngle, rotAxis, rotDegrees)
 
-def add_boxShape(MiroSystem, size_x, size_y, size_z, pos, texture='test.jpg', scale=[4,3], Collide=True, Fixed=True, rotX=0, rotY=0, rotZ=0, rotOrder=['x','y','z'], rotAngle=0, rotAxis=[1,0,0], rotDegrees=True, mass=False, density=1000, dynamic=False):
+def add_boxShape(MiroSystem, size_x, size_y, size_z, pos, texture='test.jpg', scale=[4,3], Collide=True, Fixed=True, rotX=0, rotY=0, rotZ=0, rotOrder=['x','y','z'], rotAngle=0, rotAxis=[1,0,0], rotDegrees=True, mass=False, density=1000, dynamic=False, color=[0.5, 0.5, 0.5]):
     '''system, size_x, size_y, size_z, pos, texture, scale = [5,5], hitbox = True/False'''
     # Convert position to chrono vector, supports using chvector as input as well
     ChPos = ChVecify(pos)
@@ -124,7 +131,7 @@ def add_boxShape(MiroSystem, size_x, size_y, size_z, pos, texture='test.jpg', sc
     
     return body_box
 
-def add_cylinderShape(MiroSystem, radius, height, density, pos, texture='test.jpg', scale=[1,1], Collide=True, Fixed=True, rotX=0, rotY=0, rotZ=0, rotOrder=['x','y','z'], rotAngle=0, rotAxis=[1,0,0], rotDegrees=True):
+def add_cylinderShape(MiroSystem, radius, height, density, pos, texture='test.jpg', scale=[1,1], Collide=True, Fixed=True, rotX=0, rotY=0, rotZ=0, rotOrder=['x','y','z'], rotAngle=0, rotAxis=[1,0,0], rotDegrees=True, color=[0.5, 0.5, 0.5]):
     # Convert position to chrono vector, supports using chvector as input as well
     ChPos = ChVecify(pos)
     ChRotAxis = ChVecify(rotAxis)
@@ -160,7 +167,7 @@ def add_cylinderShape(MiroSystem, radius, height, density, pos, texture='test.jp
 
     return body_cylinder
 
-def add_sphereShape(MiroSystem, radius, pos, texture='test.jpg', density=1000, scale=[1,1], Collide=True, Fixed=True, rotX=0, rotY=0, rotZ=0, rotOrder=['x','y','z'], rotAngle=0, rotAxis=[1,0,0], rotDegrees=True):
+def add_sphereShape(MiroSystem, radius, pos, texture='test.jpg', density=1000, scale=[1,1], Collide=True, Fixed=True, rotX=0, rotY=0, rotZ=0, rotOrder=['x','y','z'], rotAngle=0, rotAxis=[1,0,0], rotDegrees=True, color=[0.5, 0.5, 0.5]):
     # Convert position to chrono vector, supports using chvector as input as well
     ChPos = ChVecify(pos)
     ChRotAxis = ChVecify(rotAxis)
@@ -196,7 +203,7 @@ def add_sphereShape(MiroSystem, radius, pos, texture='test.jpg', density=1000, s
 
     return body_ball
 
-def add_ellisoidShape(MiroSystem, radius_x, radius_y, radius_z, pos, texture='test.jpg', density=1000, scale=[1,1], Collide=True, Fixed=True, rotX=0, rotY=0, rotZ=0, rotOrder=['x','y','z'], rotAngle=0, rotAxis=[1,0,0], rotDegrees=True):
+def add_ellisoidShape(MiroSystem, radius_x, radius_y, radius_z, pos, texture='test.jpg', density=1000, scale=[1,1], Collide=True, Fixed=True, rotX=0, rotY=0, rotZ=0, rotOrder=['x','y','z'], rotAngle=0, rotAxis=[1,0,0], rotDegrees=True, color=[0.5, 0.5, 0.5]):
     # Convert position to chrono vector, supports using chvector as input as well
     ChPos = ChVecify(pos)
     ChRotAxis = ChVecify(rotAxis)
@@ -530,9 +537,7 @@ def RunSimulation(MiroSystem):
         if MiroSystem.follow and not ChSimulation.GetPaused():
             MiroSystem.Set_Camera()
 
-    for _, module in MiroSystem.modules.items():
-        module.Release()
-
+    MiroSystem.Release_MiroModules()
 
     if MiroSystem.pre_pause:
         print('\n--- Press SPACE to release! ---')
