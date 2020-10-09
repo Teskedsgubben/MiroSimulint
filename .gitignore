@@ -5,6 +5,8 @@ __pycache__
 *.pyc
 # fram capture mappen
 video_capture
+imageCapture
+agx_mov.mp4
 # local settings
 .vscode
 # datavärden
