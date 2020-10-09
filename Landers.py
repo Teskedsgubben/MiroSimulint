@@ -28,9 +28,8 @@ def DemoLander(args):
     # Defaults to [0,0,0], [0,0,0], False if arguments are not provided
     # Note: Use Lander.RotateX, Y or Z if you are making several rotations to
     #       a component, as the order the rotations are made in is significant. 
-    Lander.AddComponent(Components.MC035([ 0, 90, 0], [0,0,0], False), 'Bottom plate')
-    Lander.AddComponent(Components.MC035([ 0, 90, 0]), 'Top plate')
-    Lander.RotateX('Top plate', 180)
+    Lander.AddComponent(Components.MC035([  0, 90, 0], [0,0,0], False), 'Bottom plate')
+    Lander.AddComponent(Components.MC035([180, 90, 0]), 'Top plate')
 
     # Add vertical rods
     Lander.AddComponent(Components.MC113([ 0, 0, 90]), 'Rod A')
@@ -38,8 +37,12 @@ def DemoLander(args):
     Lander.AddComponent(Components.MC113([ 0, 0, 90]), 'Rod C')
     Lander.AddComponent(Components.MC113([ 0, 0, 90]), 'Rod D')
     
-    Lander.AddSensor(Sensors.MSA02([180,0,0]), 'Accelerometer')
-    
+    # Add a sensor to the module.
+    # We need to flip it upside down as with the Top Plate.
+    # This can be done after adding it to the module by .RotateX()
+    Lander.AddSensor(Sensors.MSA02([ 0, 0, 0]), 'Accelerometer')
+    Lander.RotateX('Accelerometer', 180)
+
     Lander.RotateComponentsZ(tilt)
     Lander.RotateComponentsY(aim)
 
