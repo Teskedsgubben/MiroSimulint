@@ -32,8 +32,8 @@ def RunPureAGX(SystemList, Args):
     # This function will be called with SystemList = [sim, app, root] and you can
     # set Args to be whatever you want from the Main function. 
     [sim, app, root] = SystemList
-    CreateDigger(sim, [0,1,0])
-    # CustomAgxFunction(SystemList, Args)
+    # CreateDigger(sim, [0,1,0])
+    CustomAgxFunction(SystemList, Args)
     return
 
 def CreateDigger(sim, pos):

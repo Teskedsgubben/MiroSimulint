@@ -14,6 +14,7 @@
 #               Johan Jonsson, Franz Wikner, Niklas Edlund
 #
 #-------------------------------------------------------------------------------
+from MiroClasses.MiroAPI_selector import SelectedAPI as MiroAPI
 from MiroClasses import MiroSystem as MS
 from src import Environments
 from src import Props
@@ -33,7 +34,7 @@ except:
 # Function that runs the simulation
 def RunSimulation():
     # Initialize a Miro System
-    simulation_system  = MS.MiroSystem()
+    simulation_system = MS.MiroSystem()
 
     # Set the environment to MIT place.
     # If the simulation is too slow, set Speedmode to True.
@@ -71,6 +72,10 @@ def RunSimulation():
     # Use mouse, scroll wheel, arrow keys and pg up & pg down to move
     # Press I and see the help section for a full list of controls
     simulation_system.Set_Perspective('4th floor observing launcher')
+
+    if MiroAPI.API == 'AGX':
+        from agx_playground import RunPureAGX as RunAGX
+        RunAGX(simulation_system.Get_APIsystem(), {'robot_pos': [-11, -1 , 7.5], 'players': 1})
 
     # Run the system simulation at [w, h] resolution and X seconds delay to let
     # the lander settle in before pausing (which is then released by SPACEBAR)
