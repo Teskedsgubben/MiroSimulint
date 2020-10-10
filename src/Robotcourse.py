@@ -90,7 +90,7 @@ def buildArena(arena_pos):
         sim.add(wall)
         agxOSG.setDiffuseColor(agxOSG.createVisual(wall, root), agxRender.Color.DarkGray())
                                               
-    obstacles(sim, root, arena_pos[2])
+    # obstacles(sim, root, arena_pos[2])
 
 def obstacles(sim, root, h):
     #start plattform
