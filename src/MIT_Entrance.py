@@ -51,10 +51,10 @@ def FullEntrance(MiroSystem, pos_south, pos_north):
 
     # Revolving door ground rings
     r = 0.98
-    pos = np.array([pos_south[0]+1.70, 0, pos_south[2]])
-    MiroAPI.add_cylinderShape(MiroSystem, r, 0.02, 1000, pos, 'MITentrance_floor.png', Collide=False)
+    pos = np.array([pos_south[0]+1.70, 0.0, pos_south[2]])
+    MiroAPI.add_cylinderShape(MiroSystem, r, 0.01, 1000, pos, 'MITentrance_floor.png', Collide=False)
     pos = np.array([pos_south[0]+4.08, 0, pos_south[2]])
-    MiroAPI.add_cylinderShape(MiroSystem, r, 0.02, 1000, pos, 'MITentrance_floor.png', Collide=False)
+    MiroAPI.add_cylinderShape(MiroSystem, r, 0.01, 1000, pos, 'MITentrance_floor.png', Collide=False)
 
     # Revolving door top rings
     pos = np.array([pos_south[0]+1.70, 2.45, pos_south[2]])
@@ -67,7 +67,7 @@ def FullEntrance(MiroSystem, pos_south, pos_north):
     revolute_door(MiroSystem, d, 0.98, 50, [pos_south[0]+4.08, 2.4-d/2, pos_south[2]])
 
     # Side door, inner
-    normal_door(MiroSystem, d, 1.1-d, 192, [pos_south[0]+6.58-d, 2.5-d/2, pos_south[2]])
+    normal_door(MiroSystem, d, 1.1-d, 232, [pos_south[0]+6.58-d, 2.5-d/2, pos_south[2]])
 
     ########### INNER PART STOPS HERE ###########
     width = pos_north[0] - pos_south[0] + 3.04
@@ -92,11 +92,11 @@ def FullEntrance(MiroSystem, pos_south, pos_north):
     greenpole(MiroSystem, d, l, 0, 0, [pos_south[0]+6.02-d/2, 1.51, z])
 
     # Outer doors
-    normal_door(MiroSystem, d, 1.1-d, -15, [pos_south[0]+0.33+d, 2.5-d/2, z]) # south outward
-    normal_door(MiroSystem, d, 1.1-d, 172, [pos_south[0]+2.77-d, 2.5-d/2, z]) # south inward
+    normal_door(MiroSystem, d, 1.1-d, -42, [pos_south[0]+0.33+d, 2.5-d/2, z]) # south outward
+    normal_door(MiroSystem, d, 1.1-d, 180, [pos_south[0]+2.77-d, 2.5-d/2, z]) # south inward
 
-    normal_door(MiroSystem, d, 1.1-d,  -8, [pos_south[0]+3.25+d, 2.5-d/2, z]) # north outward
-    normal_door(MiroSystem, d, 1.1-d, 161, [pos_south[0]+5.69-d, 2.5-d/2, z]) # north inward
+    normal_door(MiroSystem, d, 1.1-d,  -0, [pos_south[0]+3.25+d, 2.5-d/2, z]) # north outward
+    normal_door(MiroSystem, d, 1.1-d, 180, [pos_south[0]+5.69-d, 2.5-d/2, z]) # north inward
     
     greenpole(MiroSystem, d, 6.02, 0, 90, [pos_south[0]+3.01, 2.5+d/2, z-d/20])
     greenpole(MiroSystem, d, 6.02, 0, 90, [pos_south[0]+3.01, 3.0-d/2, z-d/20])
