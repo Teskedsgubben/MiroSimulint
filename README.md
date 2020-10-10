@@ -160,3 +160,41 @@ Step 2) Go to _View_ -> _SCM_ or _Source Control_, which is the same as clicking
 Step 3) Once the list is completely empty, click the three dots button ... and click Pull. This will get the latest versions of the files from the repository.
 
 You then work in the files named _local instead of the ordinary files. After doing this once, you only need to redo step 3 to get the latest version again.
+
+___
+
+## Using AGX
+
+MiroSimulint was built using PyChrono. It is currently being built to support AGX as well, allowing for other functionalities. To use MiroSim with AGX, you must first have a validated AGX installation on your computer. This means you download the AGX installer and place a provided license file in the install directory. See separate instructions for details.
+
+To set MiroSimulint to use AGX you need to follow these steps:
+
+Step 1) Locate the _MiroAPI\_selector.py_ file in the MiroClasses directory.
+
+Step 2) Copy and paste the file into the same directory.
+
+Step 3) Rename the copy: _MiroAPI\_local.py_
+
+Step 4) Edit the local API file by removing the first if statement, lines 16 through 20. Then remove the indentation on the rows below (mark them then Shift+Tab).
+
+Step 5) Change the API = 'PyChrono' to API = 'AGX'
+
+You now have a local file selecting the API MiroSim will use. To change it back in the future, you only need to redo Step 5) in reverse and so on. However, you must select a python interpreter that is configured for AGX as well. Unless you knowingly configured it to be the same, you will most likely need to switch. This has to be done again if you decide to change API in the future as well.
+
+Step 6) Go to _View_ -> _Command Palette_ and locate Python: Select Interpreter. The Python you want to run should be located in the AGX install directory, i.e. the .../Algoryx/AGX-your\_version directory. If you do not see the right one in the list, click _Enter interpreter path..._ and click _Find..._ so you can navigate to _C:\Program Files\Algoryx\AGX-2.29.2.0\python-x64_ or similar, and select the _python.exe_ in that directory. You now have the right python selected.
+
+Step 7) To setup the environment for agx, you must run the _setup\_env.bat_ in the terminal you are using. This is done by _"C:\Program Files\Algoryx\AGX-2.29.2.0\setup\_env.bat"_, or if you are using powershell (it says __PS C:\Users...>__ rather than just __C:\Users...>__) you add an & before the path, like _& "C:\Program..."_. This needs to be run every time you start a new terminal for using AGX.
+
+Step 8) You can add some lines to you local settings to make pylint find the agx functions. In VS Code, this is done by opening the local directory .vscode in the MiroSimulint directory. Here, modify (or create) the file _settings.json_ with the follow lines:
+
+    {
+        "python.pythonPath": "C:/Program Files/Algoryx/AGX-2.29.2.0/python-x64/python.exe",
+        "files.associations": {
+            "*.agxPy": "python"
+        },
+        "python.autoComplete.extraPaths": [
+            "C:/Program Files/Algoryx/AGX-2.29.2.0/bin/x64/agxpy"
+        ],
+    }
+
+Note that if you installed AGX somewhere else, you need to modify the above to the correct install directory.
