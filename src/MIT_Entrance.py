@@ -1,6 +1,8 @@
 from MiroClasses.MiroAPI_selector import SelectedAPI as MiroAPI
 import numpy as np
 
+FIXED = False
+
 def build(MiroSystem, SPEEDMODE = False):
     pos_south = [1.7, 0, 12.16]
     pos_north = [8.67, 0, 12.16]
@@ -26,12 +28,15 @@ def FullEntrance(MiroSystem, pos_south, pos_north):
     d = 0.08
     l = 3.02
 
+    # Pole in front of doors
     p = np.array([pos_south[0]+2.89, 1.51, pos_south[2]-0.6])
     MiroAPI.add_boxShape(MiroSystem, 2*d, l, 2*d, p, texture='white concrete.jpg', scale=[4, 12])
 
+    # Emergency exit sign
     p = np.array([pos_south[0]+2.89, 2.7, pos_south[2]-0.6-d-0.01])
     MiroAPI.add_boxShape(MiroSystem, 0.568*0.7, 0.285*0.7, 0.02, p, texture='exit.png')
 
+    # Inner doorframe
     greenpole(MiroSystem, d, l, 0, 0, [pos_south[0]+(1/2)*d, 1.51, pos_south[2]])
     greenpole(MiroSystem, d, l, 0, 0, [pos_south[0]+   0.68, 1.51, pos_south[2]])
     greenpole(MiroSystem, d, l, 0, 0, [pos_south[0]+   2.72, 1.51, pos_south[2]])
@@ -41,26 +46,13 @@ def FullEntrance(MiroSystem, pos_south, pos_north):
     greenpole(MiroSystem, d, l, 0, 0, [pos_south[0]+   6.58, 1.51, pos_south[2]])
     greenpole(MiroSystem, d, l, 0, 0, [pos_north[0]-(1/2)*d, 1.51, pos_north[2]])
 
-    
+    # Horizontal parts
     greenpole(MiroSystem, d, (pos_north[0] - pos_south[0]), 0, 90, [(pos_north[0] + pos_south[0])/2, 2.5+d/2, pos_north[2]-d/20])
     greenpole(MiroSystem, d, (pos_north[0] - pos_south[0]), 0, 90, [(pos_north[0] + pos_south[0])/2, 3.0-d/2, pos_north[2]-d/20])
 
     # Small bits on floor
     for s in [[(1/2)*d, 0.68], [2.72, 3.06], [5.10, 5.44], [6.58, pos_north[0]-pos_south[0]-(1/2)*d]]:
         greenpole(MiroSystem, d, (s[1] - s[0] - d), 0, 90, [pos_south[0]+ (s[1] + s[0])/2, d/2, pos_north[2]])
-
-    # Revolving door ground rings
-    r = 0.98
-    pos = np.array([pos_south[0]+1.70, 0.0, pos_south[2]])
-    MiroAPI.add_cylinderShape(MiroSystem, r, 0.01, 1000, pos, 'MITentrance_floor.png', Collide=False)
-    pos = np.array([pos_south[0]+4.08, 0, pos_south[2]])
-    MiroAPI.add_cylinderShape(MiroSystem, r, 0.01, 1000, pos, 'MITentrance_floor.png', Collide=False)
-
-    # Revolving door top rings
-    pos = np.array([pos_south[0]+1.70, 2.45, pos_south[2]])
-    MiroAPI.add_cylinderShape(MiroSystem, r, 0.1, 1000, pos, 'MITentrance.png')
-    pos = np.array([pos_south[0]+4.08, 2.45, pos_south[2]])
-    MiroAPI.add_cylinderShape(MiroSystem, r, 0.1, 1000, pos, 'MITentrance.png')
     
     # Revolving doors
     revolute_door(MiroSystem, d, 0.98, 15, [pos_south[0]+1.70, 2.4-d/2, pos_south[2]])
@@ -137,9 +129,9 @@ def FullEntrance(MiroSystem, pos_south, pos_north):
     p = np.array([pos_north[0]-1.6-0.96, 1.51, z - r + (depth-inner_depth)])
     MiroAPI.add_cylinderShape(MiroSystem, r, 3.02, 1000, p, 'white concrete.jpg', color=[0.8,0.8,0.8])
 
-def greenpole(MiroSystem, d, l, spin, tilt, pos):
+def greenpole(MiroSystem, d, l, spin, tilt, pos, Fixed=True):
     p = np.array(pos)
-    return MiroAPI.add_boxShape(MiroSystem, d, l, d, p, 'MITentrance.png', rotY=spin, rotZ=tilt, rotOrder=['z','y'], scale=[0.5,50], color=[0.02, 0.1, 0.01])
+    return MiroAPI.add_boxShape(MiroSystem, d, l, d, p, 'MITentrance.png', rotY=spin, rotZ=tilt, rotOrder=['z','y'], scale=[0.5,50], color=[0.02, 0.1, 0.01], Fixed=Fixed)
 
 def normal_door(MiroSystem, d, l, spin, pos):
     top = pos[1]
@@ -181,42 +173,79 @@ def normal_door(MiroSystem, d, l, spin, pos):
     MiroAPI.add_cylinderShape(MiroSystem, r, h, 2500, ph2, 'chrome.png', scale=[2,2], color=[0.9,0.9,0.9])
     
 def revolute_door(MiroSystem, d, l, spin, pos):
-    l=l-0.03
-    top = pos[1]
-    mid = pos[1]/2+d/4
-    bot = d/2
-    # top cross
-    greenpole(MiroSystem, d, 2*(l-d), spin   , 90, pos)
-    greenpole(MiroSystem, d, 2*(l-d), spin+90, 90, pos)
-    
-    # bottom cross
-    pos[1] = bot
-    greenpole(MiroSystem, d, 2*(l-d), spin   , 90, pos)
-    greenpole(MiroSystem, d, 2*(l-d), spin+90, 90, pos)
+    # Revolving door bottom ring
+    pos_down = np.array([pos[0], 0.0, pos[2]])
+    disk_bot = MiroAPI.add_cylinderShape(MiroSystem, l, 0.01, 1000, pos_down, 'MITentrance_floor.png', Collide=False)
 
+    # Revolving door top ring
+    pos_up = np.array([pos[0], pos[1] + 0.1/2 + d/2, pos[2]])
+    disk_top = MiroAPI.add_cylinderShape(MiroSystem, l, 0.1, 1000, pos_up, 'MITentrance.png')
+
+    l=l-0.03
+    eps = 0.004
+    top = pos[1] - eps
+    mid = pos[1]/2+d/4
+    bot = d/2 + eps
+    dh = np.array([0,d/2,0])
+    
     # middle pole
     pos[1] = mid
-    greenpole(MiroSystem, d, top-bot, spin, 0, pos)
+    mid_pole = greenpole(MiroSystem, d, top-bot-d, spin, 0, pos, Fixed=FIXED)
+    
+    # top cross
+    pos[1] = top
+    top_x = greenpole(MiroSystem, d, 2*(l-d), spin   , 90, pos, Fixed=FIXED)
+    top_y = greenpole(MiroSystem, d, 2*(l-d), spin+90, 90, pos, Fixed=FIXED)
+    
+    if not FIXED:
+        dir1 = [np.cos(np.deg2rad(spin)), 0, np.sin(np.deg2rad(spin))]
+        dir2 = [np.cos(np.deg2rad(spin+90)), 0, np.sin(np.deg2rad(spin+90))]
+        MiroAPI.LinkBodies_Hinge(top_x, top_y, pos, dir1, MiroSystem)
+        MiroAPI.LinkBodies_Hinge(top_x, top_y, pos, dir2, MiroSystem)
+        MiroAPI.LinkBodies_Hinge(top_x, mid_pole, pos-dh, dir1, MiroSystem)
+        MiroAPI.LinkBodies_Hinge(top_x, disk_top, pos+dh, [0, 1,0], MiroSystem)
+        MiroAPI.LinkBodies_Hinge(top_y, disk_top, pos+dh, [0,1,0], MiroSystem)
 
+    # bottom cross
+    pos[1] = bot
+    bot_x = greenpole(MiroSystem, d, 2*(l-d), spin   , 90, pos, Fixed=FIXED)
+    bot_y = greenpole(MiroSystem, d, 2*(l-d), spin+90, 90, pos, Fixed=FIXED)
+
+    if not FIXED:
+        MiroAPI.LinkBodies_Hinge(bot_x, bot_y, pos, dir1, MiroSystem)
+        MiroAPI.LinkBodies_Hinge(bot_x, bot_y, pos, dir2, MiroSystem)
+        MiroAPI.LinkBodies_Hinge(bot_x, mid_pole, pos+dh, dir1, MiroSystem)
+        MiroAPI.LinkBodies_Hinge(bot_x, disk_top, pos-dh, [0,-1,0], MiroSystem)
+        MiroAPI.LinkBodies_Hinge(bot_y, disk_top, pos-dh, [0,-1,0], MiroSystem)
+
+    cross = [[top_x, bot_x], [top_y, bot_y]]
+    p = np.array([pos[0], mid, pos[2]])
     for phi in [0, 90, 180, 270]:
         angle = spin + phi
-        p = [pos[0] + np.cos(np.deg2rad(angle))*(l-d/2), mid, pos[2] - np.sin(np.deg2rad(angle))*(l-d/2)]
-        greenpole(MiroSystem, d, top-bot+d, angle, 0, p)
+        dp = np.array([np.cos(np.deg2rad(angle))*(l-d/2), 0, -np.sin(np.deg2rad(angle))*(l-d/2)])
+        rod = greenpole(MiroSystem, d, top-bot+d, angle, 0, p + dp, Fixed=FIXED)
+        if not FIXED:
+            dh = np.array([0,(top-bot+d)/2,0])
+            top_bar = cross[round(phi/90)%2][0]
+            bot_bar = cross[round(phi/90)%2][1]
+            MiroAPI.LinkBodies_Hinge(top_bar, rod, p+dp+dh, -dp, MiroSystem)
+            MiroAPI.LinkBodies_Hinge(bot_bar, rod, p+dp-dh, -dp, MiroSystem)
 
     # side walls
     wid = 0.4
     thick = 0.02
     angle = -13
-    p = np.array([pos[0]-(l+0.03+thick/2), pos[1], pos[2]])
+    height = top-bot+d + 2*eps
+    p = np.array([pos[0]-(l+0.03+thick/2), mid, pos[2]])
     p[0] = p[0] - np.sin(np.deg2rad(angle))*wid/2
     p[2] = p[2] - np.cos(np.deg2rad(angle))*wid/2
-    MiroAPI.add_boxShape(MiroSystem, thick, top-bot+d, wid, p, 'MITentrance.png', rotY=angle, color=[0.02, 0.1, 0.01])
+    MiroAPI.add_boxShape(MiroSystem, thick, height, wid, p, 'MITentrance.png', rotY=angle, color=[0.02, 0.1, 0.01])
         
     p[2] = p[2] + np.cos(np.deg2rad(angle))*wid
-    MiroAPI.add_boxShape(MiroSystem, thick, top-bot+d, wid, p, 'MITentrance.png', rotY=-angle, color=[0.02, 0.1, 0.01])
+    MiroAPI.add_boxShape(MiroSystem, thick, height, wid, p, 'MITentrance.png', rotY=-angle, color=[0.02, 0.1, 0.01])
 
     p[0] = p[0] + np.sin(np.deg2rad(angle))*wid + 2*(l+0.03+thick/2)
-    MiroAPI.add_boxShape(MiroSystem, thick, top-bot+d, wid, p, 'MITentrance.png', rotY=angle, color=[0.02, 0.1, 0.01])
+    MiroAPI.add_boxShape(MiroSystem, thick, height, wid, p, 'MITentrance.png', rotY=angle, color=[0.02, 0.1, 0.01])
 
     p[2] = p[2] - np.cos(np.deg2rad(angle))*wid
-    MiroAPI.add_boxShape(MiroSystem, thick, top-bot+d, wid, p, 'MITentrance.png', rotY=-angle, color=[0.02, 0.1, 0.01])
+    MiroAPI.add_boxShape(MiroSystem, thick, height, wid, p, 'MITentrance.png', rotY=-angle, color=[0.02, 0.1, 0.01])
