@@ -162,6 +162,7 @@ def add_boxShape(MiroSystem, size_x, size_y, size_z, pos, texture='test.jpg', sc
        
     # Create a box
     body_geo = agxCollide.Geometry( agxCollide.Box(size_x/2, size_y/2, size_z/2))
+    body_geo.setEnableCollisions(Collide)
     body_box = agx.RigidBody(body_geo)
     if Fixed:
         body_box.setMotionControl(1)
@@ -219,8 +220,10 @@ def add_cylinderShape(MiroSystem, radius, height, density, pos, texture='test.jp
     agxRotAxis = agxVecify(rotAxis)
     scale = scaleLimit(scale)
        
-    # Create a box
-    body_cylinder = agx.RigidBody( agxCollide.Geometry( agxCollide.Cylinder(radius, height)))
+    # Create a cylinder
+    body_geo = agxCollide.Geometry(agxCollide.Cylinder(radius, height))
+    body_geo.setEnableCollisions(Collide)
+    body_cylinder = agx.RigidBody(body_geo)
     if Fixed:
         body_cylinder.setMotionControl(1)
     body_cylinder.setPosition(agxPos)
@@ -265,7 +268,9 @@ def add_sphereShape(MiroSystem, radius, pos, texture='test.jpg', density=1000, s
     scale = scaleLimit(scale)
        
     # Create a box
-    body_ball = agx.RigidBody( agxCollide.Geometry( agxCollide.Sphere(radius)))
+    body_geo = agxCollide.Geometry(agxCollide.Sphere(radius))
+    body_geo.setEnableCollisions(Collide)
+    body_ball = agx.RigidBody(body_geo)
     if Fixed:
         body_ball.setMotionControl(1)
     body_ball.setPosition(agxPos)
