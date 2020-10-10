@@ -8,7 +8,10 @@ from src import MIT_Entrance
 from src import MIT_Props
 from src import MIT_CSplan4
 
-# from src import Robotcourse
+try:
+    from src import Robotcourse
+except:
+    print('Robotcourse is only currently available in AGX')
 
 def build_MIT(MiroSystem, SPEEDMODE = False):
     # Create the room floor: a simple fixed rigid body with a collision shape
@@ -19,7 +22,8 @@ def build_MIT(MiroSystem, SPEEDMODE = False):
     MIT_Entrance.build(MiroSystem, SPEEDMODE)
     MIT_CSplan4.build(MiroSystem, SPEEDMODE)
 
-    # Robotcourse.build(MiroSystem, SPEEDMODE)
+    if MiroAPI.API == 'AGX':
+        Robotcourse.buildArena([0,0,0.02])
 
     mit_carpet_floor(MiroSystem)
     # roof(MiroSystem)
