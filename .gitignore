@@ -19,3 +19,4 @@ ignored_storage
 Grupp*_*
 # Ignores data files
 *.dat
+*.mp3
