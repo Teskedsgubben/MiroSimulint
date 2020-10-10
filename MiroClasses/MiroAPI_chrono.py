@@ -406,7 +406,7 @@ def ChangeBodyTexture(body, texture_file, scale=[1,1]):
     body.AddAsset(texture)
 
 # Links
-def LinkBodies_Hinge(body1, body2, link_position, link_direction):
+def LinkBodies_Hinge(body1, body2, link_position, link_direction, MiroSystem=False):
     linkdir = ChVecify(link_direction)
     linkpos = ChVecify(link_position)
     # Get the quaternion that represents the rotation of the global z-axis to the link direction
@@ -420,6 +420,8 @@ def LinkBodies_Hinge(body1, body2, link_position, link_direction):
     # Create a revolute link between the components at the coordinate system
     mlink = chrono.ChLinkRevolute()
     mlink.Initialize(body1, body2, mframe)
+    if MiroSystem:
+        MiroSystem.Add(mlink)
 
     return mlink
 
