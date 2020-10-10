@@ -21,8 +21,8 @@ from MiroClasses import BackupColors
 API = 'AGX'
 TEXTURES_ON = False
 important_textures = [
-    'MITfloor.pngBLOCK',
-    'tf-logo.jpgBLOCK',
+    'MITfloor.png',
+    'tf-logo.jpg',
 ]
 
 # agx is defined in another coordinate system
