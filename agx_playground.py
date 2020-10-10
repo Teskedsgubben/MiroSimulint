@@ -1,6 +1,7 @@
 
 from MiroClasses.MiroAPI_selector import SelectedAPI as MiroAPI
 import sys
+import os
 try:
     import agx
 except:
@@ -21,19 +22,22 @@ from agxPythonModules.utils.callbacks import StepEventCallback, KeyboardCallback
 import time
 import math
 import numpy as np
+import agx_playground_1 as axp
 
 try:
     import socketio
 except:
     print('Socketio import failed')
 
+
 def RunPureAGX(SystemList, Args):
     # This is the entry point for running pure agx code in the MiroSim environment.
     # This function will be called with SystemList = [sim, app, root] and you can
     # set Args to be whatever you want from the Main function. 
     [sim, app, root] = SystemList
-    # CreateDigger(sim, [0,1,0])
+    # CreateDigger(sim, [0,0,0.2])
     CustomAgxFunction(SystemList, Args)
+    axp.RunPureAGX(SystemList, Args)
     return
 
 def CreateDigger(sim, pos):
@@ -70,8 +74,10 @@ def CustomAgxFunction(SystemList, Args):
         cameraData.farClippingPlane  = 5000
         app.applyCameraData( cameraData )
     else:
-        botBody = buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'RWD', texture='flames.png')
-        sim.add(FollowCam(app, botBody))
+        # Cam = ComboCam(app, False, dash_direction=[0,-1,0], dash_position=[0,0.5,0.25], follow_distance=2.5, follow_angle=10)
+        botBody = buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'RWD', texture='flames.png', camera=False)
+        # Cam.AddBody(botBody)
+        sim.add(FollowCam(app, botBody))#, [0,-1,0], [0,0.5,0.25]))
 
 
 class SocketKiller(agxSDK.GuiEventListener):
@@ -90,13 +96,17 @@ class SocketKiller(agxSDK.GuiEventListener):
 # Wheels to be controlled must come as a list of [left, right, left, right]
 class WheelControllerArrows(agxSDK.GuiEventListener):
     '''Wheels must be in a list and in pairs L & R, i.e. [wheel_left, wheel_right]'''
-    def __init__(self, wheels, body):
+    def __init__(self, wheels, body, lights, camera='static'):
         super().__init__(agxSDK.GuiEventListener.KEYBOARD)
         self.wheels = wheels
+        self.camera = camera
+        self.reset_rot = body.getRotation()
         self.body = body
         self.strength = 8/len(wheels)
-        # self.root = agxPython.getContext().environment.getSceneRoot()
-        # app = agxPython.getContext().environment.getApplication()
+        self.lights = lights
+        self.braking = False
+        self.backing = False
+        self.cameraswitched = False
 
     # Steering function
     def keyboard(self, key, x, y, alt, keydown):
@@ -116,60 +126,53 @@ class WheelControllerArrows(agxSDK.GuiEventListener):
             # Back up
             for wheel in self.wheels:
                 wheel.addLocalTorque(0,-self.strength/2,0)
+            if not self.backing:
+                self.backing = True
+                for light in self.lights:
+                    agxOSG.setTexture(light, 'textures/taillight_back.png', True, agxOSG.DIFFUSE_TEXTURE, 1.0, 1.0)                 
 
         elif keydown and key == agxSDK.GuiEventListener.KEY_Up:
             # Gain speed
             for wheel in self.wheels:
                 wheel.addLocalTorque(0, self.strength,0)
-        elif keydown and key == agxSDK.GuiEventListener.KEY_Home:
-            self.body.setPosition(-9, 0 , 7.5)
-            for wheel in self.wheels:
-                wheel.setPosition(-9.4, 0 , 7.5)
 
-        else:
-            return False
-        return True
-
-# Controls wheel torque from arrow key inputs. Supports 2 or 4 wheel drive.
-# Wheels to be controlled must come as a list of [left, right, left, right]
-class WheelControllerNumpad(agxSDK.GuiEventListener):
-    '''Wheels must be in a list and in pairs L & R, i.e. [wheel_left, wheel_right]'''
-    def __init__(self, wheels):
-        super().__init__(agxSDK.GuiEventListener.KEYBOARD)
-        self.wheels = wheels
-        self.strength = 8/len(wheels)
-        # self.root = agxPython.getContext().environment.getSceneRoot()
-        # app = agxPython.getContext().environment.getApplication()
-
-    # Steering function
-    def keyboard(self, key, x, y, alt, keydown):
-        if keydown and key == agxSDK.GuiEventListener.KEY_KP_4:
-            # Turn left
-            for i in range(0, len(self.wheels), 2):
-                self.wheels[i+1].addLocalTorque(0, self.strength,0)
-                self.wheels[i].addLocalTorque(0, -self.strength/4,0)
-
-        elif keydown and key == agxSDK.GuiEventListener.KEY_KP_6:
-            # Turn right
-            for i in range(0, len(self.wheels), 2):
-                self.wheels[i].addLocalTorque(0, self.strength,0)
-                self.wheels[i+1].addLocalTorque(0, -self.strength/4,0)
-
-        elif keydown and key == agxSDK.GuiEventListener.KEY_KP_2:
+        elif keydown and key == agxSDK.GuiEventListener.KEY_BackSpace:
             # Back up
             for wheel in self.wheels:
-                wheel.addLocalTorque(0,-self.strength/2,0)
-
-        elif keydown and key == agxSDK.GuiEventListener.KEY_KP_8:
-            # Gain speed
-            for wheel in self.wheels:
-                wheel.addLocalTorque(0, self.strength,0)
+                wheel.setAngularVelocityDamping(18*self.body.getMassProperties().getMass())
+            if not self.braking:
+                self.braking = True
+                for light in self.lights:
+                    agxOSG.setTexture(light, 'textures/taillight_brake.png', True, agxOSG.DIFFUSE_TEXTURE, 1.0, 1.0)  
+        
+        elif keydown and key == agxSDK.GuiEventListener.KEY_Delete:
+            if self.camera != 'static':
+                if(not self.cameraswitched):
+                    self.camera.ToggleCam()
+                self.cameraswitched = True
+        
+        elif keydown and key == ord( 'r' ):
+            self.body.setPosition(-9, 0 , 7.5)
+        elif keydown and key == ord( 't' ):
+            # self.body.setPosition(self.body.getPosition()+agx.Vec3(0,0,0.65))
+            self.body.setAngularVelocity(0,0,0)
+            self.body.setVelocity(agx.Vec3(0,0,0))
+            self.body.setRotation(self.reset_rot)
         else:
+            self.camerswitched = False
+            if(self.braking or self.backing):
+                if self.braking:
+                    self.braking = False
+                    for wheel in self.wheels:
+                        wheel.setAngularVelocityDamping(0)
+                self.backing = False
+                for light in self.lights:
+                    agxOSG.setTexture(light, 'textures/taillight_off.png', True, agxOSG.DIFFUSE_TEXTURE, 1.0, 1.0)
             return False
         return True
 
 class WheelControllerRemote(agxSDK.StepEventListener):
-    def __init__(self, wheels, body, socket):
+    def __init__(self, wheels, body, socket, camera):
         super().__init__(agxSDK.StepEventListener.PRE_COLLIDE+agxSDK.StepEventListener.PRE_STEP+agxSDK.StepEventListener.POST_STEP)
         self.body = body
         self.wheels = wheels
@@ -254,7 +257,7 @@ class Fjoink(agxSDK.GuiEventListener):
             return False
         return True
 
-def buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'FWD', color=False, texture=False):
+def buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'FWD', color=False, texture=False, camera='static'):
     scale = 1
 
     body_wid = 0.32*scale
@@ -310,6 +313,90 @@ def buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'FWD', color=
         vis_body = agxOSG.createVisual(wheel, root)
         agxOSG.setTexture(vis_body, 'textures/tire.png', True, agxOSG.DIFFUSE_TEXTURE, 1.0, 1.0)
 
+    x_ax = agx.Vec3(1,0,0)
+    y_ax = agx.Vec3(0,1,0)
+    z_ax = agx.Vec3(0,0,1)
+
+    hf = agx.HingeFrame()
+    hf.setAxis(agx.Vec3(-1,0,0))
+    hf.setCenter(agx.Vec3(bot_pos[0]-body_wid/2, bot_pos[1]+(body_len/2-wheel_rad*1.8), bot_pos[2]+wheel_rad))
+    axleLF = agx.Hinge(hf, body, wheelLF)
+    sim.add(axleLF)
+
+    hf = agx.HingeFrame()
+    hf.setAxis(agx.Vec3(-1,0,0))
+    hf.setCenter(agx.Vec3(bot_pos[0]-body_wid/2, bot_pos[1]-(body_len/2-wheel_rad*1.8), bot_pos[2]+wheel_rad))
+    axleLB = agx.Hinge(hf, body, wheelLB)
+    sim.add(axleLB)
+
+    hf = agx.HingeFrame()
+    hf.setAxis(agx.Vec3( 1,0,0))
+    hf.setCenter(agx.Vec3(bot_pos[0]+body_wid/2, bot_pos[1]-(body_len/2-wheel_rad*1.8), bot_pos[2]+wheel_rad))
+    axleRB = agx.Hinge(hf, body, wheelRB)
+    sim.add(axleRB)
+    
+    hf = agx.HingeFrame()
+    hf.setAxis(agx.Vec3( 1,0,0))
+    hf.setCenter(agx.Vec3(bot_pos[0]+body_wid/2, bot_pos[1]+(body_len/2-wheel_rad*1.8), bot_pos[2]+wheel_rad))
+    axleRF = agx.Hinge(hf, body, wheelRF)
+    sim.add(axleRF)
+    
+    light_wid = 0.012
+    light_hei = 0.02
+    light_dep = 0.003
+
+    taillightL = agx.RigidBody(agxCollide.Geometry( agxCollide.Box(light_wid, light_dep, light_hei)))
+    taillightL.setPosition(bot_pos[0] -0.79*body_wid/2,bot_pos[1] -(body_len/2+light_dep/2), bot_pos[2] + 0.7*body_hei + wheel_rad + wheel_dmp)
+    sim.add(taillightL)
+    taillightL_vis = agxOSG.createVisual(taillightL, root)
+    agxOSG.setTexture(taillightL_vis, 'textures/taillight_off.png', True, agxOSG.DIFFUSE_TEXTURE, 1.0, 1.0)
+    hf = agx.HingeFrame()
+    hf.setAxis(agx.Vec3(0,1,0))
+    hf.setCenter(agx.Vec3(bot_pos[0] -0.79*body_wid/2, bot_pos[1] -body_len/2, bot_pos[2] + 0.7*body_hei + wheel_rad + wheel_dmp + light_hei/3))
+    TLL_hi = agx.Hinge(hf, body, taillightL)
+    sim.add(TLL_hi)
+    hf = agx.HingeFrame()
+    hf.setAxis(agx.Vec3(0,1,0))
+    hf.setCenter(agx.Vec3(bot_pos[0] -0.79*body_wid/2, bot_pos[1] -body_len/2, bot_pos[2] + 0.7*body_hei + wheel_rad + wheel_dmp - light_hei/3))
+    TLL_low = agx.Hinge(hf, body, taillightL)
+    sim.add(TLL_low)
+
+    taillightR = agx.RigidBody(agxCollide.Geometry( agxCollide.Box(light_wid, light_dep, light_hei)))
+    taillightR.setPosition( bot_pos[0] + 0.79*body_wid/2,bot_pos[1] -(body_len/2+light_dep/2), bot_pos[2] + 0.7*body_hei + wheel_rad + wheel_dmp)
+    sim.add(taillightR)
+    taillightR_vis = agxOSG.createVisual(taillightR, root)
+    agxOSG.setTexture(taillightR_vis, 'textures/taillight_off.png', True, agxOSG.DIFFUSE_TEXTURE, 1.0, 1.0)
+    hf = agx.HingeFrame()
+    hf.setAxis(agx.Vec3(0,1,0))
+    hf.setCenter(agx.Vec3( bot_pos[0] + 0.79*body_wid/2,bot_pos[1]-body_len/2, bot_pos[2] + 0.7*body_hei + wheel_rad + wheel_dmp + light_hei/3))
+    TLR = agx.Hinge(hf, body, taillightR)
+    sim.add(TLR)
+    hf = agx.HingeFrame()
+    hf.setAxis(agx.Vec3(0,1,0))
+    hf.setCenter(agx.Vec3( bot_pos[0] + 0.79*body_wid/2,bot_pos[1]-body_len/2, bot_pos[2] + 0.7*body_hei + wheel_rad + wheel_dmp - light_hei/3))
+    TLR = agx.Hinge(hf, body, taillightR)
+    sim.add(TLR)
+
+
+    wheels = [wheelLF, wheelRF] # default FWD
+    if drivetrain == 'FWD':
+        wheels = [wheelLF, wheelRF]
+    elif drivetrain == 'RWD':
+        wheels = [wheelLB, wheelRB]
+    elif drivetrain == 'AWD':
+        wheels = [wheelLF, wheelRF, wheelLB, wheelRB]
+    
+    if controller == 'Remote':
+        sio = socketio.Client()
+        sim.add(WheelControllerRemote(wheels, body, sio))
+        # sim.add(SocketKiller(sio))
+        sim.add(Fjoink(body))
+    else:
+        sim.add(WheelControllerArrows(wheels, body, [taillightL_vis, taillightR_vis], camera=camera))
+        sim.add(Fjoink(body))
+
+
+    ################# Stuff to make it fancy #################
     light_rad = 0.02
     light_dep = 0.01
 
@@ -338,44 +425,6 @@ def buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'FWD', color=
     sim.add(HLR)
 
 
-    light_wid = 0.012
-    light_hei = 0.02
-    light_dep = 0.003
-
-    taillightL = agx.RigidBody(agxCollide.Geometry( agxCollide.Box(light_wid, light_dep, light_hei)))
-    taillightL.setPosition(bot_pos[0] -0.79*body_wid/2,bot_pos[1] -(body_len/2+light_dep/2), bot_pos[2] + 0.7*body_hei + wheel_rad + wheel_dmp)
-    # taillightL.setMotionControl(1)
-    # headlightL.setRotation(agx.Quat(np.pi/2, agx.Vec3(0,0,1)))
-    sim.add(taillightL)
-    agxOSG.setDiffuseColor(agxOSG.createVisual(taillightL, root), agxRender.Color.Red())
-    hf = agx.HingeFrame()
-    hf.setAxis(agx.Vec3(0,1,0))
-    hf.setCenter(agx.Vec3(bot_pos[0] -0.79*body_wid/2, bot_pos[1] -body_len/2, bot_pos[2] + 0.7*body_hei + wheel_rad + wheel_dmp + light_hei/3))
-    TLL_hi = agx.Hinge(hf, body, taillightL)
-    sim.add(TLL_hi)
-    hf = agx.HingeFrame()
-    hf.setAxis(agx.Vec3(0,1,0))
-    hf.setCenter(agx.Vec3(bot_pos[0] -0.79*body_wid/2, bot_pos[1] -body_len/2, bot_pos[2] + 0.7*body_hei + wheel_rad + wheel_dmp - light_hei/3))
-    TLL_low = agx.Hinge(hf, body, taillightL)
-    sim.add(TLL_low)
-
-    taillightR = agx.RigidBody(agxCollide.Geometry( agxCollide.Box(light_wid, light_dep, light_hei)))
-    taillightR.setPosition( bot_pos[0] + 0.79*body_wid/2,bot_pos[1] -(body_len/2+light_dep/2), bot_pos[2] + 0.7*body_hei + wheel_rad + wheel_dmp)
-    # taillightR.setMotionControl(1)
-    # headlightL.setRotation(agx.Quat(np.pi/2, agx.Vec3(0,0,1)))
-    sim.add(taillightR)
-    agxOSG.setDiffuseColor(agxOSG.createVisual(taillightR, root), agxRender.Color.Red())
-    hf = agx.HingeFrame()
-    hf.setAxis(agx.Vec3(0,1,0))
-    hf.setCenter(agx.Vec3( bot_pos[0] + 0.79*body_wid/2,bot_pos[1]-body_len/2, bot_pos[2] + 0.7*body_hei + wheel_rad + wheel_dmp + light_hei/3))
-    TLR = agx.Hinge(hf, body, taillightR)
-    sim.add(TLR)
-    hf = agx.HingeFrame()
-    hf.setAxis(agx.Vec3(0,1,0))
-    hf.setCenter(agx.Vec3( bot_pos[0] + 0.79*body_wid/2,bot_pos[1]-body_len/2, bot_pos[2] + 0.7*body_hei + wheel_rad + wheel_dmp - light_hei/3))
-    TLR = agx.Hinge(hf, body, taillightR)
-    sim.add(TLR)
-
     windangle = np.pi/4
     windshield = agx.RigidBody( agxCollide.Geometry( agxCollide.Box(0.9*body_wid/2, 0.005, body_hei/3)))
     windshield.setPosition(bot_pos[0], bot_pos[1]+body_len/5, bot_pos[2] + body_hei + wheel_rad + wheel_dmp + np.cos(windangle)*body_hei/3)
@@ -383,8 +432,9 @@ def buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'FWD', color=
     # windshield.setMotionControl(2)
     windshield.setRotation(agx.Quat(windangle, agx.Vec3(1,0,0)))
     sim.add(windshield)
-    agxOSG.setTexture(agxOSG.createVisual(windshield, root), 'textures/windshield.jpg', True, agxOSG.DIFFUSE_TEXTURE, 1.0, 1.0)
-
+    wind_vis = agxOSG.createVisual(windshield, root)
+    agxOSG.setAlpha(wind_vis, 0.45)
+    agxOSG.setTexture(wind_vis, 'textures/windshield.jpg', True, agxOSG.DIFFUSE_TEXTURE, 1.0, 1.0)
 
     hf = agx.HingeFrame()
     hf.setAxis(agx.Vec3(0,0,1))
@@ -397,56 +447,113 @@ def buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'FWD', color=
     windh2 = agx.Hinge(hf, body, windshield)
     sim.add(windh2)
 
-    x_ax = agx.Vec3(1,0,0)
-    y_ax = agx.Vec3(0,1,0)
-    z_ax = agx.Vec3(0,0,1)
-
-    hf = agx.HingeFrame()
-    hf.setAxis(agx.Vec3(-1,0,0))
-    hf.setCenter(agx.Vec3(bot_pos[0]-body_wid/2, bot_pos[1]+(body_len/2-wheel_rad*1.8), bot_pos[2]+wheel_rad))
-    axleLF = agx.Hinge(hf, body, wheelLF)
-    sim.add(axleLF)
-
-    hf = agx.HingeFrame()
-    hf.setAxis(agx.Vec3(-1,0,0))
-    hf.setCenter(agx.Vec3(bot_pos[0]-body_wid/2, bot_pos[1]-(body_len/2-wheel_rad*1.8), bot_pos[2]+wheel_rad))
-    axleLB = agx.Hinge(hf, body, wheelLB)
-    sim.add(axleLB)
-
-    hf = agx.HingeFrame()
-    hf.setAxis(agx.Vec3( 1,0,0))
-    hf.setCenter(agx.Vec3(bot_pos[0]+body_wid/2, bot_pos[1]-(body_len/2-wheel_rad*1.8), bot_pos[2]+wheel_rad))
-    axleRB = agx.Hinge(hf, body, wheelRB)
-    sim.add(axleRB)
+    backwindangle = -np.pi/10
+    sh = 0.02
+    scale = 16
+    wing = agx.RigidBody( agxCollide.Geometry( agxCollide.Box(0.95*body_wid/2, 0.0022, 1.25*body_hei/scale)))
+    wing.setPosition(bot_pos[0], bot_pos[1]-body_len/2.08, bot_pos[2] + body_hei + wheel_rad + wheel_dmp + sh + 0.0011)
+    # windshield.setTorque(0,0,100)
+    # windshield.setMotionControl(2)
+    wing.setRotation(agx.Quat(np.pi/2, agx.Vec3(1,0,0)))
+    sim.add(wing)
+    wind_vis = agxOSG.createVisual(wing, root)
+    # agxOSG.setAlpha(wind_vis, 0.45)
+    agxOSG.setTexture(wind_vis, 'textures/carbonfiber.png', True, agxOSG.DIFFUSE_TEXTURE, 2.5, 0.25)
     
-    hf = agx.HingeFrame()
-    hf.setAxis(agx.Vec3( 1,0,0))
-    hf.setCenter(agx.Vec3(bot_pos[0]+body_wid/2, bot_pos[1]+(body_len/2-wheel_rad*1.8), bot_pos[2]+wheel_rad))
-    axleRF = agx.Hinge(hf, body, wheelRF)
-    sim.add(axleRF)
-
-    wheels = [wheelLF, wheelRF] # default FWD
-    if drivetrain == 'FWD':
-        wheels = [wheelLF, wheelRF]
-    elif drivetrain == 'RWD':
-        wheels = [wheelLB, wheelRB]
-    elif drivetrain == 'AWD':
-        wheels = [wheelLF, wheelRF, wheelLB, wheelRB]
+    pole_tilt = np.pi/1.7
+    poleL = agx.RigidBody(agxCollide.Geometry( agxCollide.Cylinder(0.0025, sh)))
+    poleL.setPosition(bot_pos[0]-body_wid/2.5, bot_pos[1]-body_len/2.1, bot_pos[2] + body_hei + wheel_rad + wheel_dmp + sh/2)
+    poleL.setRotation(agx.Quat(pole_tilt, agx.Vec3(1,0,0)))
+    sim.add(poleL)
+    pole_vis = agxOSG.createVisual(poleL, root)
+    agxOSG.setTexture(pole_vis, 'textures/chrome.png', True, agxOSG.DIFFUSE_TEXTURE, 1.0, 1.0)
     
-    if controller == 'Numpad':
-        sim.add(WheelControllerNumpad(wheels))
-        sim.add(Fjoink(body).setHopper(agxSDK.GuiEventListener.KEY_KP_Subtract))
-    elif controller == 'Remote':
-        sio = socketio.Client()
-        sim.add(WheelControllerRemote(wheels, body, sio))
-        # sim.add(SocketKiller(sio))
-        sim.add(Fjoink(body))
-    else:
-        sim.add(WheelControllerArrows(wheels, body))
-        sim.add(Fjoink(body))
+    poleR = agx.RigidBody(agxCollide.Geometry( agxCollide.Cylinder(0.0025, sh)))
+    poleR.setPosition(bot_pos[0]+body_wid/2.5, bot_pos[1]-body_len/2.1, bot_pos[2] + body_hei + wheel_rad + wheel_dmp + sh/2)
+    poleR.setRotation(agx.Quat(pole_tilt, agx.Vec3(1,0,0)))
+    sim.add(poleR)
+    pole_vis = agxOSG.createVisual(poleR, root)
+    agxOSG.setTexture(pole_vis, 'textures/chrome.png', True, agxOSG.DIFFUSE_TEXTURE, 1.0, 1.0)
+
+    hf = agx.HingeFrame()
+    hf.setAxis(agx.Vec3(0,0,1))
+    hf.setCenter(wing.getPosition() + agx.Vec3(body_wid/2.5, 0, 0))
+    windh1 = agx.Hinge(hf, body, wing)
+    sim.add(windh1)
+    hf = agx.HingeFrame()
+    hf.setAxis(agx.Vec3(0,0,1))
+    hf.setCenter(wing.getPosition() - agx.Vec3(body_wid/2.5, 0, 0))
+    windh2 = agx.Hinge(hf, body, wing)
+    sim.add(windh2)
+    hf = agx.HingeFrame()
+    hf.setAxis(agx.Vec3(0,np.cos(pole_tilt), np.sin(pole_tilt)))
+    hf.setCenter(agx.Vec3(poleL.getPosition()))
+    windh1 = agx.Hinge(hf, body, poleL)
+    sim.add(windh1)
+    hf = agx.HingeFrame()
+    hf.setAxis(agx.Vec3(0,np.cos(pole_tilt), np.sin(pole_tilt)))
+    hf.setCenter(agx.Vec3(poleR.getPosition()))
+    windh2 = agx.Hinge(hf, body, poleR)
+    sim.add(windh2)
+
+
+    plate_dh = -0.045
+    plate_dep = 0.001
+    plate_front = agx.RigidBody(agxCollide.Geometry( agxCollide.Box(body_wid*0.21, plate_dep, body_hei/11)))
+    plate_front.setPosition(bot_pos[0],bot_pos[1] + body_len/2+plate_dep/2, bot_pos[2] + body_hei/2 + wheel_rad + wheel_dmp + plate_dh)
+    sim.add(plate_front)
+    plate_vis = agxOSG.createVisual(plate_front, root)
+    agxOSG.setTexture(plate_vis, 'textures/brumbo.png', True, agxOSG.DIFFUSE_TEXTURE, 1.0, 1.0)
+    hf = agx.HingeFrame()
+    hf.setAxis(agx.Vec3(0,1,0))
+    hf.setCenter(plate_front.getPosition() + agx.Vec3( body_wid/2.5, -plate_dep, 0))
+    hing = agx.Hinge(hf, body, plate_front)
+    sim.add(hing)
+    hf = agx.HingeFrame()
+    hf.setAxis(agx.Vec3(0,1,0))
+    hf.setCenter(plate_front.getPosition() + agx.Vec3(-body_wid/2.5, -plate_dep, 0))
+    hing = agx.Hinge(hf, body, plate_front)
+    sim.add(hing)
+
+    
+    plate_back = agx.RigidBody(agxCollide.Geometry( agxCollide.Box(body_wid*0.21, plate_dep, body_hei/11)))
+    plate_back.setPosition(bot_pos[0],bot_pos[1] - body_len/2-plate_dep/2, bot_pos[2] + body_hei/2 + wheel_rad + wheel_dmp + plate_dh)
+    sim.add(plate_back)
+    plate_vis = agxOSG.createVisual(plate_back, root)
+    agxOSG.setTexture(plate_vis, 'textures/brumbo.png', True, agxOSG.DIFFUSE_TEXTURE, 1.0, 1.0)
+    hf = agx.HingeFrame()
+    hf.setAxis(agx.Vec3(0,1,0))
+    hf.setCenter(plate_back.getPosition() + agx.Vec3( body_wid/2.5, plate_dep, 0))
+    hing = agx.Hinge(hf, body, plate_back)
+    sim.add(hing)
+    hf = agx.HingeFrame()
+    hf.setAxis(agx.Vec3(0,1,0))
+    hf.setCenter(plate_back.getPosition() + agx.Vec3(-body_wid/2.5, plate_dep, 0))
+    hing = agx.Hinge(hf, body, plate_back)
+    sim.add(hing)
 
     # return a pointer to the body
     return body
+
+class CamSelector():
+    def __init__(self, camera_modes, start_cam = 'static'):
+        if 'static' in camera_modes:
+            self.camera_modes = ['static']
+        else:
+            self.camera_modes = []        
+        self.camera_modes.append(camera_modes)
+        if start_cam not in self.camera_modes:
+            start_cam = 'static'
+        self.cam = self.camera_modes.index(start_cam)
+    def SetCam(self, cam_mode):
+        if not cam_mode in self.camera_modes:
+            self.camera_modes.append(cam_mode)
+        self.cam = self.camera_modes.index(cam_mode)
+    def GetCam(self):
+        return self.camera_modes[self.cam]
+    def ToggleCam(self):
+        self.cam = (self.cam+1) % len(self.camera_modes)
+
 
 # Create a class that is triggered at various steps in the simulation
 class Logger(agxSDK.StepEventListener):
@@ -494,9 +601,9 @@ class FollowCam(agxSDK.StepEventListener):
 
     def pre(self, time):
         relative_position = -self.body.getVelocity()
-        relative_position.set(0.0, 2)
 
         if(relative_position.length() > 1E-2):
+            relative_position.set(0.0, 2)
             relative_position.setLength(self.dist)
             relative_position.set(relative_position.x()*np.cos(self.angl), relative_position.y()*np.cos(self.angl), self.dist*np.sin(self.angl))
             
@@ -522,3 +629,126 @@ class FollowCam(agxSDK.StepEventListener):
 
     def post(self, time):
         return
+
+
+
+
+
+
+# Create a class that is triggered at various steps in the simulation
+class DashCam(agxSDK.StepEventListener):
+    def __init__(self, app, body, direction=[0,1,0], relative_position=[0, 0, 0.15]):
+        super().__init__(agxSDK.StepEventListener.PRE_COLLIDE+agxSDK.StepEventListener.PRE_STEP+agxSDK.StepEventListener.POST_STEP)
+        self.app = app
+        self.body = body
+
+        self.dir = agx.Vec3(direction[0], direction[1], direction[2])
+        self.rel_pos = agx.Vec3(relative_position[0], relative_position[1], relative_position[2])
+
+        self.position = self.body.getPosition() + self.body.getRotation()*self.rel_pos
+        self.looker = self.position + self.body.getRotation()*self.dir
+        self.up = self.body.getRotation()*agx.Vec3(0,0,1)
+
+        self.updateCamera()
+
+    def preCollide(self, time):
+        return
+
+    def pre(self, time):
+        if(self.body.getVelocity().length() > 1E-2):
+            self.position = self.body.getPosition() + self.body.getRotation()*self.rel_pos
+            self.looker = self.position + self.body.getRotation()*self.dir
+            self.up = self.body.getRotation()*agx.Vec3(0,0,1)
+
+            self.updateCamera()
+        return
+    
+    def updateCamera(self):
+        cameraData                   = self.app.getCameraData()
+        cameraData.eye               = self.position
+        cameraData.center            = self.looker
+        cameraData.up                = self.up
+        cameraData.nearClippingPlane = 0.1
+        cameraData.farClippingPlane  = 5000
+        self.app.applyCameraData( cameraData )
+
+    def post(self, time):
+        return
+
+
+class ComboCam(agxSDK.StepEventListener):
+    def __init__(self, app, body, dash_direction=[0,1,0], dash_position=[0, 0, 0.15], follow_distance=2.5, follow_angle=10):
+        super().__init__(agxSDK.StepEventListener.PRE_COLLIDE+agxSDK.StepEventListener.PRE_STEP+agxSDK.StepEventListener.POST_STEP)
+        self.camera_modes = ['static', 'follow', 'dash']
+        self.cam_i = 0
+        self.app = app
+        self.body = body
+
+        self.dash_dir = agx.Vec3(dash_direction[0], dash_direction[1], dash_direction[2])
+        self.dash_rel_pos = agx.Vec3(dash_position[0], dash_position[1], dash_position[2])
+
+        self.dist = follow_distance
+        self.angle = np.deg2rad(follow_angle)
+        self.follow_rel_pos = self.dist*agx.Vec3(0,-np.cos(self.angle), np.sin(self.angle))
+                
+        cameraData = self.app.getCameraData()
+        self.position = cameraData.eye
+        self.looker = cameraData.center
+        self.up = cameraData.up
+
+        self.updateCamera()
+
+    def AddBody(self, body):
+        self.body = body
+
+    def preCollide(self, time):
+        return
+
+    def pre(self, time):
+        if self.camera_modes[self.cam_i] == 'follow':
+            self.follow_update()
+        if self.camera_modes[self.cam_i] == 'dash':
+            self.dash_update()
+    
+    def post(self, time):
+        return
+
+    def follow_update(self):
+        relative_position = -self.body.getVelocity()
+
+        if(relative_position.length() > 1E-2):
+            relative_position.set(0.0, 2)
+            relative_position.setLength(self.dist)
+            relative_position.set(relative_position.x()*np.cos(self.angle), relative_position.y()*np.cos(self.angle), self.dist*np.sin(self.angle))
+            
+            relative_position = self.follow_rel_pos + relative_position/60
+            relative_position.setLength(self.dist)
+            relative_position.set(relative_position.x()*np.cos(self.angle), relative_position.y()*np.cos(self.angle), self.dist*np.sin(self.angle))
+
+            self.follow_rel_pos = relative_position
+            self.looker = self.body.getPosition()
+            self.position = self.follow_rel_pos + self.looker 
+            self.up = agx.Vec3(0,0,1)
+
+            self.updateCamera()
+
+    def dash_update(self):
+        if(self.body.getVelocity().length() > 1E-2):
+            self.position = self.body.getPosition() + self.body.getRotation()*self.dash_rel_pos
+            self.looker = self.position + self.body.getRotation()*self.dash_dir
+            self.up = self.body.getRotation()*agx.Vec3(0,0,1)
+        self.updateCamera()
+    
+    
+    def ToggleCam(self):
+        self.cam_i = (self.cam_i+1) % len(self.camera_modes)
+        print(self.camera_modes[self.cam_i])
+
+    def updateCamera(self):
+        cameraData                   = self.app.getCameraData()
+        cameraData.eye               = self.position
+        cameraData.center            = self.looker
+        cameraData.up                = self.up
+        cameraData.nearClippingPlane = 0.1
+        cameraData.farClippingPlane  = 5000
+        self.app.applyCameraData( cameraData )
