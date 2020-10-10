@@ -10,7 +10,7 @@ MIT_placeAGX.Set_Initializer(MIT.build_MIT)
 # MIT Environment
 MIT_place = ME.MiroEnvironment()
 
-MIT_place.Set_Target([2, 1.0, -3], props.trialsurface)
+# MIT_place.Set_Target([2, 1.0, -3], props.trialsurface)
 
 MIT_place.Set_Initializer(MIT.build_MIT)
 
