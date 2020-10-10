@@ -405,11 +405,13 @@ def ChangeBodyTexture(body, texture_file, scale=[1,1]):
     return
 
 # Links
-def LinkBodies_Hinge(body1, body2, link_position, link_direction):
+def LinkBodies_Hinge(body1, body2, link_position, link_direction, MiroSystem=False):
     hf = agx.HingeFrame()
     hf.setAxis(agxVecify(link_direction))
     hf.setCenter(agxVecify(link_position))
     link = agx.Hinge(hf, body1, body2)
+    if MiroSystem:
+        MiroSystem.Add(link)
     return link
 
 def LinkBodies_Spring(body1, pos1, body2, pos2, length, KS, KD, visible=False, spring_radius=0.05, spring_turns=50):
