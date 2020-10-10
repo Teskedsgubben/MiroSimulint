@@ -3,10 +3,12 @@
 # python compiler filer
 __pycache__
 *.pyc
-# fram capture mappen
+# Media filer
 video_capture
 imageCapture
-agx_mov.mp4
+agx_screen_0*
+*.mp4
+*.mp3
 # local settings
 .vscode
 # datavärden
@@ -19,4 +21,3 @@ ignored_storage
 Grupp*_*
 # Ignores data files
 *.dat
-*.mp3
