@@ -125,7 +125,7 @@ def PreSetup(args, SetupFunction):
     ## is the name of the program running
     argParser = agxIO.ArgumentParser([sys.executable] + args)
 
-    app.addScene(argParser.getArgumentName(1), "RunSimulation", ord('1'), True)
+    app.addScene(argParser.getArgumentName(1), "buildScene", ord('1'), True)
 
     ## Call the init method of ExampleApplication
     ## It will setup the viewer, windows etc.
@@ -148,7 +148,7 @@ def SetupSystem():
 def add_boxShapeHemi(MiroSystem, hemi_size_x, hemi_size_y, hemi_size_z, pos, texture='test.jpg', scale=[4,3], Collide=True, Fixed=True, rotX=0, rotY=0, rotZ=0, rotOrder=['x','y','z'], rotAngle=0, rotAxis=[1,0,0], rotDegrees=True, mass=False, density=1000, dynamic=False, color=[0.5, 0.5, 0.5]):
     add_boxShape(MiroSystem, 2*hemi_size_x, 2*hemi_size_y, 2*hemi_size_z, pos, texture, scale, Collide, Fixed, rotX, rotY, rotZ, rotOrder, rotAngle, rotAxis, rotDegrees, mass, density, dynamic, color)
 
-def add_boxShape(MiroSystem, size_x, size_y, size_z, pos, texture='test.jpg', scale=[4,3], Collide=True, Fixed=True, rotX=0, rotY=0, rotZ=0, rotOrder=['x','y','z'], rotAngle=0, rotAxis=[1,0,0], rotDegrees=True, mass=False, density=1000, dynamic=False, color=[0.5, 0.5, 0.5]):
+def add_boxShape(MiroSystem, size_x, size_y, size_z, pos, texture=False, scale=[4,3], Collide=True, Fixed=True, rotX=0, rotY=0, rotZ=0, rotOrder=['x','y','z'], rotAngle=0, rotAxis=[1,0,0], rotDegrees=True, mass=False, density=1000, dynamic=False, color=[0.5, 0.5, 0.5]):
     '''system, size_x, size_y, size_z, pos, texture, scale = [5,5], hitbox = True/False'''
     # Convert position to chrono vector, supports using chvector as input as well
     agxSim = agxPython.getContext().environment.getSimulation()
@@ -195,16 +195,12 @@ def add_boxShape(MiroSystem, size_x, size_y, size_z, pos, texture='test.jpg', sc
             agxOSG.setTexture(body_shape, 'textures/'+texture, True, agxOSG.DIFFUSE_TEXTURE, scale[0], scale[1])
         else:
             color = backupColor(texture, color)
-            if len(color) == 4:
-                color = agxRender.Color(color[0], color[1], color[2], color[3])
-            else:
-                color = agxRender.Color(color[0], color[1], color[2])
-            
-            agxOSG.setDiffuseColor(body_shape, color)
-            
-    else:
-        color = agxRender.Color(color[0], color[1], color[2])
-        agxOSG.setDiffuseColor(body_shape, color)
+            texture = False       
+    if not texture:
+        agxColor = agxRender.Color(color[0], color[1], color[2])
+        agxOSG.setDiffuseColor(body_shape, agxColor)
+        if len(color) > 3:
+                agxOSG.setAlpha(body_shape, color[3])
     
     agxSim.add(body_box)
     return body_box
@@ -247,11 +243,12 @@ def add_cylinderShape(MiroSystem, radius, height, density, pos, texture='test.jp
             agxOSG.setTexture(body_shape, 'textures/'+texture, True, agxOSG.DIFFUSE_TEXTURE, scale[0], scale[1])
         else:
             color = backupColor(texture, color)
-            color = agxRender.Color(color[0], color[1], color[2])
-            agxOSG.setDiffuseColor(body_shape, color)
-    else:
-        color = agxRender.Color(color[0], color[1], color[2])
-        agxOSG.setDiffuseColor(body_shape, color)
+            texture = False       
+    if not texture:
+        agxColor = agxRender.Color(color[0], color[1], color[2])
+        agxOSG.setDiffuseColor(body_shape, agxColor)
+        if len(color) > 3:
+                agxOSG.setAlpha(body_shape, color[3])
     
     agxSim.add(body_cylinder)
     return body_cylinder
@@ -293,11 +290,12 @@ def add_sphereShape(MiroSystem, radius, pos, texture='test.jpg', density=1000, s
             agxOSG.setTexture(body_shape, 'textures/'+texture, True, agxOSG.DIFFUSE_TEXTURE, scale[0], scale[1])
         else:
             color = backupColor(texture, color)
-            color = agxRender.Color(color[0], color[1], color[2])
-            agxOSG.setDiffuseColor(body_shape, color)
-    else:
-        color = agxRender.Color(color[0], color[1], color[2])
-        agxOSG.setDiffuseColor(body_shape, color)
+            texture = False       
+    if not texture:
+        agxColor = agxRender.Color(color[0], color[1], color[2])
+        agxOSG.setDiffuseColor(body_shape, agxColor)
+        if len(color) > 3:
+                agxOSG.setAlpha(body_shape, color[3])
     
     agxSim.add(body_ball)
     return body_ball

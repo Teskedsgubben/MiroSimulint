@@ -32,7 +32,7 @@ except:
     import Launchers
 
 # Function that runs the simulation
-def RunSimulation():
+def buildScene():
     # Initialize a Miro System
     simulation_system = MS.MiroSystem()
 
@@ -88,4 +88,4 @@ def RunSimulation():
     simulation_system.Run(config)
 
 # Initializes and runs the system
-MS.MiroSetup(RunSimulation)
+MS.MiroSetup(buildScene)
