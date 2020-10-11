@@ -6,7 +6,7 @@ from src import MIT_Stage
 from src import MIT_Tables
 from src import MIT_Entrance
 from src import MIT_Props
-from src import MIT_CSplan4
+from src import MIT_Offices
 from src import MIT_Roof
 
 try:
@@ -21,7 +21,7 @@ def build_MIT(MiroSystem, SPEEDMODE = False):
     MIT_Stage.build(MiroSystem, SPEEDMODE)
     MIT_Tables.build(MiroSystem, SPEEDMODE)
     MIT_Entrance.build(MiroSystem, SPEEDMODE)
-    MIT_CSplan4.build(MiroSystem, SPEEDMODE)
+    MIT_Offices.build(MiroSystem, SPEEDMODE)
     MIT_Roof.build(MiroSystem, SPEEDMODE)
 
     if MiroAPI.API == 'AGX':

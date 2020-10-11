@@ -20,10 +20,18 @@ from MiroClasses import BackupColors
 
 API = 'AGX'
 TEXTURES_ON = False
-important_textures = [
-    'MITfloor.png',
-    'tf-logo.jpg',
-]
+TEXTURE_EXEPTIONS = {
+    'MITfloor.png': False,
+    'tf-logo.jpg': True,
+    'MIT_story_floor.jpg': False,
+    'MIT_stone_floor.jpg': False,
+    'MIT_inner_roof.jpg': False,
+}
+
+important_textures = []
+for texture, include in TEXTURE_EXEPTIONS.items():
+    if include:
+        important_textures.append(texture)
 
 # agx is defined in another coordinate system
 def xyzTransform(vec, sizes = False, reverse = False):
@@ -413,8 +421,6 @@ def LinkBodies_Hinge(body1, body2, link_position, link_direction, MiroSystem=Fal
     return link
 
 def LinkBodies_Spring(body1, pos1, body2, pos2, length, KS, KD, visible=False, spring_radius=0.05, spring_turns=50):
-    if(visible):
-        print('Drawing springs is currently only supported in the chrono API')
     spr1 = agx.Frame()
     spr1.setTranslate(agxVecify(pos1))
     spr2 = agx.Frame()

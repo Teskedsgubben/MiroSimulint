@@ -66,9 +66,9 @@ def FullEntrance(MiroSystem, pos_south, pos_north):
     depth = 5
     inner_depth = 2.8
     p = np.array([pos_south[0]-2+width/2, -0.08, pos_south[2] + depth/2])
-    MiroAPI.add_boxShape(MiroSystem, width, 0.16, 5, p, 'stone_floor.jpg')
+    MiroAPI.add_boxShape(MiroSystem, width, 0.16, 5, p, 'MIT_stone_floor.jpg')
     p = np.array([p[0], 3.08, p[2]])
-    MiroAPI.add_boxShape(MiroSystem, width, 0.16, 5, p, 'stone_floor.jpg')
+    MiroAPI.add_boxShape(MiroSystem, width, 0.16, 5, p, 'MIT_stone_floor.jpg')
 
     # Outer door frames
     z = pos_south[2]+inner_depth

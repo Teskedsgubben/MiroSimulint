@@ -195,6 +195,9 @@ class Module():
         posA = comp_A.GetLinkPoint(point_A)
         bodB = comp_B.GetBody()
         posB = comp_B.GetLinkPoint(point_B)
+
+        if(MiroAPI.API == 'AGX' and draw_spring and self.warning_print):
+            print('Drawing springs is currently only supported in the chrono API')
         spring_link = MiroAPI.LinkBodies_Spring(bodA, posA, bodB, posB, L, K, K/200, visible=draw_spring, spring_radius = spring_radius, spring_turns = spring_turns)
         
         self.links.update({name: spring_link})
@@ -294,9 +297,8 @@ class Module():
         Set only_suppress_warnings=True as input to turn off the warning print but keep the helper objects.\n
         You can also control if you do not want to remove existing helpers, or only stop adding future helpers
         after this command is executed.'''
-        if only_suppress_warning:
-            self.warning_print = False
-        else:
+        self.warning_print = False
+        if not only_suppress_warning:
             if remove_existing:
                 self.hidden_bodies = []
                 self.hidden_links = []

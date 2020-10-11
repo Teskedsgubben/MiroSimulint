@@ -29,7 +29,7 @@ def MIT_stair(system, center, H, SPEEDMODE):
         return
     
     # Top disk
-    MiroAPI.add_cylinderShape(system, stair_r+0.01, 0.05, 1, pos_disk, 'textures/stone_floor.jpg', [1/8,1/8]) 
+    MiroAPI.add_cylinderShape(system, stair_r+0.01, 0.05, 1, pos_disk, 'textures/MIT_stone_floor.jpg', [1/8,1/8]) 
     # Add fake stair to base floor
     MiroAPI.add_cylinderShape(system, stair_r+1.7, 0.001, stair_d, center, 'textures/black.jpg', [1,1])
 
@@ -151,8 +151,8 @@ def MIT_floors(system, H, SPEEDMODE):
     floor_t = 0.08               # Floor thickness
     floor_w = 1.58                # Floor width towards NA
     floor_w_2 = 1.95 +2.11       # towards technology house
-    texture_floor = ['textures/stone_floor.jpg', 'textures/story_floor.jpg', 'textures/story_floor.jpg']
-    texture_roof = 'textures/white concrete.jpg'
+    texture_floor = ['textures/MIT_stone_floor.jpg', 'textures/MIT_story_floor.jpg', 'textures/MIT_story_floor.jpg']
+    texture_roof = 'textures/MIT_inner_roof.jpg'
     scale_roof = [80,10]
     handle_l = 13.5    
     
@@ -170,12 +170,12 @@ def MIT_floors(system, H, SPEEDMODE):
     
     for roof in range(floorsNum):
         # Add roof 
-        y_pos = roof*H - 3*floor_t 
+        y_pos = roof*H - 3*floor_t +0.025
         roof_pos_1 = np.array([-3.5, y_pos, 6.58])          # Add roof towards NA
         roof_pos_2 = np.array([10.45+2.11, y_pos, -4-0.42]) # Add roof towards technology house
 
-        MiroAPI.add_boxShapeHemi(system, floor_l, floor_t, floor_w, roof_pos_1, texture_roof, scale_roof)
-        MiroAPI.add_boxShapeHemi(system, floor_w_2, floor_t, floor_l+0.58, roof_pos_2, texture_roof, scale_roof)
+        MiroAPI.add_boxShapeHemi(system, floor_l, floor_t, floor_w, roof_pos_1, texture_roof, [100, 10])
+        MiroAPI.add_boxShapeHemi(system, floor_w_2, floor_t, floor_l+0.58, roof_pos_2, texture_roof, [35,80])
 
     # Add floor piece by the stair
     floor_x = 1.03
@@ -192,7 +192,7 @@ def MIT_floors(system, H, SPEEDMODE):
             y_pos = piece*H - 3*floor_t
             floor_pos = np.array([7.5, y_pos+0.002, 4]) 
             
-            MiroAPI.add_boxShapeHemi(system, floor_x, floor_t, floor_z, floor_pos, texture_roof, scale_roof)
+            MiroAPI.add_boxShapeHemi(system, floor_x, floor_t, floor_z, floor_pos, texture_roof, [12,9])
 
     # Add walkway towards umu library
     length = 10.5

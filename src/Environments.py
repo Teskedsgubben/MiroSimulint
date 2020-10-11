@@ -1,11 +1,8 @@
 from MiroClasses import MiroEnvironment as ME
 from MiroClasses import MiroNotifier as MN
 
-from src import MIT_building as MIT
+from src import MIT_Building as MIT
 from src import Props as props
-
-MIT_placeAGX = ME.MiroEnvironment()
-MIT_placeAGX.Set_Initializer(MIT.build_MIT)
 
 # MIT Environment
 MIT_place = ME.MiroEnvironment()

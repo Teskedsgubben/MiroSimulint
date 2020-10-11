@@ -89,8 +89,8 @@ def CustomAgxFunction(SystemList, Args):
         cameraData.farClippingPlane  = 5000
         app.applyCameraData( cameraData )
     else:
-        scale = 2/3
-        Cam = ComboCam(app, False, dash_direction=[0, 1, 0], dash_position=[0,-scale/2,scale/5], follow_distance=2.5*scale, follow_angle=10)
+        scale = 1.0
+        Cam = ComboCam(app, False, dash_direction=[0, 1, 0], dash_position=[0,-scale/2,scale/5], follow_distance=2.5*scale, follow_angle=10, static_position=agxVec([-3,9,-3.6]), static_looker=agxVec([5,6,3]))
         botBody = buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'RWD', texture='flames.png', camera=Cam, scale=scale)
         Cam.AddBody(botBody)
         sim.add(Cam)
@@ -181,7 +181,7 @@ class WheelControllerArrows(agxSDK.GuiEventListener):
         elif keydown and key == controls['brake']:
             # Back up
             for wheel in self.wheels:
-                wheel.setAngularVelocityDamping(18*self.body.getMassProperties().getMass())
+                wheel.setAngularVelocityDamping(40*self.body.getMassProperties().getMass())
             if not self.braking:
                 self.braking = True
                 for taillight in self.taillights:
@@ -521,7 +521,8 @@ def buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'FWD', color=
     backwindangle = -np.pi/10
     sh = 0.02*scale
     proportion = 1/16
-    wing = agx.RigidBody( agxCollide.Geometry( agxCollide.Box(0.95*body_wid/2, 0.0022*scale, 1.25*body_hei*proportion)))
+    wing_dims = [0.95*body_wid/2, 0.0022*scale, 1.25*body_hei*proportion]
+    wing = agx.RigidBody( agxCollide.Geometry( agxCollide.Box(wing_dims[0], wing_dims[1], wing_dims[2])))
     wing.setPosition(bot_pos[0], bot_pos[1]-body_len/2.08, bot_pos[2] + body_hei + wheel_rad + wheel_dmp + sh + 0.0011*scale)
     # windshield.setTorque(0,0,100)
     # windshield.setMotionControl(2)
@@ -529,7 +530,8 @@ def buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'FWD', color=
     sim.add(wing)
     wind_vis = agxOSG.createVisual(wing, root)
     # agxOSG.setAlpha(wind_vis, 0.45)
-    agxOSG.setTexture(wind_vis, 'textures/carbonfiber.png', True, agxOSG.DIFFUSE_TEXTURE, 2.5, 0.25)
+    carbon_scale = 3.5
+    agxOSG.setTexture(wind_vis, 'textures/carbonfiber.png', True, agxOSG.DIFFUSE_TEXTURE, carbon_scale, carbon_scale*wing_dims[2]/wing_dims[0])
     
     pole_tilt = np.pi/1.7
     poleL = agx.RigidBody(agxCollide.Geometry( agxCollide.Cylinder(0.0025*scale, sh)))
@@ -731,7 +733,7 @@ class DashCam(agxSDK.StepEventListener):
 
 
 class ComboCam(agxSDK.StepEventListener):
-    def __init__(self, app, body, dash_direction=[0,1,0], dash_position=[0, 0, 0.15], follow_distance=2.5, follow_angle=10, default=1, far_factors=[1.75, 2.25]):
+    def __init__(self, app, body, dash_direction=[0,1,0], dash_position=[0, 0, 0.15], follow_distance=2.5, follow_angle=10, default=1, far_factors=[1.75, 2.25], static_position=agxVec([-3,8,-5.6]), static_looker=agxVec([5,5,3])):
         super().__init__(agxSDK.StepEventListener.PRE_COLLIDE+agxSDK.StepEventListener.PRE_STEP+agxSDK.StepEventListener.POST_STEP)
         self.camera_modes = ['dash', 'follow near', 'follow far', 'static']
         self.cam_i = default
@@ -750,8 +752,8 @@ class ComboCam(agxSDK.StepEventListener):
         self.follow_rel_pos = self.dist*agx.Vec3(0,-np.cos(self.angle), np.sin(self.angle))
 
         # StaticCam Prep
-        self.static_position = agxVec([-3,8,-5.6])
-        self.static_looker = agxVec([5,5,3])
+        self.static_position = static_position
+        self.static_looker = static_looker
         self.static_up = agx.Vec3(0,0,1)
         self.static = False
 
@@ -928,7 +930,7 @@ def addCones(timer=False):
     sim = agxPython.getContext().environment.getSimulation()
     app = agxPython.getContext().environment.getApplication()
     root = agxPython.getContext().environment.getSceneRoot()
-    cone_dims = [0, 0.08, 0.28]
+    cone_dims = [0.008, 0.08, 0.25]
 
     cone_positions = [
         [12,6.64,11],
@@ -941,11 +943,11 @@ def addCones(timer=False):
         [0,0.1,-1],
     ]
 
-
     for cone_pos in cone_positions:
-        dh = np.array([0,0,cone_dims[2]*0.005])
+        plate_rel_h = 0.015
+        dh = np.array([0,0,cone_dims[2]*plate_rel_h])
         cone_pos = np.array(cone_pos)
-        bottom = agx.RigidBody( agxCollide.Geometry( agxCollide.Box(agxVec([cone_dims[1]*1.2, cone_dims[2]*0.005, cone_dims[1]*1.2]))))
+        bottom = agx.RigidBody( agxCollide.Geometry( agxCollide.Box(agxVec([cone_dims[1]*1.2, cone_dims[2]*plate_rel_h, cone_dims[1]*1.2]))))
         bottom.setPosition(agxVec(cone_pos+dh))
         sim.add(bottom)
         agxOSG.setDiffuseColor(agxOSG.createVisual(bottom, root), agxRender.Color.Orange())
@@ -954,9 +956,6 @@ def addCones(timer=False):
         cone.setPosition(agxVec(cone_pos+2*dh))
         agxOSG.setDiffuseColor(agxOSG.createVisual(cone, root), agxRender.Color.Orange())
         sim.add(cone)
-
-        
-
 
         hf = agx.HingeFrame()
         hf.setAxis(agx.Vec3(0,0,1))
