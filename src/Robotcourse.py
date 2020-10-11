@@ -1,3 +1,5 @@
+from MiroClasses.MiroAPI_selector import SelectedAPI as MiroAPI
+from MiroClasses.MiroAPI_agx import agxVecify as agxVec
 import numpy as np
 
 from MiroClasses import MiroModule as MM
@@ -67,7 +69,7 @@ def buildArena(arena_pos):
     root = agxPython.getContext().environment.getSceneRoot()
 
     arena_size = [width, width, 0.2]
-    h = 0.7
+    h = 0.35
     
     floor = agx.RigidBody( agxCollide.Geometry( agxCollide.Box(arena_size[0]/2, arena_size[1]/2, arena_size[2]/2)))
     floor.setPosition(arena_pos[0], arena_pos[1], arena_pos[2]-arena_size[2]/2)
@@ -76,21 +78,32 @@ def buildArena(arena_pos):
     agxOSG.setDiffuseColor(agxOSG.createVisual(floor, root), agxRender.Color.Gray())
 
     sides = 8
+    skip_sides = [2]
     side_len = width/(1+np.sqrt(2)) + arena_size[2]/2/np.sqrt(2)
     base_pos = agx.Vec3(arena_pos[0], arena_pos[1], arena_pos[2]-arena_size[2]/2+h/2)
     for w in range(sides):
-        theta = -w*np.pi/4
-        rot = agx.Quat(theta, agx.Vec3(0,0,1))
-        rot_pos = agx.Vec3(np.sin(theta)*width/2, -np.cos(theta)*width/2, 0)
+        if w not in skip_sides:
+            theta = -w*np.pi/4
+            rot = agx.Quat(theta, agx.Vec3(0,0,1))
+            rot_pos = agx.Vec3(np.sin(theta)*width/2, -np.cos(theta)*width/2, 0)
 
-        wall = agx.RigidBody( agxCollide.Geometry( agxCollide.Box(side_len/2, arena_size[2]/2, h/2)))
-        wall.setPosition(base_pos + rot_pos)
-        wall.setMotionControl(1)
-        wall.setRotation(rot)
-        sim.add(wall)
-        agxOSG.setDiffuseColor(agxOSG.createVisual(wall, root), agxRender.Color.DarkGray())
-                                              
-    # obstacles(sim, root, arena_pos[2])
+            wall = agx.RigidBody( agxCollide.Geometry( agxCollide.Box(side_len/2, arena_size[2]/2, h/2)))
+            wall.setPosition(base_pos + rot_pos)
+            wall.setMotionControl(1)
+            wall.setRotation(rot)
+            sim.add(wall)
+            agxOSG.setDiffuseColor(agxOSG.createVisual(wall, root), agxRender.Color.DarkGray())
+
+    ramp_dim = [1.4, side_len, 0.2] # *np.cos(np.pi/4)
+    ramp = agx.RigidBody( agxCollide.Geometry( agxCollide.Box(ramp_dim[0]/2, ramp_dim[1]/2, ramp_dim[2]/2)))
+    theta = -np.arcsin(ramp_dim[2]/ramp_dim[0])/2
+    ramp.setPosition(arena_pos[0]-arena_size[0]/2-ramp_dim[0]/2*np.cos(theta)-ramp_dim[2]/2*np.sin(theta), arena_pos[1], arena_pos[2]-arena_size[2]*3/4) # +arena_size[1]/2-ramp_dim[1]/2
+    ramp.setRotation(agx.Quat(theta, agx.Vec3(0,1,0)))
+    ramp.setMotionControl(1)
+    sim.add(ramp)
+    agxOSG.setDiffuseColor(agxOSG.createVisual(ramp, root), agxRender.Color.Gray())
+
+    obstacles(sim, root, arena_pos[2])
 
 def obstacles(sim, root, h):
     #start plattform
