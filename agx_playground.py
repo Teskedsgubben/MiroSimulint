@@ -1,5 +1,6 @@
 
 from MiroClasses.MiroAPI_selector import SelectedAPI as MiroAPI
+from MiroClasses.MiroAPI_agx import agxVecify as agxVec
 import sys
 import os
 try:
@@ -19,7 +20,7 @@ from agxPythonModules.models.wheel_loaders import WheelLoaderL70
 from agxPythonModules.utils.environment import simulation, root, application, init_app
 from agxPythonModules.utils.callbacks import StepEventCallback, KeyboardCallback as Input, GamepadCallback as Gamepad
 
-import time
+import time as TIME
 import math
 import numpy as np
 import agx_playground_1 as axp
@@ -28,6 +29,20 @@ try:
     import socketio
 except:
     print('Socketio import failed')
+
+controls = {
+    'forward': agxSDK.GuiEventListener.KEY_Up,
+    'backward': agxSDK.GuiEventListener.KEY_Down,
+    'left': agxSDK.GuiEventListener.KEY_Left,
+    'right': agxSDK.GuiEventListener.KEY_Right,
+    'brake': agxSDK.GuiEventListener.KEY_Delete,
+    'fjoink': agxSDK.GuiEventListener.KEY_End,
+    'toggle camera closer': agxSDK.GuiEventListener.KEY_Page_Down,
+    'toggle camera farther': agxSDK.GuiEventListener.KEY_Page_Up,
+    'reset to start': agxSDK.GuiEventListener.KEY_Home,
+    'reset on spot': agxSDK.GuiEventListener.KEY_Insert,
+}
+
 
 
 def RunPureAGX(SystemList, Args):
@@ -74,10 +89,19 @@ def CustomAgxFunction(SystemList, Args):
         cameraData.farClippingPlane  = 5000
         app.applyCameraData( cameraData )
     else:
-        # Cam = ComboCam(app, False, dash_direction=[0,-1,0], dash_position=[0,0.5,0.25], follow_distance=2.5, follow_angle=10)
-        botBody = buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'RWD', texture='flames.png', camera=False)
-        # Cam.AddBody(botBody)
-        sim.add(FollowCam(app, botBody))#, [0,-1,0], [0,0.5,0.25]))
+        scale = 2/3
+        Cam = ComboCam(app, False, dash_direction=[0, 1, 0], dash_position=[0,-scale/2,scale/5], follow_distance=2.5*scale, follow_angle=10)
+        botBody = buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'RWD', texture='flames.png', camera=Cam, scale=scale)
+        Cam.AddBody(botBody)
+        sim.add(Cam)
+        # sim.add(FollowCam(app, botBody, distance=2.8*scale))#, [0,-1,0], [0,0.5,0.25]))
+        # sim.add(DashCam(app, botBody, [0, 1,0], [0,-0.5,0.20]))
+        start_plate = addboxx(sim, root, [1,0.002,1], [12,6.6401,-6])
+        end_plate = addboxx(sim, root, [1,0.002,1], [-3,0.101, 0.5], color=agxRender.Color.Green())
+
+        timer = Timer(start_plate, botBody, end_plate)
+        sim.add(timer)
+        addCones(timer)
 
 
 class SocketKiller(agxSDK.GuiEventListener):
@@ -91,83 +115,119 @@ class SocketKiller(agxSDK.GuiEventListener):
         if keydown and key == agxSDK.GuiEventListener.KEY_Delete:
             self.sio.disconnect()
 
+def addboxx(sim, root, dims, pos, Fixed=True, color = agxRender.Color.Red()):
+    dims = np.array(dims)/2
+    if type(pos) == type([]):
+        pos = agxVec(pos)
+    boxx = agx.RigidBody( agxCollide.Geometry( agxCollide.Box(agxVec(dims))))
+    boxx.setPosition(pos)
+    if(Fixed):
+        boxx.setMotionControl(1)
+    sim.add(boxx)
+    agxOSG.setDiffuseColor(agxOSG.createVisual(boxx, root), color)
+    return boxx
 
 # Controls wheel torque from arrow key inputs. Supports 2 or 4 wheel drive.
 # Wheels to be controlled must come as a list of [left, right, left, right]
 class WheelControllerArrows(agxSDK.GuiEventListener):
     '''Wheels must be in a list and in pairs L & R, i.e. [wheel_left, wheel_right]'''
-    def __init__(self, wheels, body, lights, camera='static'):
+    def __init__(self, wheels, body, headlights=[], taillights=[], camera=False, strength=8):
         super().__init__(agxSDK.GuiEventListener.KEYBOARD)
         self.wheels = wheels
         self.camera = camera
         self.reset_rot = body.getRotation()
         self.body = body
-        self.strength = 8/len(wheels)
-        self.lights = lights
+        self.strength = strength/len(wheels)
+        self.headlights = headlights
+        self.taillights = taillights
         self.braking = False
         self.backing = False
+        self.throttling = False
         self.cameraswitched = False
-
+        self.restorePosition = self.body.getPosition()+agx.Vec3(0,0,0.4)
+    
     # Steering function
     def keyboard(self, key, x, y, alt, keydown):
-        if keydown and key == agxSDK.GuiEventListener.KEY_Left:
+        if keydown and key == controls['left']:
             # Turn left
             for i in range(0, len(self.wheels), 2):
                 self.wheels[i+1].addLocalTorque(0, self.strength,0)
                 self.wheels[i].addLocalTorque(0, -self.strength/4,0)
 
-        elif keydown and key == agxSDK.GuiEventListener.KEY_Right:
+        elif keydown and key == controls['right']:
             # Turn right
             for i in range(0, len(self.wheels), 2):
                 self.wheels[i].addLocalTorque(0, self.strength,0)
                 self.wheels[i+1].addLocalTorque(0, -self.strength/4,0)
 
-        elif keydown and key == agxSDK.GuiEventListener.KEY_Down:
+        elif keydown and key == controls['backward']:
             # Back up
             for wheel in self.wheels:
                 wheel.addLocalTorque(0,-self.strength/2,0)
             if not self.backing:
                 self.backing = True
-                for light in self.lights:
-                    agxOSG.setTexture(light, 'textures/taillight_back.png', True, agxOSG.DIFFUSE_TEXTURE, 1.0, 1.0)                 
+                for taillight in self.taillights:
+                    agxOSG.setTexture(taillight, 'textures/taillight_back.png', True, agxOSG.DIFFUSE_TEXTURE, 1.0, 1.0)                 
 
-        elif keydown and key == agxSDK.GuiEventListener.KEY_Up:
+        elif keydown and key == controls['forward']:
             # Gain speed
             for wheel in self.wheels:
                 wheel.addLocalTorque(0, self.strength,0)
+            if not self.throttling:
+                self.throttling = True
+                for headlight in self.headlights:
+                    agxOSG.setTexture(headlight, 'textures/headlight_on.png', True, agxOSG.DIFFUSE_TEXTURE, 1.0, 1.0) 
 
-        elif keydown and key == agxSDK.GuiEventListener.KEY_BackSpace:
+        elif keydown and key == controls['brake']:
             # Back up
             for wheel in self.wheels:
                 wheel.setAngularVelocityDamping(18*self.body.getMassProperties().getMass())
             if not self.braking:
                 self.braking = True
-                for light in self.lights:
-                    agxOSG.setTexture(light, 'textures/taillight_brake.png', True, agxOSG.DIFFUSE_TEXTURE, 1.0, 1.0)  
+                for taillight in self.taillights:
+                    agxOSG.setTexture(taillight, 'textures/taillight_brake.png', True, agxOSG.DIFFUSE_TEXTURE, 1.0, 1.0)  
+        elif keydown and key == controls['fjoink']:
+            # Fjoink
+            if(self.body.getVelocity().z() < 1E-4):
+                self.body.setVelocity(self.body.getVelocity()+agx.Vec3(0,0,6))
         
-        elif keydown and key == agxSDK.GuiEventListener.KEY_Delete:
-            if self.camera != 'static':
+        elif keydown and key == controls['toggle camera closer']:
+            if self.camera:
                 if(not self.cameraswitched):
-                    self.camera.ToggleCam()
+                    self.camera.ToggleCam(-1)
+                self.cameraswitched = True
+        elif keydown and key == controls['toggle camera farther']:
+            if self.camera:
+                if(not self.cameraswitched):
+                    self.camera.ToggleCam(1)
                 self.cameraswitched = True
         
-        elif keydown and key == ord( 'r' ):
+        elif keydown and key == controls['reset to start']:
             self.body.setPosition(-9, 0 , 7.5)
-        elif keydown and key == ord( 't' ):
-            # self.body.setPosition(self.body.getPosition()+agx.Vec3(0,0,0.65))
+            self.body.setAngularVelocity(0,0,0)
+            self.body.setVelocity(agx.Vec3(0,0,0))
+            self.body.setRotation(self.reset_rot)
+
+        elif keydown and key == controls['reset on spot']:
+            self.body.setPosition(self.restorePosition)
             self.body.setAngularVelocity(0,0,0)
             self.body.setVelocity(agx.Vec3(0,0,0))
             self.body.setRotation(self.reset_rot)
         else:
-            self.camerswitched = False
+            self.cameraswitched = False
             if(self.braking or self.backing):
                 if self.braking:
                     self.braking = False
                     for wheel in self.wheels:
                         wheel.setAngularVelocityDamping(0)
                 self.backing = False
-                for light in self.lights:
-                    agxOSG.setTexture(light, 'textures/taillight_off.png', True, agxOSG.DIFFUSE_TEXTURE, 1.0, 1.0)
+                for taillight in self.taillights:
+                    agxOSG.setTexture(taillight, 'textures/taillight_off.png', True, agxOSG.DIFFUSE_TEXTURE, 1.0, 1.0)
+            if self.throttling:
+                self.throttling = False
+                for headlight in self.headlights:
+                    agxOSG.setTexture(headlight, 'textures/headlight_off.png', True, agxOSG.DIFFUSE_TEXTURE, 1.0, 1.0)
+            self.restorePosition = self.body.getPosition()+agx.Vec3(0,0,0.4)
             return False
         return True
 
@@ -257,8 +317,8 @@ class Fjoink(agxSDK.GuiEventListener):
             return False
         return True
 
-def buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'FWD', color=False, texture=False, camera='static'):
-    scale = 1
+def buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'FWD', color=False, texture=False, camera='static', scale=1):
+    strength = 8
 
     body_wid = 0.32*scale
     body_len = 0.6*scale
@@ -268,10 +328,10 @@ def buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'FWD', color=
     wheel_wid = 0.02*scale
     wheel_dmp = -0.02*scale
 
-    body = agx.RigidBody( agxCollide.Geometry( agxCollide.Box(body_wid/2, body_len/2, body_hei/2)))
+    body = agx.RigidBody( agxCollide.Geometry( agxCollide.Box(body_wid/2, body_hei/2, body_len/2)))
     body.setPosition(bot_pos[0], bot_pos[1], bot_pos[2] + body_hei/2 + wheel_rad + wheel_dmp )
     # body.setMotionControl(1)
-    body.setRotation(agx.Quat(np.pi, agx.Vec3(0,0,1)))
+    body.setRotation(agx.Quat(np.pi/2, agx.Vec3(1,0,0)))
     sim.add(body)
     vis_body = agxOSG.createVisual(body, root)
     if color:
@@ -340,10 +400,46 @@ def buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'FWD', color=
     hf.setCenter(agx.Vec3(bot_pos[0]+body_wid/2, bot_pos[1]+(body_len/2-wheel_rad*1.8), bot_pos[2]+wheel_rad))
     axleRF = agx.Hinge(hf, body, wheelRF)
     sim.add(axleRF)
+
+    ## Headlights
+    light_rad = 0.02*scale
+    light_dep = 0.01*scale
+
+    headlightL = agx.RigidBody(agxCollide.Geometry( agxCollide.Cylinder(light_rad, light_dep)))
+    headlightL.setPosition( bot_pos[0] + 0.79*body_wid/2, bot_pos[1] + body_len/2+light_dep/2, bot_pos[2] + 0.7*body_hei + wheel_rad + wheel_dmp)
+    # headlightL.setMotionControl(1)
+    # headlightL.setRotation(agx.Quat(np.pi/2, agx.Vec3(0,0,1)))
+    sim.add(headlightL)
+    headlightL_vis = agxOSG.createVisual(headlightL, root)
+    agxOSG.setTexture(headlightL_vis, 'textures/headlight_off.png', True, agxOSG.DIFFUSE_TEXTURE, 1.0, 1.0)
+    hf = agx.HingeFrame()
+    hf.setAxis(agx.Vec3(0,1,0))
+    hf.setCenter(agx.Vec3( bot_pos[0] + 0.79*body_wid/2, bot_pos[1] + body_len/2, bot_pos[2] + 0.7*body_hei + wheel_rad + wheel_dmp ))
+    HLL = agx.Hinge(hf, body, headlightL)
+    sim.add(HLL)
+    hf.setAxis(agx.Vec3(0,0,1))
+    HLL = agx.Hinge(hf, body, headlightL)
+    sim.add(HLL)
+
+    headlightR = agx.RigidBody(agxCollide.Geometry( agxCollide.Cylinder(light_rad, light_dep)))
+    headlightR.setPosition(bot_pos[0] -0.79*body_wid/2, bot_pos[1] + body_len/2+light_dep/2, bot_pos[2] + 0.7*body_hei + wheel_rad + wheel_dmp )
+    # headlightR.setMotionControl(1)
+    # headlightR.setRotation(agx.Quat(np.pi/2, agx.Vec3(0,0,1)))
+    sim.add(headlightR)
+    headlightR_vis = agxOSG.createVisual(headlightR, root)
+    agxOSG.setTexture(headlightR_vis, 'textures/headlight_off.png', True, agxOSG.DIFFUSE_TEXTURE, 1.0, 1.0)
+    hf = agx.HingeFrame()
+    hf.setAxis(agx.Vec3(0,1,0))
+    hf.setCenter(agx.Vec3(bot_pos[0] -0.79*body_wid/2, bot_pos[1] + body_len/2, bot_pos[2] + 0.7*body_hei + wheel_rad + wheel_dmp ))
+    HLR = agx.Hinge(hf, body, headlightR)
+    sim.add(HLR)
+    hf.setAxis(agx.Vec3(0,0,1))
+    HLR = agx.Hinge(hf, body, headlightR)
+    sim.add(HLR)
     
-    light_wid = 0.012
-    light_hei = 0.02
-    light_dep = 0.003
+    light_wid = 0.012*scale
+    light_hei = 0.02*scale
+    light_dep = 0.003*scale
 
     taillightL = agx.RigidBody(agxCollide.Geometry( agxCollide.Box(light_wid, light_dep, light_hei)))
     taillightL.setPosition(bot_pos[0] -0.79*body_wid/2,bot_pos[1] -(body_len/2+light_dep/2), bot_pos[2] + 0.7*body_hei + wheel_rad + wheel_dmp)
@@ -392,41 +488,16 @@ def buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'FWD', color=
         # sim.add(SocketKiller(sio))
         sim.add(Fjoink(body))
     else:
-        sim.add(WheelControllerArrows(wheels, body, [taillightL_vis, taillightR_vis], camera=camera))
+        sim.add(WheelControllerArrows(wheels, body, headlights=[headlightL_vis, headlightR_vis], taillights=[taillightL_vis, taillightR_vis], camera=camera, strength=strength*(scale**5)))
         sim.add(Fjoink(body))
 
 
     ################# Stuff to make it fancy #################
-    light_rad = 0.02
-    light_dep = 0.01
-
-    headlightL = agx.RigidBody(agxCollide.Geometry( agxCollide.Cylinder(light_rad, light_dep)))
-    headlightL.setPosition( bot_pos[0] + 0.79*body_wid/2, bot_pos[1] + body_len/2+light_dep/2, bot_pos[2] + 0.7*body_hei + wheel_rad + wheel_dmp)
-    # headlightL.setMotionControl(1)
-    # headlightL.setRotation(agx.Quat(np.pi/2, agx.Vec3(0,0,1)))
-    sim.add(headlightL)
-    agxOSG.setTexture(agxOSG.createVisual(headlightL, root), 'textures/light.png', True, agxOSG.DIFFUSE_TEXTURE, 1.0, 1.0)
-    hf = agx.HingeFrame()
-    hf.setAxis(agx.Vec3(0,1,0))
-    hf.setCenter(agx.Vec3( bot_pos[0] + 0.79*body_wid/2, bot_pos[1] + body_len/2, bot_pos[2] + 0.7*body_hei + wheel_rad + wheel_dmp ))
-    HLL = agx.Hinge(hf, body, headlightL)
-    sim.add(HLL)
-
-    headlightR = agx.RigidBody(agxCollide.Geometry( agxCollide.Cylinder(light_rad, light_dep)))
-    headlightR.setPosition(bot_pos[0] -0.79*body_wid/2, bot_pos[1] + body_len/2+light_dep/2, bot_pos[2] + 0.7*body_hei + wheel_rad + wheel_dmp )
-    # headlightR.setMotionControl(1)
-    # headlightL.setRotation(agx.Quat(np.pi/2, agx.Vec3(0,0,1)))
-    sim.add(headlightR)
-    agxOSG.setTexture(agxOSG.createVisual(headlightR, root), 'textures/light.png', True, agxOSG.DIFFUSE_TEXTURE, 1.0, 1.0)
-    hf = agx.HingeFrame()
-    hf.setAxis(agx.Vec3(0,1,0))
-    hf.setCenter(agx.Vec3(bot_pos[0] -0.79*body_wid/2, bot_pos[1] + body_len/2, bot_pos[2] + 0.7*body_hei + wheel_rad + wheel_dmp ))
-    HLR = agx.Hinge(hf, body, headlightR)
-    sim.add(HLR)
+    
 
 
     windangle = np.pi/4
-    windshield = agx.RigidBody( agxCollide.Geometry( agxCollide.Box(0.9*body_wid/2, 0.005, body_hei/3)))
+    windshield = agx.RigidBody( agxCollide.Geometry( agxCollide.Box(0.9*body_wid/2, 0.003*scale, body_hei/3)))
     windshield.setPosition(bot_pos[0], bot_pos[1]+body_len/5, bot_pos[2] + body_hei + wheel_rad + wheel_dmp + np.cos(windangle)*body_hei/3)
     # windshield.setTorque(0,0,100)
     # windshield.setMotionControl(2)
@@ -448,10 +519,10 @@ def buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'FWD', color=
     sim.add(windh2)
 
     backwindangle = -np.pi/10
-    sh = 0.02
-    scale = 16
-    wing = agx.RigidBody( agxCollide.Geometry( agxCollide.Box(0.95*body_wid/2, 0.0022, 1.25*body_hei/scale)))
-    wing.setPosition(bot_pos[0], bot_pos[1]-body_len/2.08, bot_pos[2] + body_hei + wheel_rad + wheel_dmp + sh + 0.0011)
+    sh = 0.02*scale
+    proportion = 1/16
+    wing = agx.RigidBody( agxCollide.Geometry( agxCollide.Box(0.95*body_wid/2, 0.0022*scale, 1.25*body_hei*proportion)))
+    wing.setPosition(bot_pos[0], bot_pos[1]-body_len/2.08, bot_pos[2] + body_hei + wheel_rad + wheel_dmp + sh + 0.0011*scale)
     # windshield.setTorque(0,0,100)
     # windshield.setMotionControl(2)
     wing.setRotation(agx.Quat(np.pi/2, agx.Vec3(1,0,0)))
@@ -461,14 +532,14 @@ def buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'FWD', color=
     agxOSG.setTexture(wind_vis, 'textures/carbonfiber.png', True, agxOSG.DIFFUSE_TEXTURE, 2.5, 0.25)
     
     pole_tilt = np.pi/1.7
-    poleL = agx.RigidBody(agxCollide.Geometry( agxCollide.Cylinder(0.0025, sh)))
+    poleL = agx.RigidBody(agxCollide.Geometry( agxCollide.Cylinder(0.0025*scale, sh)))
     poleL.setPosition(bot_pos[0]-body_wid/2.5, bot_pos[1]-body_len/2.1, bot_pos[2] + body_hei + wheel_rad + wheel_dmp + sh/2)
     poleL.setRotation(agx.Quat(pole_tilt, agx.Vec3(1,0,0)))
     sim.add(poleL)
     pole_vis = agxOSG.createVisual(poleL, root)
     agxOSG.setTexture(pole_vis, 'textures/chrome.png', True, agxOSG.DIFFUSE_TEXTURE, 1.0, 1.0)
     
-    poleR = agx.RigidBody(agxCollide.Geometry( agxCollide.Cylinder(0.0025, sh)))
+    poleR = agx.RigidBody(agxCollide.Geometry( agxCollide.Cylinder(0.0025*scale, sh)))
     poleR.setPosition(bot_pos[0]+body_wid/2.5, bot_pos[1]-body_len/2.1, bot_pos[2] + body_hei + wheel_rad + wheel_dmp + sh/2)
     poleR.setRotation(agx.Quat(pole_tilt, agx.Vec3(1,0,0)))
     sim.add(poleR)
@@ -497,8 +568,8 @@ def buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'FWD', color=
     sim.add(windh2)
 
 
-    plate_dh = -0.045
-    plate_dep = 0.001
+    plate_dh = -0.043*scale
+    plate_dep = 0.001*scale
     plate_front = agx.RigidBody(agxCollide.Geometry( agxCollide.Box(body_wid*0.21, plate_dep, body_hei/11)))
     plate_front.setPosition(bot_pos[0],bot_pos[1] + body_len/2+plate_dep/2, bot_pos[2] + body_hei/2 + wheel_rad + wheel_dmp + plate_dh)
     sim.add(plate_front)
@@ -534,26 +605,6 @@ def buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'FWD', color=
 
     # return a pointer to the body
     return body
-
-class CamSelector():
-    def __init__(self, camera_modes, start_cam = 'static'):
-        if 'static' in camera_modes:
-            self.camera_modes = ['static']
-        else:
-            self.camera_modes = []        
-        self.camera_modes.append(camera_modes)
-        if start_cam not in self.camera_modes:
-            start_cam = 'static'
-        self.cam = self.camera_modes.index(start_cam)
-    def SetCam(self, cam_mode):
-        if not cam_mode in self.camera_modes:
-            self.camera_modes.append(cam_mode)
-        self.cam = self.camera_modes.index(cam_mode)
-    def GetCam(self):
-        return self.camera_modes[self.cam]
-    def ToggleCam(self):
-        self.cam = (self.cam+1) % len(self.camera_modes)
-
 
 # Create a class that is triggered at various steps in the simulation
 class Logger(agxSDK.StepEventListener):
@@ -641,13 +692,15 @@ class DashCam(agxSDK.StepEventListener):
         super().__init__(agxSDK.StepEventListener.PRE_COLLIDE+agxSDK.StepEventListener.PRE_STEP+agxSDK.StepEventListener.POST_STEP)
         self.app = app
         self.body = body
-
+        
         self.dir = agx.Vec3(direction[0], direction[1], direction[2])
         self.rel_pos = agx.Vec3(relative_position[0], relative_position[1], relative_position[2])
-
-        self.position = self.body.getPosition() + self.body.getRotation()*self.rel_pos
-        self.looker = self.position + self.body.getRotation()*self.dir
-        self.up = self.body.getRotation()*agx.Vec3(0,0,1)
+        
+        self.baserot = agx.Quat(-np.pi/2, agx.Vec3(1,0,0))
+        rotq = self.baserot*self.body.getRotation()
+        self.position = self.body.getPosition() + rotq*self.rel_pos
+        self.looker = self.position + rotq*self.dir
+        self.up = rotq*agx.Vec3(0,0,1)
 
         self.updateCamera()
 
@@ -656,9 +709,10 @@ class DashCam(agxSDK.StepEventListener):
 
     def pre(self, time):
         if(self.body.getVelocity().length() > 1E-2):
-            self.position = self.body.getPosition() + self.body.getRotation()*self.rel_pos
-            self.looker = self.position + self.body.getRotation()*self.dir
-            self.up = self.body.getRotation()*agx.Vec3(0,0,1)
+            rotq = self.baserot*self.body.getRotation()
+            self.position = self.body.getPosition() + rotq*self.rel_pos
+            self.looker = self.position + rotq*self.dir
+            self.up = rotq*agx.Vec3(0,0,1)
 
             self.updateCamera()
         return
@@ -677,26 +731,29 @@ class DashCam(agxSDK.StepEventListener):
 
 
 class ComboCam(agxSDK.StepEventListener):
-    def __init__(self, app, body, dash_direction=[0,1,0], dash_position=[0, 0, 0.15], follow_distance=2.5, follow_angle=10):
+    def __init__(self, app, body, dash_direction=[0,1,0], dash_position=[0, 0, 0.15], follow_distance=2.5, follow_angle=10, default=1, far_factors=[1.75, 2.25]):
         super().__init__(agxSDK.StepEventListener.PRE_COLLIDE+agxSDK.StepEventListener.PRE_STEP+agxSDK.StepEventListener.POST_STEP)
-        self.camera_modes = ['static', 'follow', 'dash']
-        self.cam_i = 0
+        self.camera_modes = ['dash', 'follow near', 'follow far', 'static']
+        self.cam_i = default
         self.app = app
         self.body = body
 
+        # DashCam Prep
         self.dash_dir = agx.Vec3(dash_direction[0], dash_direction[1], dash_direction[2])
         self.dash_rel_pos = agx.Vec3(dash_position[0], dash_position[1], dash_position[2])
+        self.baserot = agx.Quat(-np.pi/2, agx.Vec3(1,0,0))
 
+        # FollowCam Prep
+        self.ff = far_factors
         self.dist = follow_distance
         self.angle = np.deg2rad(follow_angle)
         self.follow_rel_pos = self.dist*agx.Vec3(0,-np.cos(self.angle), np.sin(self.angle))
-                
-        cameraData = self.app.getCameraData()
-        self.position = cameraData.eye
-        self.looker = cameraData.center
-        self.up = cameraData.up
 
-        self.updateCamera()
+        # StaticCam Prep
+        self.static_position = agxVec([-3,8,-5.6])
+        self.static_looker = agxVec([5,5,3])
+        self.static_up = agx.Vec3(0,0,1)
+        self.static = False
 
     def AddBody(self, body):
         self.body = body
@@ -705,25 +762,29 @@ class ComboCam(agxSDK.StepEventListener):
         return
 
     def pre(self, time):
-        if self.camera_modes[self.cam_i] == 'follow':
-            self.follow_update()
+        if self.camera_modes[self.cam_i] == 'follow near':
+            self.follow_update(self.dist, self.angle)
+        if self.camera_modes[self.cam_i] == 'follow far':
+            self.follow_update(self.dist*self.ff[0], self.angle*self.ff[1])
         if self.camera_modes[self.cam_i] == 'dash':
             self.dash_update()
+        if self.camera_modes[self.cam_i] == 'static':
+            self.static_update()
     
     def post(self, time):
         return
 
-    def follow_update(self):
+    def follow_update(self, distance, angle):
         relative_position = -self.body.getVelocity()
 
         if(relative_position.length() > 1E-2):
             relative_position.set(0.0, 2)
-            relative_position.setLength(self.dist)
-            relative_position.set(relative_position.x()*np.cos(self.angle), relative_position.y()*np.cos(self.angle), self.dist*np.sin(self.angle))
+            relative_position.setLength(distance)
+            relative_position.set(relative_position.x()*np.cos(angle), relative_position.y()*np.cos(angle), distance*np.sin(angle))
             
             relative_position = self.follow_rel_pos + relative_position/60
-            relative_position.setLength(self.dist)
-            relative_position.set(relative_position.x()*np.cos(self.angle), relative_position.y()*np.cos(self.angle), self.dist*np.sin(self.angle))
+            relative_position.setLength(distance)
+            relative_position.set(relative_position.x()*np.cos(angle), relative_position.y()*np.cos(angle), distance*np.sin(angle))
 
             self.follow_rel_pos = relative_position
             self.looker = self.body.getPosition()
@@ -734,15 +795,39 @@ class ComboCam(agxSDK.StepEventListener):
 
     def dash_update(self):
         if(self.body.getVelocity().length() > 1E-2):
-            self.position = self.body.getPosition() + self.body.getRotation()*self.dash_rel_pos
-            self.looker = self.position + self.body.getRotation()*self.dash_dir
-            self.up = self.body.getRotation()*agx.Vec3(0,0,1)
-        self.updateCamera()
+            rotq = self.baserot*self.body.getRotation()
+            self.position = self.body.getPosition() + rotq*self.dash_rel_pos
+            self.looker = self.position + rotq*self.dash_dir
+            self.up = rotq*agx.Vec3(0,0,1)
+            self.updateCamera()
+
+    def static_update(self):
+        if not self.static:
+            self.position = self.static_position
+            self.looker = self.static_looker
+            self.up = self.static_up
+            self.static = True
+            self.updateCamera()
+        cameraData = self.app.getCameraData()
+        self.static_position = agx.Vec3(cameraData.eye)
+        self.static_looker = agx.Vec3(cameraData.center)
+        self.static_up = agx.Vec3(cameraData.up)
     
     
-    def ToggleCam(self):
-        self.cam_i = (self.cam_i+1) % len(self.camera_modes)
-        print(self.camera_modes[self.cam_i])
+    def ToggleCam(self, add = 1):
+        self.cam_i = (self.cam_i+add) % len(self.camera_modes)
+        self.static = False
+        if self.camera_modes[self.cam_i] == 'follow near':
+            self.follow_rel_pos = -self.body.getVelocity()
+            self.follow_rel_pos.set(0.0, 2)
+            self.follow_rel_pos.setLength(self.dist)
+            self.follow_rel_pos.set(self.follow_rel_pos.x()*np.cos(self.angle), self.follow_rel_pos.y()*np.cos(self.angle), self.dist*np.sin(self.angle))
+        if self.camera_modes[self.cam_i] == 'follow far':
+            self.follow_rel_pos = -self.body.getVelocity()
+            self.follow_rel_pos.set(0.0, 2)
+            self.follow_rel_pos.setLength(self.dist*self.ff[0])
+            self.follow_rel_pos.set(self.follow_rel_pos.x()*np.cos(self.angle*self.ff[1]), self.follow_rel_pos.y()*np.cos(self.angle*self.ff[1]), self.dist*np.sin(self.angle*self.ff[1]))
+        # print(self.camera_modes[self.cam_i])
 
     def updateCamera(self):
         cameraData                   = self.app.getCameraData()
@@ -752,3 +837,133 @@ class ComboCam(agxSDK.StepEventListener):
         cameraData.nearClippingPlane = 0.1
         cameraData.farClippingPlane  = 5000
         self.app.applyCameraData( cameraData )
+
+class Timer(agxSDK.ContactEventListener):
+    def __init__(self, start_object, robot_body, end_object=False):
+        super().__init__(agxSDK.ContactEventListener.ALL)
+        self.start_object = start_object
+        if end_object:
+            self.end_object = end_object
+        else:
+            self.end_object = start_object
+        self.body = robot_body
+        self.start = False
+        self.checkpoints = []
+        self.check_positions = []
+        self.check_rotations = []
+        self.checks = []
+        self.complete = False
+
+    def addCheckpoint(self, checkpoint_object_list=[]):
+        pos_list = []
+        rot_list = []
+        for obj in checkpoint_object_list:
+            pos_list.append(obj.getPosition())
+            rot_list.append(obj.getRotation())
+        self.check_positions.append(pos_list)
+        self.check_rotations.append(rot_list)
+        self.checkpoints.append(checkpoint_object_list)
+        self.checks.append(False)
+
+    def impact(self, time, contact):
+        # Check if all checkpoints have been reached
+        isComplete = True
+        for i in range(len(self.checks)):
+            if not self.checks[i]:
+                for obj in self.checkpoints[i]:
+                    if contact.contains(obj) >= 0 and contact.contains(self.body) >= 0:
+                        if self.start:
+                            self.checks[i] = True
+                            print('Checkpoint '+str(i+1)+' reached at '+self.getTime())
+                        else:
+                            print('Clock has not been started.')
+            if not self.checks[i]:
+                isComplete = False
+        
+        if isComplete and not self.complete:
+            self.complete = True
+            print('All checkpoints reached, go for the goal!')
+
+        if(not self.complete and contact.contains(self.start_object) >= 0):
+            if TIME.time() - self.start > 10:
+                self.start = TIME.time()
+                self.checks = [False]*len(self.checks)
+                for i in range(len(self.checks)):
+                    for j in range(len(self.checkpoints[i])):
+                        obj = self.checkpoints[i][j]
+                        obj.setPosition(self.check_positions[i][j])
+                        obj.setRotation(self.check_rotations[i][j])
+                        obj.setVelocity(agx.Vec3(0,0,0))
+                        obj.setAngularVelocity(agx.Vec3(0,0,0))
+                print('Starting the time, hit the', len(self.checks),'cones!')
+        
+        if(self.complete and contact.contains(self.end_object) >= 0):
+            if TIME.time() - self.start > 10:
+                print('Time: '+self.getTime())
+                self.complete = False
+                self.checks = [False]*len(self.checks)
+        return agxSDK.ContactEventListener.KEEP_CONTACT
+    
+    def getTime(self):
+        timenum = TIME.time() - self.start
+        seconds = round(timenum % 60, 2)
+        if seconds < 10:
+            seconds = '0'+str(seconds)
+        else:
+            seconds = str(seconds)
+        minutes = round(np.floor(timenum/60))
+        if minutes < 10:
+            minutes = '0'+str(minutes)
+        else:
+            minutes = str(minutes)
+        return minutes+':'+seconds
+
+
+
+
+
+    # obstacles(sim, root, arena_pos[2])
+
+def addCones(timer=False):
+    sim = agxPython.getContext().environment.getSimulation()
+    app = agxPython.getContext().environment.getApplication()
+    root = agxPython.getContext().environment.getSceneRoot()
+    cone_dims = [0, 0.08, 0.28]
+
+    cone_positions = [
+        [12,6.64,11],
+        [6.5,7.698,3],
+        [-7,3.32,7],
+        [16,3.32,11],
+        [3,0,14],
+        [-5,0,4],
+        [6,0,-8],
+        [0,0.1,-1],
+    ]
+
+
+    for cone_pos in cone_positions:
+        dh = np.array([0,0,cone_dims[2]*0.005])
+        cone_pos = np.array(cone_pos)
+        bottom = agx.RigidBody( agxCollide.Geometry( agxCollide.Box(agxVec([cone_dims[1]*1.2, cone_dims[2]*0.005, cone_dims[1]*1.2]))))
+        bottom.setPosition(agxVec(cone_pos+dh))
+        sim.add(bottom)
+        agxOSG.setDiffuseColor(agxOSG.createVisual(bottom, root), agxRender.Color.Orange())
+        cone = agx.RigidBody( agxCollide.Geometry( agxCollide.Cone(cone_dims[0], cone_dims[1], cone_dims[2])))
+        cone.setRotation(agx.Quat(np.pi/2, agx.Vec3(1,0,0)))
+        cone.setPosition(agxVec(cone_pos+2*dh))
+        agxOSG.setDiffuseColor(agxOSG.createVisual(cone, root), agxRender.Color.Orange())
+        sim.add(cone)
+
+        
+
+
+        hf = agx.HingeFrame()
+        hf.setAxis(agx.Vec3(0,0,1))
+        hf.setCenter(agxVec(cone_pos+2*dh))
+        H = agx.Hinge(hf, bottom, cone)
+        sim.add(H)
+        
+        traffic_cone = [bottom, cone]
+        if timer:
+            timer.addCheckpoint(traffic_cone)
