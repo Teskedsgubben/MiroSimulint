@@ -13,6 +13,7 @@ import agxOSG
 import agxSDK
 import agxPython
 import agxIO
+import agxUtil
 import agxModel
 import agxRender
 import agxDriveTrain
@@ -29,6 +30,11 @@ try:
     import socketio
 except:
     print('Socketio import failed')
+
+if(os.path.isfile('robot_local.py')):
+    import robot_local
+
+    
 
 controls = {
     'forward': agxSDK.GuiEventListener.KEY_Up,
@@ -55,17 +61,6 @@ def RunPureAGX(SystemList, Args):
     axp.RunPureAGX(SystemList, Args)
     return
 
-def CreateDigger(sim, pos):
-    controls = WheelLoaderL70.default_keyboard_controls()
-    controls.engine.forward.key = Input.KEY_Up
-    controls.engine.reverse.key = Input.KEY_Down
-    controls.elevate_up.key = ord( 'a' )
-    controls.elevate_down.key = ord( 'z' )
-
-    truck = WheelLoaderL70(keyboard_controls = controls)
-    truck.setPosition(MiroAPI.agxVecify(pos))
-    sim.add(truck)
-
 def CustomAgxFunction(SystemList, Args): 
     [sim, app, root] = SystemList
     bot_pos = Args.get('robot_pos', [0,0,1])
@@ -90,18 +85,103 @@ def CustomAgxFunction(SystemList, Args):
         app.applyCameraData( cameraData )
     else:
         scale = 1.0
-        Cam = ComboCam(app, False, dash_direction=[0, 1, 0], dash_position=[0,-scale/2,scale/5], follow_distance=2.5*scale, follow_angle=10, static_position=agxVec([-3,9,-3.6]), static_looker=agxVec([5,6,3]))
-        botBody = buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'RWD', texture='flames.png', camera=Cam, scale=scale)
-        Cam.AddBody(botBody)
-        sim.add(Cam)
-        # sim.add(FollowCam(app, botBody, distance=2.8*scale))#, [0,-1,0], [0,0.5,0.25]))
-        # sim.add(DashCam(app, botBody, [0, 1,0], [0,-0.5,0.20]))
+        Cam = ComboCam(app, sim, dash_direction=[0, 1, 0], dash_position=[0,-scale/2.5,scale/5], follow_distance=2.5*scale, follow_angle=10, static_position=agxVec([-3,9,-3.6]), static_looker=agxVec([5,6,3]), baserot= agx.Quat(-np.pi/2, agx.Vec3(1,0,0)))
+        
+        try:
+            botBody = robot_local.buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'RWD', texture='flames.png', camera=Cam, scale=scale)
+        except:
+            botBody = buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'RWD', texture='flames.png', camera=Cam, scale=scale)
+
+        # car = robot_local.TT([sim, app, root], agxVec([6,0.0,2.3]))
+        # sim.add(DummyController(car, Cam))     
+
         start_plate = addboxx(sim, root, [1,0.002,1], [12,6.6401,-6])
         end_plate = addboxx(sim, root, [1,0.002,1], [-3,0.101, 0.5], color=agxRender.Color.Green())
-
         timer = Timer(start_plate, botBody, end_plate)
         sim.add(timer)
         addCones(timer)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class DummyController(agxSDK.GuiEventListener):
+    '''Wheels must be in a list and in pairs L & R, i.e. [wheel_left, wheel_right]'''
+    def __init__(self, body, camera=False, baseRot = agx.Quat()):
+        super().__init__(agxSDK.GuiEventListener.KEYBOARD)
+        self.body = body
+        self.max_speed = 15
+        self.acc = -0.15
+        self.turnrate = 0.03
+        self.camera = camera
+        self.cameraswitched = False
+        self.camera.SetBody(self.body)
+
+
+    # Steering function
+    def keyboard(self, key, x, y, alt, keydown):
+        if keydown and key == agxSDK.GuiEventListener.KEY_Up:
+            self.accelerate(1)
+
+        elif keydown and key == agxSDK.GuiEventListener.KEY_Down:
+            self.accelerate(-0.85)
+
+        elif keydown and key == agxSDK.GuiEventListener.KEY_Left:
+            z_ax = self.body.getRotation()*agx.Vec3(0,0,1)
+            turn = agx.Quat(self.turnrate, z_ax)
+            self.body.setVelocity(turn*self.body.getVelocity())
+            self.body.setRotation(turn*self.body.getRotation())
+            self.accelerate(1)
+
+        elif keydown and key == agxSDK.GuiEventListener.KEY_Right:
+            z_ax = self.body.getRotation()*agx.Vec3(0,0,1)
+            turn = agx.Quat(-self.turnrate, z_ax)
+            self.body.setVelocity(turn*self.body.getVelocity())
+            self.body.setRotation(turn*self.body.getRotation())
+            self.accelerate(1)
+        elif keydown and key == controls['toggle camera closer']:
+            if self.camera:
+                if(not self.cameraswitched):
+                    self.camera.ToggleCam(-1)
+                self.cameraswitched = True
+        elif keydown and key == controls['toggle camera farther']:
+            if self.camera:
+                if(not self.cameraswitched):
+                    self.camera.ToggleCam(1)
+                self.cameraswitched = True
+        else:
+            self.cameraswitched = False
+            return False
+        return True
+
+    def accelerate(self, pwr):
+        local_vel = self.body.getRotation().conj()*self.body.getVelocity()
+        local_vel = local_vel + agx.Vec3(0, pwr*self.acc*(1 - np.abs(local_vel.y())/self.max_speed), 0)
+        self.body.setVelocity(self.body.getRotation()*local_vel)
+
+def CreateDigger(sim, pos):
+    controls = WheelLoaderL70.default_keyboard_controls()
+    controls.engine.forward.key = Input.KEY_Up
+    controls.engine.reverse.key = Input.KEY_Down
+    controls.elevate_up.key = ord( 'a' )
+    controls.elevate_down.key = ord( 'z' )
+
+    truck = WheelLoaderL70(keyboard_controls = controls)
+    truck.setPosition(MiroAPI.agxVecify(pos))
+    sim.add(truck)
+
+
 
 
 class SocketKiller(agxSDK.GuiEventListener):
@@ -131,13 +211,14 @@ def addboxx(sim, root, dims, pos, Fixed=True, color = agxRender.Color.Red()):
 # Wheels to be controlled must come as a list of [left, right, left, right]
 class WheelControllerArrows(agxSDK.GuiEventListener):
     '''Wheels must be in a list and in pairs L & R, i.e. [wheel_left, wheel_right]'''
-    def __init__(self, wheels, body, headlights=[], taillights=[], camera=False, strength=8):
+    def __init__(self, wheels, body, headlights=[], taillights=[], camera=False, strength=8, wheel_axis=[0,1,0]):
         super().__init__(agxSDK.GuiEventListener.KEYBOARD)
         self.wheels = wheels
         self.camera = camera
         self.reset_rot = body.getRotation()
         self.body = body
         self.strength = strength/len(wheels)
+        self.wheel_axis = [agx.Vec3(wheel_axis[0], wheel_axis[1], wheel_axis[2]), -agx.Vec3(wheel_axis[0], wheel_axis[1], wheel_axis[2])]
         self.headlights = headlights
         self.taillights = taillights
         self.braking = False
@@ -145,25 +226,27 @@ class WheelControllerArrows(agxSDK.GuiEventListener):
         self.throttling = False
         self.cameraswitched = False
         self.restorePosition = self.body.getPosition()+agx.Vec3(0,0,0.4)
+
+        self.camera.SetBody(self.body)
     
     # Steering function
     def keyboard(self, key, x, y, alt, keydown):
         if keydown and key == controls['left']:
             # Turn left
             for i in range(0, len(self.wheels), 2):
-                self.wheels[i+1].addLocalTorque(0, self.strength,0)
-                self.wheels[i].addLocalTorque(0, -self.strength/4,0)
+                self.wheels[i+1].addLocalTorque(self.strength*self.wheel_axis[(i+1)%2])
+                self.wheels[i].addLocalTorque(-self.strength/4*self.wheel_axis[i%2])
 
         elif keydown and key == controls['right']:
             # Turn right
             for i in range(0, len(self.wheels), 2):
-                self.wheels[i].addLocalTorque(0, self.strength,0)
-                self.wheels[i+1].addLocalTorque(0, -self.strength/4,0)
+                self.wheels[i+1].addLocalTorque(-self.strength/4*self.wheel_axis[(i+1)%2])
+                self.wheels[i].addLocalTorque(self.strength*self.wheel_axis[i%2])
 
         elif keydown and key == controls['backward']:
             # Back up
-            for wheel in self.wheels:
-                wheel.addLocalTorque(0,-self.strength/2,0)
+            for i in range(0, len(self.wheels)):
+                self.wheels[i].addLocalTorque(-self.strength/2*self.wheel_axis[i%2])
             if not self.backing:
                 self.backing = True
                 for taillight in self.taillights:
@@ -171,8 +254,8 @@ class WheelControllerArrows(agxSDK.GuiEventListener):
 
         elif keydown and key == controls['forward']:
             # Gain speed
-            for wheel in self.wheels:
-                wheel.addLocalTorque(0, self.strength,0)
+            for i in range(0, len(self.wheels)):
+                self.wheels[i].addLocalTorque(self.strength*self.wheel_axis[i%2])
             if not self.throttling:
                 self.throttling = True
                 for headlight in self.headlights:
@@ -322,7 +405,7 @@ def buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'FWD', color=
 
     body_wid = 0.32*scale
     body_len = 0.6*scale
-    body_hei = 0.16 *scale
+    body_hei = 0.15 *scale
     
     wheel_rad = 0.07*scale
     wheel_wid = 0.02*scale
@@ -351,7 +434,7 @@ def buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'FWD', color=
     wheelRF = agx.RigidBody(agxCollide.Geometry( agxCollide.Cylinder(wheel_rad, wheel_wid)))
     wheelRF.setPosition(bot_pos[0]+(body_wid/2+wheel_wid/2), bot_pos[1]+(body_len/2-wheel_rad*1.8), bot_pos[2]+wheel_rad)
     # wheelRF.setMotionControl(1)
-    wheelRF.setRotation(agx.Quat(np.pi/2, agx.Vec3(0,0,1)))
+    wheelRF.setRotation(agx.Quat(-np.pi/2, agx.Vec3(0,0,1)))
     sim.add(wheelRF)
     # agxOSG.setDiffuseColor(agxOSG.createVisual(wheelRF, root), agxRender.Color.Red())
 
@@ -365,7 +448,7 @@ def buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'FWD', color=
     wheelRB = agx.RigidBody(agxCollide.Geometry( agxCollide.Cylinder(wheel_rad, wheel_wid)))
     wheelRB.setPosition(bot_pos[0]+(body_wid/2+wheel_wid/2), bot_pos[1]-(body_len/2-wheel_rad*1.8), bot_pos[2]+wheel_rad)
     # wheelRB.setMotionControl(1)
-    wheelRB.setRotation(agx.Quat(np.pi/2, agx.Vec3(0,0,1)))
+    wheelRB.setRotation(agx.Quat(-np.pi/2, agx.Vec3(0,0,1)))
     sim.add(wheelRB)
     # agxOSG.setDiffuseColor(agxOSG.createVisual(wheelRB, root), agxRender.Color.Red())
 
@@ -733,17 +816,17 @@ class DashCam(agxSDK.StepEventListener):
 
 
 class ComboCam(agxSDK.StepEventListener):
-    def __init__(self, app, body, dash_direction=[0,1,0], dash_position=[0, 0, 0.15], follow_distance=2.5, follow_angle=10, default=1, far_factors=[1.75, 2.25], static_position=agxVec([-3,8,-5.6]), static_looker=agxVec([5,5,3])):
+    def __init__(self, app, sim, dash_direction=[0,1,0], dash_position=[0, 0, 0.15], follow_distance=2.5, follow_angle=10, default=1, far_factors=[1.75, 2.25], static_position=agxVec([-3,8,-5.6]), static_looker=agxVec([5,5,3]), baserot=agx.Quat()):
         super().__init__(agxSDK.StepEventListener.PRE_COLLIDE+agxSDK.StepEventListener.PRE_STEP+agxSDK.StepEventListener.POST_STEP)
         self.camera_modes = ['dash', 'follow near', 'follow far', 'static']
         self.cam_i = default
         self.app = app
-        self.body = body
+        sim.add(self)
 
         # DashCam Prep
         self.dash_dir = agx.Vec3(dash_direction[0], dash_direction[1], dash_direction[2])
         self.dash_rel_pos = agx.Vec3(dash_position[0], dash_position[1], dash_position[2])
-        self.baserot = agx.Quat(-np.pi/2, agx.Vec3(1,0,0))
+        self.baserot = baserot
 
         # FollowCam Prep
         self.ff = far_factors
@@ -757,7 +840,7 @@ class ComboCam(agxSDK.StepEventListener):
         self.static_up = agx.Vec3(0,0,1)
         self.static = False
 
-    def AddBody(self, body):
+    def SetBody(self, body):
         self.body = body
 
     def preCollide(self, time):

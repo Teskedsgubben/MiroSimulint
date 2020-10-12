@@ -24,7 +24,7 @@ TEXTURE_EXEPTIONS = {
     'MITfloor.png': False,
     'tf-logo.jpg': True,
     'MIT_story_floor.jpg': False,
-    'MIT_stone_floor.jpg': False,
+    'MIT_stone_floor.jpg': True,
     'MIT_inner_roof.jpg': False,
 }
 

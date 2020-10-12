@@ -17,6 +17,7 @@ agx_screen_0*
 ignored_storage
 # ignore all .obj files
 *.obj
+*.mtl
 # Any group files
 Grupp*_*
 # Ignores data files
