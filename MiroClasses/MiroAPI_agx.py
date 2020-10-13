@@ -19,7 +19,9 @@ import os
 from MiroClasses import BackupColors
 
 API = 'AGX'
-TEXTURES_ON = False
+
+TEXTURES_ON = True
+TEXTURE_PATH ='textures_lowres/'
 TEXTURE_EXEPTIONS = {
     'MITfloor.png': False,
     'tf-logo.jpg': True,
@@ -33,6 +35,7 @@ for texture, include in TEXTURE_EXEPTIONS.items():
     if include:
         important_textures.append(texture)
 
+####### UTILITY FUNCTIONS #######
 # agx is defined in another coordinate system
 def xyzTransform(vec, sizes = False, reverse = False):
     newvec = [-vec[0], -vec[2], vec[1]]
@@ -120,6 +123,8 @@ def rotateBodyExp(body, rotX=0, rotY=0, rotZ=0, rotOrder=['x', 'y', 'z'], rotAng
             q = agx.Quat(angle, axis)
             body.setRotation(body.getRotation()*q)
 
+####### SIMULATION SETUP #######
+# Preparatory setup
 def PreSetup(args, SetupFunction):
     if agxPython.getContext():
         return
@@ -127,12 +132,13 @@ def PreSetup(args, SetupFunction):
     init = agx.AutoInit()
     ## Create an application with graphics etc.
     app = agxOSG.ExampleApplication()
+    dec = app.getSceneDecorator()
+    dec.setEnableLogo(False)
 
     ## Create a command line parser. sys.executable will point to python executable
     ## in this case, because getArgumentName(0) needs to match the C argv[0] which
     ## is the name of the program running
     argParser = agxIO.ArgumentParser([sys.executable] + args)
-
     app.addScene(argParser.getArgumentName(1), "buildScene", ord('1'), True)
 
     ## Call the init method of ExampleApplication
@@ -142,8 +148,7 @@ def PreSetup(args, SetupFunction):
     else:
         print("An error occurred while initializing ExampleApplication.")
 
-
-# System setup
+# MiroSystem setup call
 def SetupSystem():
     if agxPython.getContext():
         sim = agxPython.getContext().environment.getSimulation()
@@ -152,6 +157,14 @@ def SetupSystem():
         return [sim, app, root]
     return []
 
+# Final function call in the simulation
+def RunSimulation(MiroSystem):
+    [sim, app, root] = MiroSystem.Get_APIsystem()
+    MiroSystem.Set_Camera()
+    sim.add(ModuleReleaser(MiroSystem))
+    return
+
+####### SIMPLE SHAPE SHORTHANDS #######
 # Functions for adding shapes to the MiroSystem
 def add_boxShapeHemi(MiroSystem, hemi_size_x, hemi_size_y, hemi_size_z, pos, texture='test.jpg', scale=[4,3], Collide=True, Fixed=True, rotX=0, rotY=0, rotZ=0, rotOrder=['x','y','z'], rotAngle=0, rotAxis=[1,0,0], rotDegrees=True, mass=False, density=1000, dynamic=False, color=[0.5, 0.5, 0.5]):
     add_boxShape(MiroSystem, 2*hemi_size_x, 2*hemi_size_y, 2*hemi_size_z, pos, texture, scale, Collide, Fixed, rotX, rotY, rotZ, rotOrder, rotAngle, rotAxis, rotDegrees, mass, density, dynamic, color)
@@ -200,7 +213,10 @@ def add_boxShape(MiroSystem, size_x, size_y, size_z, pos, texture=False, scale=[
                 # agxOSG.setShininess(body_shape, 120  )
                 # agxOSG.setAlpha(body_shape, 1.0 )
                 # agxOSG.setTexture(body_geo, agxRoot, 'textures/'+texture)
-            agxOSG.setTexture(body_shape, 'textures/'+texture, True, agxOSG.DIFFUSE_TEXTURE, scale[0], scale[1])
+            if TEXTURE_PATH == 'textures_lowres/' and texture=='yellow_brick.jpg':
+                scale[0] = 11*scale[0]
+                scale[1] = 8*scale[1]
+            agxOSG.setTexture(body_shape, TEXTURE_PATH+texture, True, agxOSG.DIFFUSE_TEXTURE, scale[0], scale[1])
         else:
             color = backupColor(texture, color)
             texture = False       
@@ -248,7 +264,7 @@ def add_cylinderShape(MiroSystem, radius, height, density, pos, texture='test.jp
             if texture[0:len('textures/')] == 'textures/':
                 texture = texture[len('textures/'):]
         if TEXTURES_ON:
-            agxOSG.setTexture(body_shape, 'textures/'+texture, True, agxOSG.DIFFUSE_TEXTURE, scale[0], scale[1])
+            agxOSG.setTexture(body_shape, TEXTURE_PATH+texture, True, agxOSG.DIFFUSE_TEXTURE, scale[0], -scale[1])
         else:
             color = backupColor(texture, color)
             texture = False       
@@ -295,7 +311,7 @@ def add_sphereShape(MiroSystem, radius, pos, texture='test.jpg', density=1000, s
             if texture[0:len('textures/')] == 'textures/':
                 texture = texture[len('textures/'):]
         if TEXTURES_ON:
-            agxOSG.setTexture(body_shape, 'textures/'+texture, True, agxOSG.DIFFUSE_TEXTURE, scale[0], scale[1])
+            agxOSG.setTexture(body_shape, TEXTURE_PATH+texture, True, agxOSG.DIFFUSE_TEXTURE, scale[0], scale[1])
         else:
             color = backupColor(texture, color)
             texture = False       
@@ -350,11 +366,10 @@ def add_stepShape(MiroSystem, position_front, direction_front, position_back, di
 
     return add_boxShape(MiroSystem, size_x, size_y, size_z, pos, rotY=theta, rotDegrees=False, texture=False, color=clr)
 
-
 def stepShape(position_front, direction_front, position_back, direction_back, width, height, clr = [0.5,0.5,0.5]):
     return add_stepShape(False, position_front, direction_front, position_back, direction_back, width, height, clr)
 
-
+####### RIGID BODY OPERATIONS #######
 # Import from file
 def LoadFromObj(filename, density=1000, color=[1,0.1,0.1]):
     return add_boxShape(False, 0.1, 0.1, 0.1, [0,0,0], color=color)
@@ -410,6 +425,7 @@ def RemoveBodyForce(body, force_pointer):
 def ChangeBodyTexture(body, texture_file, scale=[1,1]):
     return
 
+####### LINKS AND CONSTRAINTS #######
 # Links
 def LinkBodies_Hinge(body1, body2, link_position, link_direction, MiroSystem=False):
     hf = agx.HingeFrame()
@@ -430,6 +446,7 @@ def LinkBodies_Spring(body1, pos1, body2, pos2, length, KS, KD, visible=False, s
     spring.setDamping(KD)
     return spring
 
+####### SCENE CONFIGURATION #######
 # Simulation stuff
 def SetCamera(system_list, camera_position, look_at_point, up_direction=[0,1,0]):
     sim = agxPython.getContext().environment.getSimulation()
@@ -454,13 +471,6 @@ def AddObjectByAPI(system_list, Object):
     root = agxPython.getContext().environment.getSceneRoot()
 
     sim.add(Object)
-    return
-
-# Running the simulation
-def RunSimulation(MiroSystem):
-    [sim, app, root] = MiroSystem.Get_APIsystem()
-    MiroSystem.Set_Camera()
-    sim.add(ModuleReleaser(MiroSystem))
     return
 
 class ModuleReleaser(agxSDK.GuiEventListener):

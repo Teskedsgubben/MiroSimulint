@@ -56,14 +56,23 @@ def RunPureAGX(SystemList, Args):
     # This function will be called with SystemList = [sim, app, root] and you can
     # set Args to be whatever you want from the Main function. 
     [sim, app, root] = SystemList
+
+    
+    skybox = agxOSG.SkyBox('Campus','skybox/sky_','.jpg')
+    root.addChild(skybox)
+    # agxOSG.createSkyBox(skybox, 1000)
     # CreateDigger(sim, [0,0,0.2])
     CustomAgxFunction(SystemList, Args)
     axp.RunPureAGX(SystemList, Args)
+    # addGround(sim, app, root)
     return
 
 def CustomAgxFunction(SystemList, Args): 
     [sim, app, root] = SystemList
     bot_pos = Args.get('robot_pos', [0,0,1])
+    
+    # bot_pos[0] = bot_pos[0] - 460
+    # bot_pos[1] = bot_pos[1] + 2
     players = Args.get('players', 1)
 
     if players == 2:
@@ -86,9 +95,9 @@ def CustomAgxFunction(SystemList, Args):
     else:
         scale = 1.0
         Cam = ComboCam(app, sim, dash_direction=[0, 1, 0], dash_position=[0,-scale/2.5,scale/5], follow_distance=2.5*scale, follow_angle=10, static_position=agxVec([-3,9,-3.6]), static_looker=agxVec([5,6,3]), baserot= agx.Quat(-np.pi/2, agx.Vec3(1,0,0)))
-        
+        sim.add(CameraConroller(app))
         try:
-            botBody = robot_local.buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'RWD', texture='flames.png', camera=Cam, scale=scale)
+            botBody = robot_local.buildBotBLOCK(sim, root, bot_pos, controller='Arrows', drivetrain = 'RWD', texture='flames.png', camera=Cam, scale=scale)
         except:
             botBody = buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'RWD', texture='flames.png', camera=Cam, scale=scale)
 
@@ -108,13 +117,22 @@ def CustomAgxFunction(SystemList, Args):
 
 
 
+def addGround(sim, app, root):
+    # Create the ground
+    ground_material = agx.Material("Ground")
 
+    # Create the height field from a heightmap
+    hf = agxCollide.HeightField.createFromFile("textures/height_map_jump.png", 70, 70, -0.1, 5.0)
 
+    ground_geometry = agxCollide.Geometry(hf)
+    ground = agx.RigidBody(ground_geometry)
+    ground.setMotionControl(agx.RigidBody.STATIC)
+    node = agxOSG.createVisual( ground, root )
+    agxOSG.setShininess(node, 5)
 
-
-
-
-
+    # Add a visual texture.
+    agxOSG.setTexture(node, "textures/terrain_detail.png", True, agxOSG.DIFFUSE_TEXTURE,10, 10)
+    sim.add(ground)
 
 class DummyController(agxSDK.GuiEventListener):
     '''Wheels must be in a list and in pairs L & R, i.e. [wheel_left, wheel_right]'''
@@ -211,7 +229,7 @@ def addboxx(sim, root, dims, pos, Fixed=True, color = agxRender.Color.Red()):
 # Wheels to be controlled must come as a list of [left, right, left, right]
 class WheelControllerArrows(agxSDK.GuiEventListener):
     '''Wheels must be in a list and in pairs L & R, i.e. [wheel_left, wheel_right]'''
-    def __init__(self, wheels, body, headlights=[], taillights=[], camera=False, strength=8, wheel_axis=[0,1,0]):
+    def __init__(self, wheels, body, headlights=[], taillights=[], camera=False, strength=8, wheel_axis=[0,1,0], wheelfjoink=False, turn_ratio=-1/4):
         super().__init__(agxSDK.GuiEventListener.KEYBOARD)
         self.wheels = wheels
         self.camera = camera
@@ -219,6 +237,8 @@ class WheelControllerArrows(agxSDK.GuiEventListener):
         self.body = body
         self.strength = strength/len(wheels)
         self.wheel_axis = [agx.Vec3(wheel_axis[0], wheel_axis[1], wheel_axis[2]), -agx.Vec3(wheel_axis[0], wheel_axis[1], wheel_axis[2])]
+        self.whlfjoink = wheelfjoink
+        self.trun = turn_ratio
         self.headlights = headlights
         self.taillights = taillights
         self.braking = False
@@ -231,16 +251,23 @@ class WheelControllerArrows(agxSDK.GuiEventListener):
     
     # Steering function
     def keyboard(self, key, x, y, alt, keydown):
-        if keydown and key == controls['left']:
+        if keydown and key == controls['fjoink']:
+            # Fjoink
+            if(self.body.getVelocity().z() < 1E-2):
+                self.body.setVelocity(self.body.getVelocity()+agx.Vec3(0,0,6))
+                if self.whlfjoink:
+                    for wheel in self.wheels:
+                        wheel.setVelocity(wheel.getVelocity()+agx.Vec3(0,0,6))
+        elif keydown and key == controls['left']:
             # Turn left
             for i in range(0, len(self.wheels), 2):
                 self.wheels[i+1].addLocalTorque(self.strength*self.wheel_axis[(i+1)%2])
-                self.wheels[i].addLocalTorque(-self.strength/4*self.wheel_axis[i%2])
+                self.wheels[i].addLocalTorque(self.trun*self.strength*self.wheel_axis[i%2])
 
         elif keydown and key == controls['right']:
             # Turn right
             for i in range(0, len(self.wheels), 2):
-                self.wheels[i+1].addLocalTorque(-self.strength/4*self.wheel_axis[(i+1)%2])
+                self.wheels[i+1].addLocalTorque(self.trun*self.strength*self.wheel_axis[(i+1)%2])
                 self.wheels[i].addLocalTorque(self.strength*self.wheel_axis[i%2])
 
         elif keydown and key == controls['backward']:
@@ -269,10 +296,7 @@ class WheelControllerArrows(agxSDK.GuiEventListener):
                 self.braking = True
                 for taillight in self.taillights:
                     agxOSG.setTexture(taillight, 'textures/taillight_brake.png', True, agxOSG.DIFFUSE_TEXTURE, 1.0, 1.0)  
-        elif keydown and key == controls['fjoink']:
-            # Fjoink
-            if(self.body.getVelocity().z() < 1E-4):
-                self.body.setVelocity(self.body.getVelocity()+agx.Vec3(0,0,6))
+        
         
         elif keydown and key == controls['toggle camera closer']:
             if self.camera:
@@ -381,21 +405,20 @@ class WheelControllerRemote(agxSDK.StepEventListener):
     def post(self, time):
         return
 
-class Fjoink(agxSDK.GuiEventListener):
+class CameraConroller(agxSDK.GuiEventListener):
     '''Wheels must be in a list and in pairs L & R, i.e. [wheel_left, wheel_right]'''
-    def __init__(self, body):
+    def __init__(self, app):
         super().__init__(agxSDK.GuiEventListener.KEYBOARD)
-        self.body = body
-        self.hopper = agxSDK.GuiEventListener.KEY_Page_Down
+        self.app = app
 
-    def setHopper(self, hopper):
-        self.hopper = hopper
-        return self
+    def updateUp(self, axis=[0,1,0]):
+        cameraData                   = self.app.getCameraData()
+        cameraData.up                = agxVec(axis)
+        self.app.applyCameraData(cameraData)
 
     def keyboard(self, key, x, y, alt, keydown):
-        if keydown and key == self.hopper:
-            if(self.body.getVelocity().z() < 1E-4):
-                self.body.setVelocity(self.body.getVelocity()+agx.Vec3(0,0,5))
+        if keydown and key == ord('z'):
+            self.updateUp()
         else:
             return False
         return True
@@ -569,10 +592,8 @@ def buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'FWD', color=
         sio = socketio.Client()
         sim.add(WheelControllerRemote(wheels, body, sio))
         # sim.add(SocketKiller(sio))
-        sim.add(Fjoink(body))
     else:
         sim.add(WheelControllerArrows(wheels, body, headlights=[headlightL_vis, headlightR_vis], taillights=[taillightL_vis, taillightR_vis], camera=camera, strength=strength*(scale**5)))
-        sim.add(Fjoink(body))
 
 
     ################# Stuff to make it fancy #################
@@ -926,6 +947,7 @@ class ComboCam(agxSDK.StepEventListener):
 class Timer(agxSDK.ContactEventListener):
     def __init__(self, start_object, robot_body, end_object=False):
         super().__init__(agxSDK.ContactEventListener.ALL)
+        self.app = agxPython.getContext().environment.getApplication()
         self.start_object = start_object
         if end_object:
             self.end_object = end_object
@@ -959,15 +981,17 @@ class Timer(agxSDK.ContactEventListener):
                     if contact.contains(obj) >= 0 and contact.contains(self.body) >= 0:
                         if self.start:
                             self.checks[i] = True
-                            print('Checkpoint '+str(i+1)+' reached at '+self.getTime())
+                            app = agxPython.getContext().environment.getApplication()
+                            self.app.getSceneDecorator().setText(0, 'Last event: Checkpoint '+str(i+1)+' reached at '+self.getTime())
+                            self.app.getSceneDecorator().setText(i+1, str(i+1)+': '+self.getTime())
                         else:
-                            print('Clock has not been started.')
+                            self.app.getSceneDecorator().setText(0, 'Clock has not been started.')
             if not self.checks[i]:
                 isComplete = False
         
         if isComplete and not self.complete:
             self.complete = True
-            print('All checkpoints reached, go for the goal!')
+            self.app.getSceneDecorator().setText('All checkpoints reached, go for the goal!')
 
         if(not self.complete and contact.contains(self.start_object) >= 0):
             if TIME.time() - self.start > 10:
@@ -980,11 +1004,16 @@ class Timer(agxSDK.ContactEventListener):
                         obj.setRotation(self.check_rotations[i][j])
                         obj.setVelocity(agx.Vec3(0,0,0))
                         obj.setAngularVelocity(agx.Vec3(0,0,0))
-                print('Starting the time, hit the', len(self.checks),'cones!')
+                app = agxPython.getContext().environment.getApplication()
+                app.getSceneDecorator().setText(0, 'Starting the time, hit the '+str(len(self.checks))+' cones!')
+                for i in range(len(self.checks)):
+                    app.getSceneDecorator().setText(i+1, str(i+1)+': --:--')
         
         if(self.complete and contact.contains(self.end_object) >= 0):
             if TIME.time() - self.start > 10:
-                print('Time: '+self.getTime())
+                self.app.getSceneDecorator().clearText()
+                self.app.getSceneDecorator().setText(2,'CHALLENGE COMPLETED!')
+                self.app.getSceneDecorator().setText(4,'Time: '+self.getTime())
                 self.complete = False
                 self.checks = [False]*len(self.checks)
         return agxSDK.ContactEventListener.KEEP_CONTACT
@@ -996,6 +1025,8 @@ class Timer(agxSDK.ContactEventListener):
             seconds = '0'+str(seconds)
         else:
             seconds = str(seconds)
+        if len(seconds) < 5:
+            seconds = seconds[0:3]+'0'+seconds[3]
         minutes = round(np.floor(timenum/60))
         if minutes < 10:
             minutes = '0'+str(minutes)

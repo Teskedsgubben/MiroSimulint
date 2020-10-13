@@ -10,9 +10,12 @@ from src import MIT_Offices
 from src import MIT_Roof
 
 try:
-    from src import Robotcourse
+    from src import Robotcourse_local as Robotcourse
 except:
-    print('Robotcourse is only currently available in AGX')
+    try:
+        from src import Robotcourse
+    except:
+        print('Robotcourse is only currently available in AGX')
 
 def build_MIT(MiroSystem, SPEEDMODE = False):
     # Create the room floor: a simple fixed rigid body with a collision shape
@@ -42,8 +45,8 @@ def mit_carpet_floor(MiroSystem):
 
 def mit_outside_ground(MiroSystem):
     # Add a ground outside as a huge box
-    MIT_ground_x = 250
-    MIT_ground_x = 250
+    MIT_ground_x = 80
+    MIT_ground_z = 80
     MIT_floor_pos = np.array([0, -1.15, 20])
 
-    MiroAPI.add_boxShape(MiroSystem, MIT_ground_x, 2, MIT_ground_x, MIT_floor_pos, 'grey concrete.jpg',scale=[23,18])
+    MiroAPI.add_boxShape(MiroSystem, MIT_ground_x, 2, MIT_ground_z, MIT_floor_pos, 'grey concrete.jpg',scale=[23,18])
