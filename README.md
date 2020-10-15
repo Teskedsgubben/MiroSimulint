@@ -198,3 +198,26 @@ Step 8) You can add some lines to you local settings to make pylint find the agx
     }
 
 Note that if you installed AGX somewhere else, you need to modify the above to the correct install directory.
+
+### On Unix
+
+Prerequisites:
+
+    sudo apt install python3.8
+    sudo apt install libglu1
+    sudo apt install python3-dev
+    sudo apt install python3-pip
+    sudo apt install python3-venv
+
+Run this:
+
+    /usr/bin/python3.8 -m venv MiroSim
+    echo "source /opt/Algoryx/AgX-2.29.2.0/setup_env.bash" >> MiroSim/bin/activate
+    source MiroSim/bin/activate
+    pip install -r unix/requirements.txt.in
+
+To run the program:
+
+    python Main.py
+    --- OR ---
+    agxViewer Main.py
