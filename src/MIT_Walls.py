@@ -166,8 +166,8 @@ def MIT_floors(system, H, SPEEDMODE):
 
         MiroAPI.add_boxShapeHemi(system, floor_l, floor_t, floor_w, floor_pos_1, texture_floor[floor], [50,3.6])
         MiroAPI.add_boxShapeHemi(system, floor_w_2, floor_t, floor_l+0.58, floor_pos_2, texture_floor[floor], [18,28])
-        MiroAPI.add_boxShapeHemi(system, 0.85, floor_t, floor_l, floor_pos_3, texture_floor[floor], [18,28])
-        MiroAPI.add_boxShapeHemi(system, 7, floor_t, 0.85, floor_pos_4, texture_floor[floor], [50,3.6])
+        MiroAPI.add_boxShapeHemi(system, 0.85, floor_t, floor_l, floor_pos_3, texture_floor[floor], [50,3.6])
+        MiroAPI.add_boxShapeHemi(system, 7, floor_t, 0.85, floor_pos_4, texture_floor[floor], [18,28])
 
         if floor > 0 and SPEEDMODE == False:
             add_fence(system, H, postNum, floor_w, floor_w_2, floor, floor_t, handle_l)
@@ -193,7 +193,6 @@ def MIT_floors(system, H, SPEEDMODE):
         floor_pos_4 = np.array([1.5, y_pos, -10.8])      # Add roof in NTK cooriodor (-z direction)
         MiroAPI.add_boxShapeHemi(system, 1.925, floor_t, floor_l, floor_pos_3, 'textures/BHgang.jpg', [35,80])
         MiroAPI.add_boxShapeHemi(system, 7, floor_t, 1.8, floor_pos_4, 'textures/BHgang.jpg', [100,10])
-        
 
     for roof in range(floorsNum):
         # Add roof
@@ -202,7 +201,6 @@ def MIT_floors(system, H, SPEEDMODE):
         roof_pos_4 = np.array([1.5, y_pos, -10.8])      # Add roof in NTK cooriodor (-z direction)
         MiroAPI.add_boxShapeHemi(system, 1.925, floor_t, floor_l, roof_pos_3, texture_roof, [35,80])
         MiroAPI.add_boxShapeHemi(system, 7, floor_t, 1.8, roof_pos_4, texture_roof, [100,10])
-
 
     # Add floor piece by the stair
     floor_x = 1.03
@@ -388,6 +386,22 @@ def MIT_walls(system, H):
     pos = np.array([8.5-wall_t+2.8, 0+3/2*H, -11.8-wall_t+1.1])
     MiroAPI.add_boxShapeHemi(system, wall_t, 3/2*H, 1.9-wall_t, pos, 'textures/white concrete.jpg', [10,10])
 
+    # Add office cooridor wall (negative x direction)
+    pos = np.array([-11.05, 0+3/2*H, -7])
+    MiroAPI.add_boxShapeHemi(system, wall_t, 3/2*H, 12, pos, 'textures/white concrete.jpg', [10,10])
+
+    # Add office wall (negative x direction)
+    pos = np.array([-9.35, 0+3/2*H, -1.9])
+    MiroAPI.add_boxShapeHemi(system, wall_t, 3/2*H, 6.9, pos, 'textures/white concrete.jpg', [10,10])
+
+    # Add office wall (negative z direction)
+    pos = np.array([1.5, 0+3/2*H, -12.6])
+    MiroAPI.add_boxShapeHemi(system, 7, 3/2*H, wall_t, pos, 'textures/white concrete.jpg', [10,10])
+
+    # Add office cooridor wall (negative z direction)
+    pos = np.array([1.5, 0+3/2*H, -14.3])
+    MiroAPI.add_boxShapeHemi(system, 7, 3/2*H, wall_t, pos, 'textures/white concrete.jpg', [10,10])
+
     # Add elevator shaft
     for floor in range(3):
         y_pos = H*floor + H/2
@@ -399,7 +413,7 @@ def MIT_walls(system, H):
     for floor in range(3):
         y_pos = H*floor + H/2
         pos = np.array([10.5+2.8-0.23, y_pos, -17+2.2+2.2])
-        MiroAPI.add_boxShapeHemi(system, 1.77, H/2, wall_t, pos, texture[floor], [-4,-3])
+        MiroAPI.add_boxShapeHemi(system, 1.77, H/2, wall_t, pos, texture[floor], [-4,-3], Collide=False)
 
     #Add oblique walls
     
