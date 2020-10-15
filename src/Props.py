@@ -93,6 +93,9 @@ def pokeball(MiroSystem, pos, rot = 0):
 
     MiroAPI.add_sphereShape(MiroSystem, r, [pos[0], pos[1]+r, pos[2]], texture='pokeball.jpg', density = 100, Fixed=False, rotY=rot)
 
+def eyeball(MiroSystem, pos, radius=0.1):
+    MiroAPI.add_sphereShape(MiroSystem, radius, [pos[0], pos[1]+radius, pos[2]], texture='eyeball.png', density = 100, Fixed=False, rotY=-30)
+
 def coin(MiroSystem, target, angle = 0):
     h = 0.0012
     r = 0.012
@@ -122,3 +125,7 @@ def floorvent(MiroSystem, target, SPEEDMODE = False):
     MiroAPI.add_cylinderShape(MiroSystem, r-0.02, h1, 1500, pos_base, texture='vents_surface.jpg')
     MiroAPI.add_cylinderShape(MiroSystem, r, h2, 1500, pos_vent, texture='vents.jpg')
     MiroAPI.add_cylinderShape(MiroSystem, r, h3, 1500, pos_topp, texture='vents_surface.jpg')
+
+def UNbox(MiroSystem, pos, goal_nr, skew):
+    pos[1] = pos[1]+0.2
+    MiroAPI.add_boxShape(MiroSystem, 0.4, 0.4, 0.4, pos, rotY=skew, texture='UN_'+str(goal_nr)+'.png', Collide=False)
