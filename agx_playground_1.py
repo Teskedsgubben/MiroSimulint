@@ -27,10 +27,10 @@ try:
 except:
     print('Socketio import failed')
 
-def RunPureAGX(SystemList, Args):
+def RunPureAGX(MiroSystem):
     # This is the entry point for running pure agx code in the MiroSim environment.
     # This function will be called with SystemList = [sim, app, root] and you can
     # set Args to be whatever you want from the Main function. 
-    [sim, app, root] = SystemList
+    [sim, app, root] = MiroSystem.Get_APIsystem()
 
     return
