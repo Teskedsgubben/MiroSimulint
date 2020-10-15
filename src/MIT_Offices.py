@@ -27,10 +27,6 @@ def build(MiroSystem, SPEEDMODE = False):
 
 
 def MIT_Officewalls(MiroSystem, H, wall_t, posW, posE, posS):
-        # Walls behind windowpanes. These are only temporary. Remove these two lines once the rooms are built.
-        MiroAPI.add_boxShape(MiroSystem, 2*6.9, 3*H, wall_t, posE, 'white concrete.jpg', [-4,-3])
-        MiroAPI.add_boxShape(MiroSystem, wall_t, 3*H, 2*6.9, posS, 'white concrete.jpg', [4,3])
-
         corner_windowpane0 = np.array([-5.29, 2*H+1.5, 4.99])
         first_windowpane0 = np.array([corner_windowpane0[0]+0.10, corner_windowpane0[1], corner_windowpane0[2]])
         corner_windowpane1 = np.array([-0.7, 2*H+1.5, 4.99])
@@ -139,6 +135,18 @@ def make_window(size_vx, size_vy, size_vz, size_hx, size_hy, size_hz, mid_pos, w
     test = 0.085
 
     if wall == 'south':
+        #concrete part under and over windows
+        for fl in range(3):
+            bot_pos = mid_pos + np.array([-0.104, 0.15 + fl*3.32 + 0.8/2, 0])
+            top_pos = mid_pos + np.array([-0.104, 0.15 + fl*3.32 + 3.33 - 0.3/2, 0])
+            MiroAPI.add_boxShape(MiroSystem, 0.2, 0.8, W*3, bot_pos, texture='white concrete.jpg', scale=[9, 12])
+            MiroAPI.add_boxShape(MiroSystem, 0.2, 0.3, W*3, top_pos, texture='white concrete.jpg', scale=[9, 12])
+        for wid in range(3):
+            left_pos = mid_pos + np.array([-0.104, 1.5*3.32, -6.78 + wid*W])
+            right_pos = mid_pos + np.array([-0.104, 1.5*3.32, -6.78 + W - 0.25 + wid*W])
+            MiroAPI.add_boxShape(MiroSystem, 0.2, 3.32*3, 0.25, left_pos, texture='white concrete.jpg', scale=[9, 12])
+            MiroAPI.add_boxShape(MiroSystem, 0.2, 3.32*3, 0.25, right_pos, texture='white concrete.jpg', scale=[9, 12])
+
         for i in range(1, 6, 2):
             lvl_height = np.array([0, i/2*H, 0])
             for j in [-1, 0, 1]:
@@ -160,18 +168,30 @@ def make_window(size_vx, size_vy, size_vz, size_hx, size_hy, size_hz, mid_pos, w
                     else:
                         MiroAPI.add_boxShape(MiroSystem, size_hx, size_hy-test, size_hz, r_hzt_pos+np.array([0,0.7*n*(-1),0]) ,rotX=90,rotZ=90,texture='wood_ikea_style.png')
     if wall == 'east':
+        for fl in range(3):
+            bot_pos = mid_pos + np.array([0, 0.15 + fl*3.32 + 0.8/2, -0.104])
+            top_pos = mid_pos + np.array([0, 0.15 + fl*3.32 + 3.32 - 0.3/2, -0.104])
+            MiroAPI.add_boxShape(MiroSystem, W*3, 0.8, 0.2, bot_pos, texture='white concrete.jpg', scale=[9, 12])
+            MiroAPI.add_boxShape(MiroSystem, W*3, 0.3, 0.2, top_pos, texture='white concrete.jpg', scale=[9, 12])
+        for wid in range(3):
+            left_pos = mid_pos + np.array([-6.8 + wid*W, 1.5*3.32, -0.104])
+            right_pos = mid_pos + np.array([-6.8 + W - 0.25 + wid*W, 1.5*3.32, -0.104])
+            MiroAPI.add_boxShape(MiroSystem, 0.25, 3.32*3, 0.2, left_pos, texture='white concrete.jpg', scale=[9, 12])
+            MiroAPI.add_boxShape(MiroSystem, 0.25, 3.32*3, 0.2, right_pos, texture='white concrete.jpg', scale=[9, 12])
+
         for i in range(1, 6, 2):
             lvl_height = np.array([0, i/2*H, 0])
             for j in [-1, 0, 1]:
                 lvl_width = np.array([j*W, 0, 0])
                 
                 # This box is the windows.
-                MiroAPI.add_boxShape(MiroSystem, 0.0025, 3.0-0.8, W-3*0.16, mid_pos+lvl_width+lvl_height+np.array([0,0.4,-0.0025]), rotY=90, color=[0.5,0.6,0.7,0.6])
+                if j != -1 or i != 5:
+                    MiroAPI.add_boxShape(MiroSystem, 0.0025, 3.0-0.8, W-3*0.16, mid_pos+lvl_width+lvl_height+np.array([0,0.4,-0.0025]), rotY=90, color=[0.5,0.6,0.7,0.6])
 
                 for k in range(0, len(dists)):
                     tmp = np.array([dists[k], 0, 0])
                     result_pos = mid_pos + lvl_width + lvl_height + tmp
-                    MiroAPI.add_boxShape(MiroSystem, size_vz,  size_vy, size_vx, result_pos, rotY=90,texture='wood_ikea_style.png')
+                    MiroAPI.add_boxShape(MiroSystem, size_vz,  size_vy, size_vx, result_pos, rotY=90,texture='wood_ikea_style.png', Collide=(j!=-1 or i!=5))
                 for n in [-1, 1]:
                     hzt_pos = np.array([0, 3/2, -0.005])
                     r_hzt_pos = mid_pos + n*hzt_pos + lvl_height + lvl_width
