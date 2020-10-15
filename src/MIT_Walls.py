@@ -402,6 +402,10 @@ def MIT_walls(system, H):
     pos = np.array([1.5, 0+3/2*H, -14.3])
     MiroAPI.add_boxShapeHemi(system, 7, 3/2*H, wall_t, pos, 'textures/white concrete.jpg', [10,10])
 
+    # Add office end
+    pos = np.array([-8.5, 0+3/2*H, -19])
+    MiroAPI.add_boxShapeHemi(system, 2.65, 3/2*H, wall_t, pos, 'textures/white concrete.jpg', [10,10])
+
     # Add elevator shaft
     for floor in range(3):
         y_pos = H*floor + H/2
