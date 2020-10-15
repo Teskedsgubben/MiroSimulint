@@ -257,11 +257,16 @@ class Module():
 
     def Rotate(self, component_name, theta, axis):
         '''Rotates a specific component in the module theta degrees about the provided axis.'''
-        if not component_name in self.components:
-            print('Cannot rotate '+component_name+', component not found.')
-            return
-        comp = self.components[component_name]
-        comp.RotateAxis(theta, axis)
+        if type(component_name) == type([]):
+            component_list = component_name
+        else:
+            component_list = [component_name]
+        for comp_name in component_list:
+            if not comp_name in self.components:
+                print('Cannot rotate '+comp_name+', component not found.')
+            else:
+                comp = self.components[comp_name]
+                comp.RotateAxis(theta, axis)
 
     def RotateX(self, component_name, theta):
         '''Rotates a specific component in the module theta degrees about the X-axis.'''
@@ -291,6 +296,18 @@ class Module():
     def RotateComponentsZ(self, theta):
         '''Rotates all components in the module theta degrees about the Z-axis.'''
         self.RotateComponents(theta, [0,0,1])
+
+    def SetTexture(self, component_name, texture_file, scale=[4,3]):
+        if type(component_name) == type([]):
+            component_list = component_name
+        else:
+            component_list = [component_name]
+        for comp_name in component_list:
+            if not comp_name in self.components:
+                print('Cannot texturize '+comp_name+', component not found.')
+            else:
+                comp = self.components[comp_name]
+                comp.SetTexture(texture_file, scale)
 
     def DisableHelpers(self, only_suppress_warning = False, remove_existing=True, remove_future=True):
         '''This removes all visual help objects, including marked linkpoints and spring attachments.\n
