@@ -154,6 +154,14 @@ def SetupSystem():
         sim = agxPython.getContext().environment.getSimulation()
         app = agxPython.getContext().environment.getApplication()
         root = agxPython.getContext().environment.getSceneRoot()
+
+        # Run on maximum threads, pasted from ice_floe example
+        agx.setNumThreads(0)
+        n = agx.getNumThreads()*0.5-1
+        agx.setNumThreads(int(n))
+        
+        skybox = agxOSG.SkyBox('Campus','skybox/sky_','.jpg')
+        root.addChild(skybox)
         return [sim, app, root]
     return []
 
@@ -169,7 +177,7 @@ def RunSimulation(MiroSystem):
 def add_boxShapeHemi(MiroSystem, hemi_size_x, hemi_size_y, hemi_size_z, pos, texture='test.jpg', scale=[4,3], Collide=True, Fixed=True, rotX=0, rotY=0, rotZ=0, rotOrder=['x','y','z'], rotAngle=0, rotAxis=[1,0,0], rotDegrees=True, mass=False, density=1000, dynamic=False, color=[0.5, 0.5, 0.5]):
     add_boxShape(MiroSystem, 2*hemi_size_x, 2*hemi_size_y, 2*hemi_size_z, pos, texture, scale, Collide, Fixed, rotX, rotY, rotZ, rotOrder, rotAngle, rotAxis, rotDegrees, mass, density, dynamic, color)
 
-def add_boxShape(MiroSystem, size_x, size_y, size_z, pos, texture=False, scale=[4,3], Collide=True, Fixed=True, rotX=0, rotY=0, rotZ=0, rotOrder=['x','y','z'], rotAngle=0, rotAxis=[1,0,0], rotDegrees=True, mass=False, density=1000, dynamic=False, color=[0.5, 0.5, 0.5]):
+def add_boxShape(MiroSystem, size_x, size_y, size_z, pos, texture=False, scale=[4,3], Collide=True, Fixed=True, rotX=0, rotY=0, rotZ=0, rotOrder=['x','y','z'], rotAngle=0, rotAxis=[1,0,0], rotDegrees=True, mass=False, density=1000, dynamic=False, color=[0.5, 0.5, 0.5], friction=False):
     '''system, size_x, size_y, size_z, pos, texture, scale = [5,5], hitbox = True/False'''
     # Convert position to chrono vector, supports using chvector as input as well
     agxSim = agxPython.getContext().environment.getSimulation()
@@ -183,8 +191,16 @@ def add_boxShape(MiroSystem, size_x, size_y, size_z, pos, texture=False, scale=[
        
     # Create a box
     body_geo = agxCollide.Geometry( agxCollide.Box(size_x/2, size_y/2, size_z/2))
+    if friction:
+        high_friction_tires = agx.Material('Tires', 0.05, friction)
+        body_geo.setMaterial(high_friction_tires)
+    
     body_geo.setEnableCollisions(Collide)
     body_box = agx.RigidBody(body_geo)
+    if mass:
+        body_box.getMassProperties().setMass(mass)
+    else:
+        body_box.getMassProperties().setMass(size_x*size_y*size_z*density)
     if Fixed:
         body_box.setMotionControl(1)
     body_box.setPosition(agxPos)
@@ -423,6 +439,14 @@ def RemoveBodyForce(body, force_pointer):
     return
 
 def ChangeBodyTexture(body, texture_file, scale=[1,1]):
+    # # Filter 'textures/' out of the texture name, it's added later
+    # if len(texture_file) > len('textures/'):
+    #     if texture_file[0:len('textures/')] == 'textures/':
+    #         texture_file = texture_file[len('textures/'):]
+    # if TEXTURES_ON:
+    #     agxOSG.setTexture(body, TEXTURE_PATH+texture_file, True, agxOSG.DIFFUSE_TEXTURE, scale[0], -scale[1])
+    # else:
+    #     color = backupColor(texture_file, color) 
     return
 
 ####### LINKS AND CONSTRAINTS #######
