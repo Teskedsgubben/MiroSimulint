@@ -1,4 +1,5 @@
 from src import Props as props
+import random as rng
 import numpy as np
 
 
@@ -64,3 +65,29 @@ def AddProps(system):
 
     # Pink dinosaur
     # props.dino(system, [5.75,0.85,-9.75], 210, .15)
+
+    nr_unboxes = [5,4,2]
+    base_pos = np.array([ 2, 0, 6.5])
+    direction = np.array([0,0,1])
+    # base_pos = np.array([ 11, 0, -5])
+    # direction = np.array([1,0,-0.1])
+
+    for row in range(len(nr_unboxes)):
+        for nr in range(nr_unboxes[row]):
+            skew =  10*(2*rng.random()-1) + 90*rng.randint(0,3)
+            pos = base_pos + (nr_unboxes[row]/4 - 0.5*nr)*direction + np.array([0,0.4*row,0])
+            goal_nr = rng.randint(0,17)
+            props.UNbox(system, pos, goal_nr, skew)
+
+
+    props.robotcourse(system, [-1, 6, -2])
+
+
+    # grid_x = [-5.3, -5.4+4.8+4.5+4.5-0.2]
+    # grid_z = [-8.8, -6+4.8+4.5+4.5-0.2]
+
+    # dx = grid_x[1]-grid_x[0]
+    # dz = grid_x[1]-grid_x[0]
+
+    # for ball in range(400):
+    #     props.eyeball(system, [grid_x[0] + rng.random()*dx, 50+rng.random(), grid_z[0] + rng.random()*dz], radius=0.15)
