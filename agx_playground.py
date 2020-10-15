@@ -25,6 +25,7 @@ import time as TIME
 import math
 import numpy as np
 import agx_playground_1 as axp
+import random
 
 try:
     import socketio
@@ -42,38 +43,34 @@ controls = {
     'left': agxSDK.GuiEventListener.KEY_Left,
     'right': agxSDK.GuiEventListener.KEY_Right,
     'brake': agxSDK.GuiEventListener.KEY_Delete,
-    'fjoink': agxSDK.GuiEventListener.KEY_End,
+    'fjoink': agxSDK.GuiEventListener.KEY_Home,
     'toggle camera closer': agxSDK.GuiEventListener.KEY_Page_Down,
     'toggle camera farther': agxSDK.GuiEventListener.KEY_Page_Up,
-    'reset to start': agxSDK.GuiEventListener.KEY_Home,
+    # 'reset to start': agxSDK.GuiEventListener.KEY_Home,
     'reset on spot': agxSDK.GuiEventListener.KEY_Insert,
+    'boost': agxSDK.GuiEventListener.KEY_End
 }
 
 
 
-def RunPureAGX(SystemList, Args):
+def RunPureAGX(MiroSystem):
     # This is the entry point for running pure agx code in the MiroSim environment.
     # This function will be called with SystemList = [sim, app, root] and you can
     # set Args to be whatever you want from the Main function. 
-    [sim, app, root] = SystemList
-
+    [sim, app, root] = MiroSystem.Get_APIsystem()
     
-    skybox = agxOSG.SkyBox('Campus','skybox/sky_','.jpg')
-    root.addChild(skybox)
-    # agxOSG.createSkyBox(skybox, 1000)
-    # CreateDigger(sim, [0,0,0.2])
-    CustomAgxFunction(SystemList, Args)
-    axp.RunPureAGX(SystemList, Args)
+    # CreateDigger(sim, [1,0,0.2])
+    CustomAgxFunction([sim, app, root])
+    axp.RunPureAGX(MiroSystem)
     # addGround(sim, app, root)
     return
 
-def CustomAgxFunction(SystemList, Args): 
+def CustomAgxFunction(SystemList): 
     [sim, app, root] = SystemList
-    bot_pos = Args.get('robot_pos', [0,0,1])
-    
+    bot_pos = [-207, 16, 7.5]
     # bot_pos[0] = bot_pos[0] - 460
     # bot_pos[1] = bot_pos[1] + 2
-    players = Args.get('players', 1)
+    players = 1
 
     if players == 2:
         bot1_pos = [bot_pos[0]-0.35,bot_pos[1],bot_pos[2]]
@@ -93,13 +90,13 @@ def CustomAgxFunction(SystemList, Args):
         cameraData.farClippingPlane  = 5000
         app.applyCameraData( cameraData )
     else:
-        scale = 1.0
+        scale = 1.25
         Cam = ComboCam(app, sim, dash_direction=[0, 1, 0], dash_position=[0,-scale/2.5,scale/5], follow_distance=2.5*scale, follow_angle=10, static_position=agxVec([-3,9,-3.6]), static_looker=agxVec([5,6,3]), baserot= agx.Quat(-np.pi/2, agx.Vec3(1,0,0)))
         sim.add(CameraConroller(app))
         try:
-            botBody = robot_local.buildBotBLOCK(sim, root, bot_pos, controller='Arrows', drivetrain = 'RWD', texture='flames.png', camera=Cam, scale=scale)
+            botBody = robot_local.buildBotws(sim, root, bot_pos, controller='Arrows', drivetrain = 'RWD', texture='flames.png', camera=Cam, scale=scale)
         except:
-            botBody = buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'RWD', texture='flames.png', camera=Cam, scale=scale)
+            botBody = buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'AWD', texture='flames.png', camera=Cam, scale=scale)
 
         # car = robot_local.TT([sim, app, root], agxVec([6,0.0,2.3]))
         # sim.add(DummyController(car, Cam))     
@@ -110,11 +107,38 @@ def CustomAgxFunction(SystemList, Args):
         sim.add(timer)
         addCones(timer)
 
+        buildRamp(agx.Vec3(-100,0,-0.15), sim, root)
 
 
-
-
-
+def buildRamp(ramp_pos, sim, root):    
+    off_angle = np.pi/6.5
+    parts = 20
+    ramp_length = 40
+    ramp_height = 4
+    ramp_pos = ramp_pos - agx.Vec3(0,0,ramp_height/2)
+    eps_x=-0.0
+    eps_z=0.0
+    part_pos = agx.Vec3(ramp_pos)
+    for i in range(parts):
+        ramp_dim = [ramp_length/parts,15, ramp_height] # *np.cos(np.pi/4)
+        ramp = agx.RigidBody( agxCollide.Geometry( agxCollide.Box(ramp_dim[0]/2, ramp_dim[1]/2, ramp_dim[2]/2)))
+        theta = -(i)/parts*off_angle
+        part_pos = part_pos - agx.Vec3(-np.cos(theta)*ramp_dim[0]-eps_x, 0, np.sin(theta)*ramp_dim[0]-eps_z)
+        ramp.setPosition(part_pos) # +arena_size[1]/2-ramp_dim[1]/2
+        ramp.setRotation(agx.Quat(theta - off_angle/parts/2, agx.Vec3(0,1,0)))
+        ramp.setMotionControl(1)
+        sim.add(ramp)
+        agxOSG.setDiffuseColor(agxOSG.createVisual(ramp, root), agxRender.Color.Gray())
+    
+    ramp_dim = [15,15, ramp_height] # *np.cos(np.pi/4)
+    ramp = agx.RigidBody( agxCollide.Geometry( agxCollide.Box(ramp_dim[0]/2, ramp_dim[1]/2, ramp_dim[2]/2)))
+    theta = -off_angle
+    part_pos = part_pos - agx.Vec3(-np.cos(theta)*ramp_dim[0]-eps_x, 0, np.sin(theta)*ramp_dim[0]-eps_z)/2
+    ramp.setPosition(part_pos) # +arena_size[1]/2-ramp_dim[1]/2
+    ramp.setRotation(agx.Quat(theta - off_angle/parts/2, agx.Vec3(0,1,0)))
+    ramp.setMotionControl(1)
+    sim.add(ramp)
+    agxOSG.setDiffuseColor(agxOSG.createVisual(ramp, root), agxRender.Color.Gray())
 
 
 def addGround(sim, app, root):
@@ -122,17 +146,47 @@ def addGround(sim, app, root):
     ground_material = agx.Material("Ground")
 
     # Create the height field from a heightmap
-    hf = agxCollide.HeightField.createFromFile("textures/height_map_jump.png", 70, 70, -0.1, 5.0)
+    hf = agxCollide.HeightField.createFromFile("textures/dammen_map_test.png", 80, 120, -5.1, 2.0)
 
     ground_geometry = agxCollide.Geometry(hf)
     ground = agx.RigidBody(ground_geometry)
+    ground.setPosition(agxVec([2,-1,40]))
     ground.setMotionControl(agx.RigidBody.STATIC)
     node = agxOSG.createVisual( ground, root )
     agxOSG.setShininess(node, 5)
 
     # Add a visual texture.
-    agxOSG.setTexture(node, "textures/terrain_detail.png", True, agxOSG.DIFFUSE_TEXTURE,10, 10)
+    agxOSG.setTexture(node, "skybox/sky_dn.jpg", True, agxOSG.DIFFUSE_TEXTURE, 1, 1)
     sim.add(ground)
+
+    createPond(sim, root)
+
+def create_water_visual(geo, root):
+    node = agxOSG.createVisual(geo, root)
+
+    diffuse_color = agxRender.Color(0.0, 0.75, 1.0, 1)
+    ambient_color = agxRender.Color(1, 1, 1, 1)
+    specular_color = agxRender.Color(1, 1, 1, 1)
+    agxOSG.setDiffuseColor(node, diffuse_color)
+    agxOSG.setAmbientColor(node, ambient_color)
+    agxOSG.setSpecularColor(node, specular_color)
+    agxOSG.setShininess(node, 120)
+    agxOSG.setAlpha(node, 0.5)
+    return node
+
+def createPond(sim, root):
+    water_material = agx.Material("waterMaterial")
+    water_material.getBulkMaterial().setDensity(1025)
+    
+    water = agxCollide.Geometry(agxCollide.Box(30, 50, 5))
+    water.setMaterial(water_material)
+    water.setPosition(agxVec([10,-8,45]))
+    sim.add(water)
+    
+    controller = agxModel.WindAndWaterController()
+    controller.addWater(water)
+    create_water_visual(water, root)
+    sim.add(controller)
 
 class DummyController(agxSDK.GuiEventListener):
     '''Wheels must be in a list and in pairs L & R, i.e. [wheel_left, wheel_right]'''
@@ -251,9 +305,12 @@ class WheelControllerArrows(agxSDK.GuiEventListener):
     
     # Steering function
     def keyboard(self, key, x, y, alt, keydown):
-        if keydown and key == controls['fjoink']:
+        if keydown and key == controls['boost']:
+            # BOOST
+            self.body.setVelocity(self.body.getVelocity()*1.06)
+        elif keydown and key == controls['fjoink']:
             # Fjoink
-            if(self.body.getVelocity().z() < 1E-2):
+            if(self.body.getVelocity().z() < 1):
                 self.body.setVelocity(self.body.getVelocity()+agx.Vec3(0,0,6))
                 if self.whlfjoink:
                     for wheel in self.wheels:
@@ -423,7 +480,30 @@ class CameraConroller(agxSDK.GuiEventListener):
             return False
         return True
 
+class Exploder(agxSDK.GuiEventListener):
+    '''Wheels must be in a list and in pairs L & R, i.e. [wheel_left, wheel_right]'''
+    def __init__(self):
+        super().__init__(agxSDK.GuiEventListener.KEYBOARD)
+        self.bodylist = []
+
+    def AddBody(self, body):
+        self.bodylist.append(body)
+
+    def keyboard(self, key, x, y, alt, keydown):
+        if keydown and key == agxSDK.GuiEventListener.KEY_BackSpace:
+            self.explode()
+        else:
+            return False
+        return True
+
+    def explode(self):
+        for body in self.bodylist:
+            body.setVelocity(5000*agxVec([0.5-random.random(),0.5-random.random(),0.5-random.random()]))
+
 def buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'FWD', color=False, texture=False, camera='static', scale=1):
+    EXPLODE = Exploder()
+    sim.add(EXPLODE)
+    
     strength = 8
 
     body_wid = 0.32*scale
@@ -433,12 +513,15 @@ def buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'FWD', color=
     wheel_rad = 0.07*scale
     wheel_wid = 0.02*scale
     wheel_dmp = -0.02*scale
+    wheel_gap = 0.004*scale
 
     body = agx.RigidBody( agxCollide.Geometry( agxCollide.Box(body_wid/2, body_hei/2, body_len/2)))
     body.setPosition(bot_pos[0], bot_pos[1], bot_pos[2] + body_hei/2 + wheel_rad + wheel_dmp )
     # body.setMotionControl(1)
     body.setRotation(agx.Quat(np.pi/2, agx.Vec3(1,0,0)))
     sim.add(body)
+    
+    EXPLODE.AddBody(body)
     vis_body = agxOSG.createVisual(body, root)
     if color:
         agxOSG.setDiffuseColor(vis_body, color)
@@ -447,29 +530,33 @@ def buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'FWD', color=
     else:
         agxOSG.setDiffuseColor(vis_body, agxRender.Color.Green())
 
+    wheel_dx = body_wid/2+wheel_wid/2+wheel_gap
+
     wheelLF = agx.RigidBody(agxCollide.Geometry( agxCollide.Cylinder(wheel_rad, wheel_wid)))
-    wheelLF.setPosition(bot_pos[0]-(body_wid/2+wheel_wid/2), bot_pos[1]+(body_len/2-wheel_rad*1.8), bot_pos[2]+wheel_rad)
+    wheelLF.setPosition(bot_pos[0]-wheel_dx, bot_pos[1]+(body_len/2-wheel_rad*1.8), bot_pos[2]+wheel_rad)
     # wheelLF.setMotionControl(1)
     wheelLF.setRotation(agx.Quat(np.pi/2, agx.Vec3(0,0,1)))
     sim.add(wheelLF)
+    
+    EXPLODE.AddBody(wheelLF)
     # agxOSG.setDiffuseColor(agxOSG.createVisual(wheelLF, root), agxRender.Color.Red())
 
     wheelRF = agx.RigidBody(agxCollide.Geometry( agxCollide.Cylinder(wheel_rad, wheel_wid)))
-    wheelRF.setPosition(bot_pos[0]+(body_wid/2+wheel_wid/2), bot_pos[1]+(body_len/2-wheel_rad*1.8), bot_pos[2]+wheel_rad)
+    wheelRF.setPosition(bot_pos[0]+wheel_dx, bot_pos[1]+(body_len/2-wheel_rad*1.8), bot_pos[2]+wheel_rad)
     # wheelRF.setMotionControl(1)
     wheelRF.setRotation(agx.Quat(-np.pi/2, agx.Vec3(0,0,1)))
     sim.add(wheelRF)
     # agxOSG.setDiffuseColor(agxOSG.createVisual(wheelRF, root), agxRender.Color.Red())
 
     wheelLB = agx.RigidBody(agxCollide.Geometry( agxCollide.Cylinder(wheel_rad, wheel_wid)))
-    wheelLB.setPosition(bot_pos[0]-(body_wid/2+wheel_wid/2), bot_pos[1]-(body_len/2-wheel_rad*1.8), bot_pos[2]+wheel_rad)
+    wheelLB.setPosition(bot_pos[0]-wheel_dx, bot_pos[1]-(body_len/2-wheel_rad*1.8), bot_pos[2]+wheel_rad)
     # wheelLB.setMotionControl(1)
     wheelLB.setRotation(agx.Quat(np.pi/2, agx.Vec3(0,0,1)))
     sim.add(wheelLB)
     # agxOSG.setDiffuseColor(agxOSG.createVisual(wheelLB, root), agxRender.Color.Red())
 
     wheelRB = agx.RigidBody(agxCollide.Geometry( agxCollide.Cylinder(wheel_rad, wheel_wid)))
-    wheelRB.setPosition(bot_pos[0]+(body_wid/2+wheel_wid/2), bot_pos[1]-(body_len/2-wheel_rad*1.8), bot_pos[2]+wheel_rad)
+    wheelRB.setPosition(bot_pos[0]+wheel_dx, bot_pos[1]-(body_len/2-wheel_rad*1.8), bot_pos[2]+wheel_rad)
     # wheelRB.setMotionControl(1)
     wheelRB.setRotation(agx.Quat(-np.pi/2, agx.Vec3(0,0,1)))
     sim.add(wheelRB)
