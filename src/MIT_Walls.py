@@ -306,7 +306,7 @@ def MIT_walls(system, H):
 
     # Add entrence wall (negative x direction)
     pos = np.array([-0.4, 0+H/2-0.16, 9.86])
-    MiroAPI.add_boxShapeHemi(system, wall_t, H/2-0.16, 1.5, pos, 'textures/door_cs.jpg', [4,3])
+    MiroAPI.add_boxShapeHemi(system, wall_t, H/2-0.16, 1.5, pos, 'textures/door_cs.jpg', [4,3],Collide=False)
 
     # Add entrence corridor (negative x direction)
     pos = np.array([0.65, 0+H/2-0.1, 11.41])
@@ -364,7 +364,7 @@ def MIT_walls(system, H):
 
     # Add wall, 4th floor data cooridor (negative x direction) 
     pos = np.array([5.5-wall_t, 0+5/2*H , 10.66+wall_t])
-    MiroAPI.add_boxShapeHemi(system, wall_t, H/2, 1.5-wall_t, pos, 'textures/door_cs.jpg', [4,3])
+    MiroAPI.add_boxShapeHemi(system, wall_t, H/2, 1.5-wall_t, pos, 'textures/door_cs.jpg', [4,3], Collide=False)
 
     # Add 4th floor wall (positive x direction)
     pos = np.array([12.7+wall_t, 0+5/2*H, 10.18])
