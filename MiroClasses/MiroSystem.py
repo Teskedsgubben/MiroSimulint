@@ -151,6 +151,9 @@ class MiroSystem():
             sensor_ID = name+'_'+s_name
             self.sensors.update({sensor_ID: sensor})
 
+    def Get_MiroModule(self, name):
+        return self.modules[name]
+
     def Release_MiroModules(self):
         if not self.released:
             for _, module in self.modules.items():
