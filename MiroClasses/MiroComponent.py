@@ -150,6 +150,9 @@ class MiroComponent():
     def SetVelocity(self, vel):
         MiroAPI.SetBodyVelocity(self.body, vel)
 
+    def SetTexture(self, texture_file, scale=[4,3]):
+        MiroAPI.ChangeBodyTexture(self.body, texture_file, scale)
+
     def SetCollisionAsBox(self, size_x, size_y, size_z, offset = [0,0,0]):
         mass = self.GetMass()
         dims = [size_x, size_y, size_z]
