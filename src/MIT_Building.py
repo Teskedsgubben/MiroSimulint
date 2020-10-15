@@ -45,8 +45,16 @@ def mit_carpet_floor(MiroSystem):
 
 def mit_outside_ground(MiroSystem):
     # Add a ground outside as a huge box
-    MIT_ground_x = 80
+    MIT_ground_x = 1000
     MIT_ground_z = 80
-    MIT_floor_pos = np.array([0, -1.15, 20])
+    MIT_floor_pos = np.array([300, -1.15, 20])
 
     MiroAPI.add_boxShape(MiroSystem, MIT_ground_x, 2, MIT_ground_z, MIT_floor_pos, 'grey concrete.jpg',scale=[23,18])
+
+    dims = [4, 0.6, 10]
+    pos = [15, -0.15, 25]
+    MiroAPI.add_boxShape(MiroSystem, dims[0], dims[1], dims[2], pos, rotX= 0*np.arcsin(dims[1]/dims[2]), rotZ= 1*np.arcsin(dims[1]/dims[0]), texture='grey concrete.jpg',scale=[23,18], rotDegrees=False)
+
+    dims = [4, 0.6, 10]
+    pos = [20, -0.15, 25]
+    MiroAPI.add_boxShape(MiroSystem, dims[0], dims[1], dims[2], pos, rotX= 0*np.arcsin(dims[1]/dims[2]), rotZ= -1*np.arcsin(dims[1]/dims[0]), texture='grey concrete.jpg',scale=[23,18], rotDegrees=False)
