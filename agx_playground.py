@@ -33,7 +33,7 @@ except:
     print('Socketio import failed')
 
 if(os.path.isfile('robot_local.py')):
-    import robot_local
+    import robot2_local as robot_local
 
     
 
@@ -67,7 +67,7 @@ def RunPureAGX(MiroSystem):
 
 def CustomAgxFunction(SystemList): 
     [sim, app, root] = SystemList
-    bot_pos = [-207, 16, 7.5]
+    bot_pos = [-11, 1, 7.5]
     # bot_pos[0] = bot_pos[0] - 460
     # bot_pos[1] = bot_pos[1] + 2
     players = 1
@@ -94,7 +94,7 @@ def CustomAgxFunction(SystemList):
         Cam = ComboCam(app, sim, dash_direction=[0, 1, 0], dash_position=[0,-scale/2.5,scale/5], follow_distance=2.5*scale, follow_angle=10, static_position=agxVec([-3,9,-3.6]), static_looker=agxVec([5,6,3]), baserot= agx.Quat(-np.pi/2, agx.Vec3(1,0,0)))
         sim.add(CameraConroller(app))
         try:
-            botBody = robot_local.buildBotws(sim, root, bot_pos, controller='Arrows', drivetrain = 'RWD', texture='flames.png', camera=Cam, scale=scale)
+            botBody = robot_local.buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'RWD', texture='flames.png', camera=Cam, scale=scale)
         except:
             botBody = buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'AWD', texture='flames.png', camera=Cam, scale=scale)
 
