@@ -209,7 +209,12 @@ Prerequisites:
     sudo apt install python3-pip
     sudo apt install python3-venv
 
-Run this:
+Run this to get MiroSimulint:
+
+    git clone https://github.com/Teskedsgubben/MiroSimulint
+    cd MiroSimulint
+
+From the MiroSimulint folder, run:
 
     /usr/bin/python3.8 -m venv MiroSim
     echo "source /opt/Algoryx/AgX-2.29.2.0/setup_env.bash" >> MiroSim/bin/activate
