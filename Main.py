@@ -75,7 +75,7 @@ def buildScene():
 
     if MiroAPI.API == 'AGX':
         from agx_playground import RunPureAGX as RunAGX
-        RunAGX(simulation_system.Get_APIsystem(), {'robot_pos': [-11, -1 , 7.5], 'players': 1})
+        RunAGX(simulation_system)
 
     # Run the system simulation at [w, h] resolution and X seconds delay to let
     # the lander settle in before pausing (which is then released by SPACEBAR)
