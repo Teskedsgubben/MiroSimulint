@@ -80,8 +80,6 @@ def AddProps(system):
             props.UNbox(system, pos, goal_nr, skew)
 
 
-    props.robotcourse(system, [-1, 6, -2])
-
 
     # grid_x = [-5.3, -5.4+4.8+4.5+4.5-0.2]
     # grid_z = [-8.8, -6+4.8+4.5+4.5-0.2]
