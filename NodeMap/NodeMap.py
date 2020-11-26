@@ -74,8 +74,9 @@ def GenerateMap():
             print('.', end = '', flush = True)
     if(capture):
         PlotLayout(graph, layout, save_name='NodeMap/capture_local/graph_plot_'+str(iterations).zfill(5)+'.png')
-    PlotLayout(graph, layout, save_name='NodeMap/Module_Map_local.png')
-    print(' Done!')
+    output_name = 'NodeMap/Module_Map_local.png'
+    PlotLayout(graph, layout, save_name=output_name)
+    print(' Done!\n\nSaved map as: '+output_name)
 
 
 ###############################################################################
