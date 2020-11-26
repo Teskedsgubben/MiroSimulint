@@ -28,9 +28,9 @@ def buildScene():
 
     # Add the DemoRobot to the system at the specified position
     BotPosition1 = [9.3, 7.6, 1.7]
-    BotPosition2 = [11, 7, 3]
+    BotPosition2 = [9.3, 7.8, 1.7]
     Simulation.Add_MiroModule(MiroBots.DemoRobot1(), 'MyBot1', BotPosition1)
-    Simulation.Add_MiroModule(MiroBots.DemoRobot2(), 'MyBot2', BotPosition2)
+    # Simulation.Add_MiroModule(MiroBots.DemoRobot2(), 'MyBot2', BotPosition2)
 
     # Set the camera perspective
     view = [BotPosition1[0]-0.17, BotPosition1[1], BotPosition1[2]+0.17]

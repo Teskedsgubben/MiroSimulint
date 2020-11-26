@@ -35,7 +35,7 @@ def DemoRobot1():
     # MyRobot.SetTexture(['Base', 'Top'], 'mirobooster.png', [1,1])
     # MyRobot.SetTexture(['Wheel: Left, Back', 'Wheel: Left, Back', 'Wheel: Left, Back', 'Wheel: Left, Back'], 'woodwheel.png', [1,1])
 
-    # Show the layout of the build before simulation
+    # Save the robot layout to enable generating a map using NodeMap
     MyRobot.CreateModuleMap()
 
     return MyRobot

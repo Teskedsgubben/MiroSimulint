@@ -1,6 +1,6 @@
 from MiroClasses.MiroAPI_selector import SelectedAPI as MiroAPI
 import numpy as np
-from Felix import NodeMap
+from NodeMap import NodeMap
 
 class Module():
     def __init__(self, name=False):
