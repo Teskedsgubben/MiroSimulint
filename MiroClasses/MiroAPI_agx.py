@@ -133,7 +133,12 @@ def PreSetup(args, SetupFunction):
     ## Create an application with graphics etc.
     app = agxOSG.ExampleApplication()
     dec = app.getSceneDecorator()
-    dec.setEnableLogo(False)
+    dec.setBackgroundColor(agx.Vec3(1,1,1))
+    dec.setLogoFile('textures/TF-loader.png')
+    dec.setLogoLocation(agxOSG.SceneDecorator.FREE)
+    width = 0.25
+    dec.setLogoPosition(0.5-width/2, 0.3)
+    dec.setMaximumLogoDimension(width, 1.0)
 
     ## Create a command line parser. sys.executable will point to python executable
     ## in this case, because getArgumentName(0) needs to match the C argv[0] which
@@ -159,6 +164,10 @@ def SetupSystem():
         agx.setNumThreads(0)
         n = agx.getNumThreads()*0.5-1
         agx.setNumThreads(int(n))
+
+        
+        dec = app.getSceneDecorator()
+        dec.setEnableLogo(False)
         
         skybox = agxOSG.SkyBox('Campus','skybox/sky_','.jpg')
         root.addChild(skybox)

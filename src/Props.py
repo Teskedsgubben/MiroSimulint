@@ -128,4 +128,4 @@ def floorvent(MiroSystem, target, SPEEDMODE = False):
 
 def UNbox(MiroSystem, pos, goal_nr, skew):
     pos[1] = pos[1]+0.2
-    MiroAPI.add_boxShape(MiroSystem, 0.4, 0.4, 0.4, pos, rotY=skew, texture='UN_'+str(goal_nr)+'.png', Collide=False)
+    MiroAPI.add_boxShape(MiroSystem, 0.4, 0.4, 0.4, pos, density=8, rotY=skew, texture='UN_'+str(goal_nr)+'.png', Fixed=False)

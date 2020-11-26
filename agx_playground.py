@@ -68,6 +68,7 @@ def RunPureAGX(MiroSystem):
 def CustomAgxFunction(SystemList): 
     [sim, app, root] = SystemList
     bot_pos = [-11, 1, 7.5]
+    # bot_pos = [-287, -151.43, 23.77]
     # bot_pos[0] = bot_pos[0] - 460
     # bot_pos[1] = bot_pos[1] + 2
     players = 1
@@ -90,25 +91,56 @@ def CustomAgxFunction(SystemList):
         cameraData.farClippingPlane  = 5000
         app.applyCameraData( cameraData )
     else:
-        scale = 1.25
+        scale = 2/3
+        # bot_pos = [5,11.2,6.85]
         Cam = ComboCam(app, sim, dash_direction=[0, 1, 0], dash_position=[0,-scale/2.5,scale/5], follow_distance=2.5*scale, follow_angle=10, static_position=agxVec([-3,9,-3.6]), static_looker=agxVec([5,6,3]), baserot= agx.Quat(-np.pi/2, agx.Vec3(1,0,0)))
         sim.add(CameraConroller(app))
         try:
-            botBody = robot_local.buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'RWD', texture='flames.png', camera=Cam, scale=scale)
+            botBody = robot_local.buildBots(sim, root, bot_pos, controller='Arrows', drivetrain = 'RWD', texture='flames.png', camera=Cam, scale=scale)
         except:
-            botBody = buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'AWD', texture='flames.png', camera=Cam, scale=scale)
+            botBody = buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'RWD', texture='flames.png', camera=Cam, scale=scale)
 
+        # rot_x = agx.Quat(-np.pi/9.8, agx.Vec3(1,0,0))
+        # rot_z = agx.Quat(np.pi*0.779, agx.Vec3(0,0,1))
+        # botBody.setRotation(botBody.getRotation()*rot_z*rot_x)
+        # botBody.setMotionControl(1)
+        # sim.add(Starter(botBody, 21))
+        # 
+        # start_pos = [bot_pos[0], bot_pos[1], bot_pos[2]+0.2]
+        # end_pos = [-298, 99.43, -24.77]
+        # sim.add(ZoomCam(app, start_pos, start_pos, end_pos, speed=0.003))
         # car = robot_local.TT([sim, app, root], agxVec([6,0.0,2.3]))
         # sim.add(DummyController(car, Cam))     
 
-        start_plate = addboxx(sim, root, [1,0.002,1], [12,6.6401,-6])
-        end_plate = addboxx(sim, root, [1,0.002,1], [-3,0.101, 0.5], color=agxRender.Color.Green())
-        timer = Timer(start_plate, botBody, end_plate)
-        sim.add(timer)
-        addCones(timer)
+        # ConeCourse(sim, root, botBody)
 
         buildRamp(agx.Vec3(-100,0,-0.15), sim, root)
 
+
+
+class Starter(agxSDK.GuiEventListener):
+    '''Wheels must be in a list and in pairs L & R, i.e. [wheel_left, wheel_right]'''
+    def __init__(self, body, speed):
+        super().__init__(agxSDK.GuiEventListener.KEYBOARD)
+        self.body = body
+        self.speed = speed
+
+    # Steering function
+    def keyboard(self, key, x, y, alt, keydown):
+        if keydown and key == agxSDK.GuiEventListener.KEY_BackSpace:
+            self.body.setMotionControl(3)
+            self.body.setVelocity(self.body.getRotation()*agx.Vec3(0,0,-self.speed))
+        else:
+            return False
+        return True
+
+
+def ConeCourse(sim, root, body):
+    start_plate = addboxx(sim, root, [1,0.002,1], [12,6.6401,-6])
+    end_plate = addboxx(sim, root, [1,0.002,1], [-3,0.101, 0.5], color=agxRender.Color.Green())
+    timer = Timer(start_plate, body, end_plate)
+    sim.add(timer)
+    addCones(timer)
 
 def buildRamp(ramp_pos, sim, root):    
     off_angle = np.pi/6.5
@@ -146,7 +178,7 @@ def addGround(sim, app, root):
     ground_material = agx.Material("Ground")
 
     # Create the height field from a heightmap
-    hf = agxCollide.HeightField.createFromFile("textures/dammen_map_test.png", 80, 120, -5.1, 2.0)
+    hf = agxCollide.HeightField.createFromFile("textures/terrain_heightfield.png", 800, 800, -25.1, 25.0)
 
     ground_geometry = agxCollide.Geometry(hf)
     ground = agx.RigidBody(ground_geometry)
@@ -156,7 +188,7 @@ def addGround(sim, app, root):
     agxOSG.setShininess(node, 5)
 
     # Add a visual texture.
-    agxOSG.setTexture(node, "skybox/sky_dn.jpg", True, agxOSG.DIFFUSE_TEXTURE, 1, 1)
+    agxOSG.setTexture(node, "textures/stone.png", True, agxOSG.DIFFUSE_TEXTURE, 100, 100)
     sim.add(ground)
 
     createPond(sim, root)
@@ -366,11 +398,11 @@ class WheelControllerArrows(agxSDK.GuiEventListener):
                     self.camera.ToggleCam(1)
                 self.cameraswitched = True
         
-        elif keydown and key == controls['reset to start']:
-            self.body.setPosition(-9, 0 , 7.5)
-            self.body.setAngularVelocity(0,0,0)
-            self.body.setVelocity(agx.Vec3(0,0,0))
-            self.body.setRotation(self.reset_rot)
+        # elif keydown and key == controls['reset to start']:
+        #     self.body.setPosition(-9, 0 , 7.5)
+        #     self.body.setAngularVelocity(0,0,0)
+        #     self.body.setVelocity(agx.Vec3(0,0,0))
+        #     self.body.setRotation(self.reset_rot)
 
         elif keydown and key == controls['reset on spot']:
             self.body.setPosition(self.restorePosition)
@@ -1167,3 +1199,88 @@ def addCones(timer=False):
         traffic_cone = [bottom, cone]
         if timer:
             timer.addCheckpoint(traffic_cone)
+
+
+class CycleCam(agxSDK.StepEventListener):
+    def __init__(self, app, target, distance=2.5, tilt=16, start_angle=0):
+        super().__init__(agxSDK.StepEventListener.PRE_COLLIDE+agxSDK.StepEventListener.PRE_STEP+agxSDK.StepEventListener.POST_STEP)
+        self.app = app
+        self.dist = distance
+        self.dlooker = distance/5
+        self.tilt = np.deg2rad(tilt)
+        angle = np.deg2rad(start_angle)
+        self.speed=0.002
+        
+        self.relative_position = self.dist*agx.Vec3(np.sin(angle),-np.cos(self.tilt)*np.cos(angle), np.sin(self.tilt))
+        self.relative_looker = self.dist*agx.Vec3(np.sin(angle+np.pi/2),-np.cos(self.tilt)*np.cos(angle+np.pi/2), np.sin(self.tilt))
+        
+        self.target = agx.Vec3(target[0], target[1], target[2])
+        self.position = self.relative_position + self.target
+        self.looker = self.relative_looker + self.target  
+
+        self.updateCamera()
+
+    def preCollide(self, time):
+        return
+
+    def pre(self, time):
+        relative_position = agx.Quat(self.speed, agx.Vec3(0,0,1))*self.relative_position
+        relative_position.setLength(self.dist)
+
+        relative_looker = agx.Quat(self.speed, agx.Vec3(0,0,1))*self.relative_looker
+        relative_looker.setLength(self.dlooker)
+
+        self.relative_position = relative_position
+        self.relative_looker = relative_looker
+
+        self.position = self.relative_position + self.target 
+        self.looker = self.relative_looker + self.target 
+
+        self.updateCamera()
+        return
+    
+    def updateCamera(self):
+        cameraData                   = self.app.getCameraData()
+        cameraData.eye               = self.position
+        cameraData.center            = self.looker
+        cameraData.up                = agx.Vec3( 0, 0, 1 )
+        cameraData.nearClippingPlane = 0.1
+        cameraData.farClippingPlane  = 5000
+        self.app.applyCameraData( cameraData )
+
+    def post(self, time):
+        return
+
+class ZoomCam(agxSDK.StepEventListener):
+    def __init__(self, app, target, start, end, speed=0.0001):
+        super().__init__(agxSDK.StepEventListener.PRE_COLLIDE+agxSDK.StepEventListener.PRE_STEP+agxSDK.StepEventListener.POST_STEP)
+        self.app = app
+        self.looker = agx.Vec3(target[0], target[1], target[2])
+        self.start = agx.Vec3(start[0], start[1], start[2])
+        self.end = agx.Vec3(end[0], end[1], end[2])
+        self.position = self.start
+        self.speed = speed
+        self.ratio = 0
+        
+        self.updateCamera()
+
+    def preCollide(self, time):
+        return
+
+    def pre(self, time):
+        self.position = (1-self.ratio**4)*self.start + self.ratio**4*self.end
+        self.ratio = self.ratio + self.speed
+        self.updateCamera()
+        return
+    
+    def updateCamera(self):
+        cameraData                   = self.app.getCameraData()
+        cameraData.eye               = self.position
+        cameraData.center            = self.looker
+        cameraData.up                = agx.Vec3( 0, 0, 1 )
+        cameraData.nearClippingPlane = 0.1
+        cameraData.farClippingPlane  = 5000
+        self.app.applyCameraData( cameraData )
+
+    def post(self, time):
+        return

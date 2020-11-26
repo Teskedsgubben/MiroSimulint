@@ -1,8 +1,9 @@
 from MiroClasses.MiroAPI_selector import SelectedAPI as MiroAPI
 import numpy as np
+from Felix import NodeMap
 
 class Module():
-    def __init__(self):
+    def __init__(self, name=False):
         self.components = {}
         self.sensors = {}
         self.links = {}
@@ -14,6 +15,9 @@ class Module():
         self.refcomp = False
         self.base = False
         self.mass = 0
+        self.name = name
+        self.graph_nodes=[]
+        self.graph_links=[]
 
         # Extra bodies or links for props, not to be counted into module
         self.hidden_bodies = []
@@ -29,6 +33,9 @@ class Module():
         print('  Components: '+str(len(self.components.keys()) - len(self.sensors.keys())))
         print('  Connections: '+str(len(self.links.keys())))
         print('  Mass: %.3f kg' % (round(self.GetMass(),2)))
+        
+    def CreateModuleMap(self):
+        NodeMap.WriteGraph(self.graph_links)
     
     def AddComponent(self, comp, name='unnamed'):
         if not self.base:
@@ -181,6 +188,7 @@ class Module():
         
         # Add the link to the module's dictionary of links
         self.links.update({name: hinge_link})
+        self.graph_links.append({'Source': name_A, 'Target': name_B, 'Weight': 1})
 
     def SetSpring(self, name_A, point_A, name_B, point_B, L, K, marking_radius = 0.005, draw_spring = False, spring_radius = 0.005, spring_turns = 40):
         '''Sets a spring of rest length L and spring constant K between the points on components A and B in the module. 

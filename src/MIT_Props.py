@@ -71,13 +71,21 @@ def AddProps(system):
     direction = np.array([0,0,1])
     # base_pos = np.array([ 11, 0, -5])
     # direction = np.array([1,0,-0.1])
+    base_pos = np.array([ 8, 0, 4.2])
+    direction = np.array([1,0,-0.4])
+    direction = direction/np.linalg.norm(direction)
 
+    goals= [3,16,12,1,15,4,11,9,2,6,10,8,5,17,14,16,13]
+
+    i=0
     for row in range(len(nr_unboxes)):
         for nr in range(nr_unboxes[row]):
-            skew =  10*(2*rng.random()-1) + 90*rng.randint(0,3)
+            skew = 10*(2*rng.random()-1) + 90*rng.randint(0,3) + 180/np.pi*np.arccos(np.dot(direction, np.array([1,0,0])))
             pos = base_pos + (nr_unboxes[row]/4 - 0.5*nr)*direction + np.array([0,0.4*row,0])
-            goal_nr = rng.randint(0,17)
+            # goal_nr = rng.randint(0,17)
+            goal_nr = goals[i]
             props.UNbox(system, pos, goal_nr, skew)
+            i=i+1
 
 
 

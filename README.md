@@ -207,7 +207,7 @@ Prerequisites:
     sudo apt install libglu1
     sudo apt install python3-dev
     sudo apt install python3-pip
-    sudo apt install python3-venv
+    sudo apt install python3.8-venv
 
 Run this to get MiroSimulint:
 

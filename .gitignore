@@ -22,3 +22,5 @@ ignored_storage
 Grupp*_*
 # Ignores data files
 *.dat
+# T-SNE development dir
+T-SNE

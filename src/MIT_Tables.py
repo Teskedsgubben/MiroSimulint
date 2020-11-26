@@ -100,7 +100,7 @@ def tabletop(MiroSystem, table_pos, size_table):
 
 def table_leg(MiroSystem, leg_pos, size_leg_r, size_leg_h):
     # creating the cylinder leg
-    return MiroAPI.add_cylinderShape(MiroSystem, size_leg_r, size_leg_h, 1200, leg_pos, texture='brushsteel.png', Fixed=FIXED)
+    return MiroAPI.add_cylinderShape(MiroSystem, size_leg_r, size_leg_h, 1200, leg_pos, texture='chrome.png', Fixed=FIXED)
 
 def chair_back(MiroSystem, pos_back, size_back_x,size_back_y, size_back_z):
     return MiroAPI.add_boxShape(MiroSystem, size_back_x, size_back_y, size_back_z, pos_back, 'MITstol.jpg', Fixed=FIXED)

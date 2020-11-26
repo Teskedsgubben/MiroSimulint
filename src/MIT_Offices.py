@@ -142,8 +142,8 @@ def make_window(size_vx, size_vy, size_vz, size_hx, size_hy, size_hz, mid_pos, w
             MiroAPI.add_boxShape(MiroSystem, 0.2, 0.8, W*3, bot_pos, texture='white concrete.jpg', scale=[9, 12])
             MiroAPI.add_boxShape(MiroSystem, 0.2, 0.3, W*3, top_pos, texture='white concrete.jpg', scale=[9, 12])
         for wid in range(3):
-            left_pos = mid_pos + np.array([-0.104, 1.5*3.32, -6.78 + wid*W])
-            right_pos = mid_pos + np.array([-0.104, 1.5*3.32, -6.78 + W - 0.25 + wid*W])
+            left_pos = mid_pos + np.array([-0.102, 1.5*3.32, -6.78 + wid*W])
+            right_pos = mid_pos + np.array([-0.102, 1.5*3.32, -6.78 + W - 0.25 + wid*W])
             MiroAPI.add_boxShape(MiroSystem, 0.2, 3.32*3, 0.25, left_pos, texture='white concrete.jpg', scale=[9, 12])
             MiroAPI.add_boxShape(MiroSystem, 0.2, 3.32*3, 0.25, right_pos, texture='white concrete.jpg', scale=[9, 12])
 
@@ -174,8 +174,8 @@ def make_window(size_vx, size_vy, size_vz, size_hx, size_hy, size_hz, mid_pos, w
             MiroAPI.add_boxShape(MiroSystem, W*3, 0.8, 0.2, bot_pos, texture='white concrete.jpg', scale=[9, 12])
             MiroAPI.add_boxShape(MiroSystem, W*3, 0.3, 0.2, top_pos, texture='white concrete.jpg', scale=[9, 12])
         for wid in range(3):
-            left_pos = mid_pos + np.array([-6.8 + wid*W, 1.5*3.32, -0.104])
-            right_pos = mid_pos + np.array([-6.8 + W - 0.25 + wid*W, 1.5*3.32, -0.104])
+            left_pos = mid_pos + np.array([-6.8 + wid*W, 1.5*3.32, -0.102])
+            right_pos = mid_pos + np.array([-6.8 + W - 0.25 + wid*W, 1.5*3.32, -0.102])
             MiroAPI.add_boxShape(MiroSystem, 0.25, 3.32*3, 0.2, left_pos, texture='white concrete.jpg', scale=[9, 12])
             MiroAPI.add_boxShape(MiroSystem, 0.25, 3.32*3, 0.2, right_pos, texture='white concrete.jpg', scale=[9, 12])
 
