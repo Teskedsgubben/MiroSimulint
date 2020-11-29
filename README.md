@@ -181,19 +181,19 @@ Step 5) Change the API = 'PyChrono' to API = 'AGX'
 
 You now have a local file selecting the API MiroSim will use. To change it back in the future, you only need to redo Step 5) in reverse and so on. However, you must select a python interpreter that is configured for AGX as well. Unless you knowingly configured it to be the same, you will most likely need to switch. This has to be done again if you decide to change API in the future as well.
 
-Step 6) Go to _View_ -> _Command Palette_ and locate Python: Select Interpreter. The Python you want to run should be located in the AGX install directory, i.e. the .../Algoryx/AGX-your\_version directory. If you do not see the right one in the list, click _Enter interpreter path..._ and click _Find..._ so you can navigate to _C:\Program Files\Algoryx\AGX-2.29.2.0\python-x64_ or similar, and select the _python.exe_ in that directory. You now have the right python selected.
+Step 6) Go to _View_ -> _Command Palette_ and locate Python: Select Interpreter. The Python you want to run should be located in the AGX install directory, i.e. the .../Algoryx/AGX-YOURAGXVERSION directory. If you do not see the right one in the list, click _Enter interpreter path..._ and click _Find..._ so you can navigate to _C:\Program Files\Algoryx\AGX-YOURAGXVERSION\python-x64_ or similar, and select the _python.exe_ in that directory. You now have the right python selected.
 
-Step 7) To setup the environment for agx, you must run the _setup\_env.bat_ in the terminal you are using. This is done by _"C:\Program Files\Algoryx\AGX-2.29.2.0\setup\_env.bat"_, or if you are using powershell (it says __PS C:\Users...>__ rather than just __C:\Users...>__) you add an & before the path, like _& "C:\Program..."_. This needs to be run every time you start a new terminal for using AGX.
+Step 7) To setup the environment for agx, you must run the _setup\_env.bat_ in the terminal you are using. This is done by _"C:\Program Files\Algoryx\AGX-YOURAGXVERSION\setup\_env.bat"_, or if you are using powershell (it says __PS C:\Users...>__ rather than just __C:\Users...>__) you add an & before the path, like _& "C:\Program..."_. This needs to be run every time you start a new terminal for using AGX.
 
 Step 8) You can add some lines to you local settings to make pylint find the agx functions. In VS Code, this is done by opening the local directory .vscode in the MiroSimulint directory. Here, modify (or create) the file _settings.json_ with the follow lines:
 
     {
-        "python.pythonPath": "C:/Program Files/Algoryx/AGX-2.29.2.0/python-x64/python.exe",
+        "python.pythonPath": "C:/Program Files/Algoryx/AGX-YOURAGXVERSION/python-x64/python.exe",
         "files.associations": {
             "*.agxPy": "python"
         },
         "python.autoComplete.extraPaths": [
-            "C:/Program Files/Algoryx/AGX-2.29.2.0/bin/x64/agxpy"
+            "C:/Program Files/Algoryx/AGX-YOURAGXVERSION/bin/x64/agxpy"
         ],
     }
 
@@ -201,28 +201,61 @@ Note that if you installed AGX somewhere else, you need to modify the above to t
 
 ### On Unix
 
-Prerequisites:
+The Python version in use must be the same as the one agxViewer is installed for. Once AGX is installed, you can navigate to the directory where AGX is installed, being /opt/Algoryx/AgX-YOURAGXVERSION. Here you can run the bash script for setting up the AGX environment by:
 
-    sudo apt install python3.8
+    source setup_env.bash
+
+Once the script is sourced, the command agxViewer should be recognized. You can check the version of Python that was used by the command:
+
+    agxViewer --version
+
+The output should end with something like:
+
+    Built with Python version: 3.X.Y
+
+Then check your system Python version with:
+
+    python3 --version
+
+As long as the X in the versions are the same, things should be fine. If not, then you need to make sure to use the correct python version. To do this, you can use this.
+
+You DO NOT have to do this if your python version is correct. Replace the X with the correct version:
+
+    sudo apt install python3.X
+
+Once you know you have the correct python version, these commands need to run as well. Replace the X with the right version:
+
     sudo apt install libglu1
     sudo apt install python3-dev
     sudo apt install python3-pip
-    sudo apt install python3.8-venv
+    sudo apt install python3.X-venv
 
-Run this to get MiroSimulint:
+Now that the Python packages are in place, run this to get MiroSimulint. Navigate to the directory you want to put MiroSimulint in first, maybe with just "cd" to get to your $HOME directory:
 
     git clone https://github.com/Teskedsgubben/MiroSimulint
     cd MiroSimulint
 
-From the MiroSimulint folder, run:
+From the MiroSimulint folder, setup a virtual environment:
 
-    /usr/bin/python3.8 -m venv MiroSim
-    echo "source /opt/Algoryx/AgX-2.29.2.0/setup_env.bash" >> MiroSim/bin/activate
+    /usr/bin/python3.X -m venv MiroSim
+
+You have to run both the virtual environment's activation script and the AGX setup_env script to run the program. You can put the command to run the AGX script into the venv script by:
+
+    echo "source /opt/Algoryx/AgX-YOURAGXVERSION/setup_env.bash" >> MiroSim/bin/activate
+
+Then, activate the MiroSim environment with:
+
     source MiroSim/bin/activate
-    pip install -r unix/requirements.txt.in
 
-To run the program:
+The first time you do this, you need to install these two packages as well:
+
+    pip install numpy
+    pip install scipy
+
+Done! To run the program:
 
     python Main.py
     --- OR ---
     agxViewer Main.py
+
+The next time you start MiroSim, you repeat "source MiroSim/bin/activate" in the terminal and run the program again.
