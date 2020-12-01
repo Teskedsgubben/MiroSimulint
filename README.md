@@ -258,4 +258,4 @@ Done! To run the program:
     --- OR ---
     agxViewer Main.py
 
-The next time you start MiroSim, you repeat "source MiroSim/bin/activate" in the terminal and run the program again.
+The next time you start MiroSim, you repeat "source MiroSim/bin/activate" in the terminal and run the Main.py file again.
