@@ -93,7 +93,10 @@ def CustomAgxFunction(SystemList):
     else:
         scale = 2/3
         # bot_pos = [5,11.2,6.85]
+        
         Cam = ComboCam(app, sim, dash_direction=[0, 1, 0], dash_position=[0,-scale/2.5,scale/5], follow_distance=2.5*scale, follow_angle=10, static_position=agxVec([-3,9,-3.6]), static_looker=agxVec([5,6,3]), baserot= agx.Quat(-np.pi/2, agx.Vec3(1,0,0)))
+        # Cam = False
+
         sim.add(CameraConroller(app))
         try:
             botBody = robot_local.buildBots(sim, root, bot_pos, controller='Arrows', drivetrain = 'RWD', texture='flames.png', camera=Cam, scale=scale)
@@ -333,7 +336,8 @@ class WheelControllerArrows(agxSDK.GuiEventListener):
         self.cameraswitched = False
         self.restorePosition = self.body.getPosition()+agx.Vec3(0,0,0.4)
 
-        self.camera.SetBody(self.body)
+        if camera:
+            self.camera.SetBody(self.body)
     
     # Steering function
     def keyboard(self, key, x, y, alt, keydown):
@@ -532,7 +536,7 @@ class Exploder(agxSDK.GuiEventListener):
         for body in self.bodylist:
             body.setVelocity(5000*agxVec([0.5-random.random(),0.5-random.random(),0.5-random.random()]))
 
-def buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'FWD', color=False, texture=False, camera='static', scale=1):
+def buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'FWD', color=False, texture=False, camera=False, scale=1):
     EXPLODE = Exploder()
     sim.add(EXPLODE)
     
