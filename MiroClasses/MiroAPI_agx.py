@@ -178,6 +178,7 @@ def SetupSystem():
 def RunSimulation(MiroSystem):
     [sim, app, root] = MiroSystem.Get_APIsystem()
     MiroSystem.Set_Camera()
+    sim.add(SimStepper(MiroSystem))
     sim.add(ModuleReleaser(MiroSystem))
     return
 
@@ -519,3 +520,18 @@ class ModuleReleaser(agxSDK.GuiEventListener):
         else:
             return False
         return True
+
+class SimStepper(agxSDK.StepEventListener):
+    def __init__(self, MiroSystem):
+        super().__init__(agxSDK.StepEventListener.PRE_COLLIDE+agxSDK.StepEventListener.PRE_STEP+agxSDK.StepEventListener.POST_STEP)
+        self.system = MiroSystem
+
+    def preCollide(self, time):
+        return
+
+    def pre(self, time):
+        self.system.Set_Camera()
+        return
+
+    def post(self, time):
+        return
