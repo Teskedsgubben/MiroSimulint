@@ -74,7 +74,15 @@ class Module():
         for _, comp in self.components.items():
             addpos = np.array(comp.GetPosition())*comp.GetMass()/M
             mass_center = mass_center + addpos
-        return mass_center        
+        return mass_center     
+
+    def GetCenterOfMassVelocity(self):
+        mass_center = np.array([0,0,0])
+        M = self.GetMass()
+        for _, comp in self.components.items():
+            addpos = np.array(comp.GetVelocity())*comp.GetMass()/M
+            mass_center = mass_center + addpos
+        return mass_center      
 
     def GetComponent(self, name='unnamed'):
         return self.components[name]

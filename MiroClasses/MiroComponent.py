@@ -92,6 +92,9 @@ class MiroComponent():
 
     def GetPosition(self):
         return MiroAPI.GetBodyPosition(self.body)
+    
+    def GetVelocity(self):
+        return MiroAPI.GetBodyVelocity(self.body)
 
     def GetLinkPoint(self, name):
         return self.GetPosition() + self.linkpoints[name]
