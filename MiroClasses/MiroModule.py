@@ -1,6 +1,6 @@
 from MiroClasses.MiroAPI_selector import SelectedAPI as MiroAPI
 import numpy as np
-from NodeMap import NodeMap
+from NodeMap.Graph import Graph
 
 class Module():
     def __init__(self, name=False):
@@ -34,8 +34,11 @@ class Module():
         print('  Connections: '+str(len(self.links.keys())))
         print('  Mass: %.3f kg' % (round(self.GetMass(),2)))
         
-    def CreateModuleMap(self):
-        NodeMap.WriteGraph(self.graph_links)
+    def CreateModuleMap(self, filename = 'NodeMap/module_graph.json'):
+        ModuleMap = Graph()
+        ModuleMap.append(self.graph_links)
+        ModuleMap.writeToFile(filename)
+        # NodeMap.WriteGraph(self.graph_links)
     
     def AddComponent(self, comp, name='unnamed'):
         if not self.base:

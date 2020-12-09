@@ -178,7 +178,7 @@ def SetupSystem():
 def RunSimulation(MiroSystem):
     [sim, app, root] = MiroSystem.Get_APIsystem()
     MiroSystem.Set_Camera()
-    sim.add(SimStepper(MiroSystem))
+    # sim.add(SimStepper(MiroSystem))
     sim.add(ModuleReleaser(MiroSystem))
     return
 

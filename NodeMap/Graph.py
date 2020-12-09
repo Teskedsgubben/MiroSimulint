@@ -1,4 +1,5 @@
-
+import random as rng
+import json
 
 class Graph():
     def __init__(self):
@@ -8,24 +9,65 @@ class Graph():
     def append(self, link, symmetric = False):
         if type(link) == type([]):
             for lk in link:
-                self.append(lk)
+                self.append(lk, symmetric)
         else:
             for side in ['Source', 'Target']:
+                if not str(link[side]) in self.labels:
+                    self.labels.append(str(link[side]))
                 if type(link[side]) == type(''):
-                    if not link[side] in self.labels:
-                        self.labels.append(str(link[side]))
                     link[side] = self.labels.index(link[side])
             self.links.append(link)
             if symmetric:
                 link_sym = {
-                    'Source': link['Target'],
-                    'Target': link['Source'],
+                    'Source': int(link['Target']),
+                    'Target': int(link['Source']),
                     'Weight': link['Weight'],
                 }
                 self.links.append(link_sym)
     
-    def getLink(self, i):
+    def getLink(self, i): 
         return self.links[i]
+
+    def generateRandom(self, nr_of_nodes, nr_of_neighbors):
+        if type(nr_of_neighbors) != type([]):
+            nr_of_neighbors = [nr_of_neighbors]
+        if max(nr_of_neighbors) >= nr_of_nodes:
+            print('More neighbors then nodes, graph not generated')
+            return
+        for i in range(nr_of_nodes):
+            neighs = []
+            nr_neighs = nr_of_neighbors[rng.randrange(0, len(nr_of_neighbors))]
+            for j in range(nr_neighs):
+                new_neigh = i
+                while new_neigh == i or new_neigh in neighs:
+                    # new_neigh = rng.randrange(0, nr_of_nodes)
+                    new_neigh = round(rng.normalvariate(i, nr_neighs/1.41))
+                    new_neigh = new_neigh + (1*(new_neigh < 0) - 1*(new_neigh >= nr_of_nodes))*nr_of_nodes
+                    if new_neigh < 0:
+                        new_neigh = new_neigh + nr_of_nodes
+                    if new_neigh >= nr_of_nodes:
+                        new_neigh = new_neigh - nr_of_nodes
+                neighs.append(new_neigh)
+                link = {
+                    'Source': i,
+                    'Target': new_neigh,
+                    'Weight': 1,
+                }
+                self.append(link)
+
+    def writeToFile(self, filename):
+        '''Currently loses labels'''
+        filestream = open(filename, "w")
+        filestream.truncate(0)
+        labeled_links = []
+        for link in self.links:
+            labeled_links.append({
+                    'Source': self.labels[link['Source']],
+                    'Target': self.labels[link['Target']],
+                    'Weight': link['Weight'],
+                })
+        filestream.write(json.dumps(labeled_links))
+
 
     
     # type Link struct {
@@ -70,10 +112,12 @@ class Graph():
     #     return fallback
     # }
 
-    def ExtractSubGraph(self, source):
+    def ExtractSubGraph(self, source, bidi = False):
         subG = Graph()
         for link in self.links:
-            if link['Source'] == source or link['Target'] == source:
+            if link['Source'] == source:
+                subG.append(link)
+            if bidi and link['Target'] == source:
                 subG.append(link)
         return subG
     
