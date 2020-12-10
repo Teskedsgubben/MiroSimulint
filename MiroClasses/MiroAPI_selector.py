@@ -18,7 +18,7 @@ if(os.path.isfile('MiroClasses/MiroAPI_local.py')):
     from MiroClasses import MiroAPI_local
     SelectedAPI = MiroAPI_local.SelectedAPI
 else:
-    API = 'PyChrono'
+    API = 'AGX'
 
     if API == 'AGX':
         import MiroClasses.MiroAPI_agx as agxAPI
