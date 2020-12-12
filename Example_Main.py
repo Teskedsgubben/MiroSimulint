@@ -20,6 +20,8 @@ from src import Environments
 import Example_MiroBots as MiroBots
 import Example_BotController as CustomController
 
+import TestController
+
 # Function that runs the simulation
 def buildScene():
     # Initialize a Miro System
@@ -30,12 +32,14 @@ def buildScene():
     BotPosition1 = [9.3, 7.6, 1.7]
     BotPosition2 = [9.3, 7.8, 1.7]
     Simulation.Add_MiroModule(MiroBots.DemoRobot1(), 'MyBot1', BotPosition1)
-    # Simulation.Add_MiroModule(MiroBots.DemoRobot2(), 'MyBot2', BotPosition2)
+    Simulation.Add_MiroModule(MiroBots.DemoRobot2(), 'MyBot2', BotPosition2)
 
     # Set the camera perspective
     view = [BotPosition1[0]-0.17, BotPosition1[1], BotPosition1[2]+0.17]
     Simulation.Add_Camview('testpos', [10.3, 8.2, 2.65], [-0.25,-0.2,-1],look_at_point=view)
-    Simulation.Set_Perspective('testpos')
+    Simulation.Set_Perspective('follow', follow_module_name='MyBot1', cycle=True)
+
+    TestController.AddDummController(Simulation, 'MyBot1')
     # CustomController.ControlModule(Simulation.Get_MiroModule('MyBot2'))
     
     Simulation.Run()

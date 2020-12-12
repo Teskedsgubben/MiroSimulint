@@ -130,7 +130,7 @@ class MiroSystem():
         use SetPerspective to configure the camera before running the simulation.'''
         if self.cycle:
             self.cam_to_obs = MiroAPI.rotateVector(self.cam_to_obs, self.cycle_angle/self.fps, [0,1,0], rotDegrees=False)
-            self.cam_to_obs = self.followmod.GetCenterOfMassVelocity()
+            self.cam_to_obs = (49*self.cam_to_obs + self.followmod.GetCenterOfMassVelocity())/50
             self.cam_to_obs = self.cam_to_obs/np.linalg.norm(self.cam_to_obs)
         if self.follow:
             self.obs_pos = self.followmod.GetCenterOfMass()
