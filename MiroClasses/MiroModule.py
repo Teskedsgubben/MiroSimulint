@@ -89,6 +89,9 @@ class Module():
 
     def GetComponent(self, name='unnamed'):
         return self.components[name]
+    
+    def GetBaseComponent(self, name='unnamed'):
+        return self.base
 
     def GetSensor(self, name='unnamed'):
         return self.sensors[name]
