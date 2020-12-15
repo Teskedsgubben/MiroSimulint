@@ -1,8 +1,11 @@
 # MiroSimulint
 
-This is a simulation library built on PyChrono. It can be used to build component based modules in a test environment.
+This is a simulation library built for creating modular constructions using a highly simplified interface. It supports different APIs and you only need to install support for the one you intend to use.
 
-To get this running:
+**AGX Dynamics** API: Physics engine used for real time simulations and interactive controls, such as robots and vehicles. Requires a license file to use.  
+**PyChrono** API: Used for simulations without interactive controls, that are made for recording video rather than real time. Free to install and use.
+
+To get MiroSimulint running:
 ___
 
 ## Installing Programs
@@ -13,7 +16,58 @@ Download and install Git from:
 
 > <https://git-scm.com/downloads>
 
-### Step 2) *Install Anaconda*
+### Step 2) *Download MiroSimulint*
+
+When git is installed, you can clone this repository into a local directory. Open *Git Bash* on your computer, then download the MiroSimulint code by typing:
+
+    git clone https://github.com/Teskedsgubben/MiroSimulint
+
+You can change where to put MiroSimulint by first typing *cd NAMEOFDIRECTORY* which will change the directory git bash is in, and git clone will then put MiroSimulint into that directory.
+
+### Step 3) *Install VS Code*
+
+You need a program to edit your code. If you do not have one you already intend to use, this is the recommended code editor:
+
+> <https://code.visualstudio.com/download>
+
+__On Windows:__ We will need to change default shell in VS Code. To do this, open VS Code and click _View_ $\to$ _Command Pallette_ and type "shell". Select command prompt (cmd) and restart VS Code.
+
+### Step 4a) *Install API: AGX Dynamics*
+
+#### 4a.1) *Install AGX Dynamics*
+
+Open the AGX download page
+
+> <https://www.algoryx.se/download/?id=2079>
+
+Find the download link that matches your system. Using Windows, which platform you install for will not matter for this library, but **make sure** you have the correct bits, most likely x64. If you are unsure, go to Control Panel $\to$ System to see your System type.
+
+#### 4a.2) *Prepare License File*
+
+When installed, you need a license file to place in your install directory. If you do not already have one, contact us. The directory should be:
+
+On Windows: _C:\Program Files\Algoryx\AgX-YOURAGXVERSION_  
+On Mac/Unix: _/opt/Algoryx/AgX-YOURAGXVERSION_
+
+#### 4a.3) *Test AGX Viewer*
+
+Open a terminal and navigate to the agx install directory. Then run the setup_env script
+
+__On Windows:__
+  
+    cd "C:\Program Files\Algoryx\AgX-YOURAGXVERSION"
+    setup_env.bat
+    agxViewer --version
+
+__On Mac/Unix:__
+
+    cd /opt/Algoryx/AgX-YOURAGXVERSION
+    source_env.bash
+    agxViewer --version
+
+### Step 4b) *Install API: PyChrono*
+
+#### 4b.1) *Install Anaconda*
 
 Download and install Anaconda from:
 
@@ -23,21 +77,19 @@ _Note: MiroSimulint was built using the 2019.10 version of Anaconda. If you run 
 
 > <https://repo.anaconda.com/archive/>
 
-### Step 3) *Install PyChrono and MiroSimulint*
+#### 4b.2) *Install PyChrono*
 
-Run Anaconda Prompt from the start menu or the Anaconda Navigator page. Type the commands in the following steps.
+Note: *Skip this section if you do not need to use PyChrono*
 
-__a)__ Download the MiroSimulint code by:
+Run Anaconda Prompt from the start menu or the Anaconda Navigator page. Type the follow commands:
 
-    git clone https://github.com/Teskedsgubben/MiroSimulint
-
-__b)__ Create an environment and install PyChrono by:
+Create an environment named MiroSim and install PyChrono by:
 
     conda create -n MiroSim python=3.7 numpy matplotlib pylint ffmpeg
 
     conda install -n MiroSim -c projectchrono pychrono
 
-__c)__ _Optional._ You should be able to run the program now. You can try it if you want, but we will do it a different way using VS Code in the next step. If you are familiar with code editing, you can just use this method and edit your files in your own editor, if you prefer.
+_Optional._ You should be able to run the program now. You can try it if you want, but we will do it a different way using VS Code in the next step. If you are familiar with code editing, you can just use this method and edit your files in your own editor, if you prefer.
 
     cd MiroSimulint
 
@@ -47,7 +99,7 @@ __c)__ _Optional._ You should be able to run the program now. You can try it if 
 
 __Linux Users:__
 
-You then need to install irrlicht, run these commands in a terminal window:
+On Linux (and possibly Mac) you need to install irrlicht, run these commands in a terminal window:
 
     sudo apt-get install libirrlicht1.8 libirrlicht-dev libirrlicht-doc
 
@@ -59,29 +111,35 @@ If you get glibc version error, try checking the version by the command below an
 
 If your version of glibc (technically ldd, but they should be the same) is older than the error says that the program needs, you probably need to update to the latest LTS version of you distro. On Ubuntu, this is currently version 20.04 and this has been confirmed to work.
 
-### Step 4) *Install VS Code*
-
-This is the recommended code editor:
-
-> <https://code.visualstudio.com/download>
-
 ### Step 5) *Setup the program with VS Code*
 
 To open the files, start VS Code and click _File -> Open Folder_ to open the *MiroSimulint* folder. This should be at you user directory, such as __C:\\Users\\*MyUsername*\\MiroSimulint__ unless you changed it in step __3a)__, or __C:\\Users\\*MyUsername*\\Documents\\MiroSimulint__.
 
 There is a package needed to get full support for Python commands. When VS Code is open, click _View -> Extensions_, search for Python and install Microsofts Python package.
 
-Once the Python package is installed, click _View -> Command Palette..._ and type _"Python: Select Interpreter"_ and click it. You can then select the _('MiroSim': conda)_ option. Clicking this will create a file telling VS code to use the MiroSim environment for this project, and is only needed once.
+Once the Python package is installed, click _View -> Command Palette..._ and type _"Python: Select Interpreter"_ and click it.
 
-You also need to set the command prompt to default shell. Click _View -> Command Palette..._ and type _"Terminal: Select Default Shell"_ and click it. Now choose _Command Prompt_ in the menu.
+_Using AGX (Windows):_ Click _Enter interpreter path..._ then click _Find..._ and navigate to the AGX install directory, then open the python folder and select the python.exe inside.
 
-Now restart Visual Studio Code and the configuration is complete.
+_Using AGX (Mac/Unix):_ If your python3 version (python3 --version) is the same as agxviewer (3.X, last digit may differ) you can create a virtual environment with:
+
+    python3 -m venv MiroSim
+    echo "source /opt/Algoryx/AgX-YOURAGXVERSION/setup_env.bash" >> MiroSim/bin/activate
+
+_Using PyChrono:_ You can then select the _('MiroSim': conda)_ option.
+
+Clicking this will create a file telling VS code to use the MiroSim environment for this project, and is only needed once.
 
 ### Step 6) *Run the program*
 
 Open VS Code and open the MiroSimulint directory (_File -> Open Folder..._). Open the _Main.py_ file in the explorer menu on your left. When the file is open, click the green "Play Button" on the top right to run the code. If it starts, you're all set to begin coding. Otherwise, contact a supervisor with any error(s) you get.
 
-__IMPORTANT NOTE:__ Some DirectX issues have been occuring. What happens is that the code runs, but the simulation only produces a black screen. See the folder dx9_shaderfix and follow the readme.txt instructions for a quickfix on this. A reliable solution will be posted when ready.
+__IN AGX:__ You must run a setup script in the terminal window before running the code for every new terminal. You should get an import error otherwise. Run the following in the terminal, just below the error:
+
+__On Windows:__ "C:/Program Files/Algoryx/AgX-YOURAGXVERSION/setup_env.bat"
+__On Mac/Unix:__ source MiroSim/bin/activate
+
+__IN PYCHRONO:__ Some DirectX issues have been occuring. What happens is that the code runs, but the simulation only produces a black screen. See the folder OS Resources and follow the readme.txt instructions for a quickfix on this.
 
 ___
 
@@ -89,11 +147,13 @@ ___
 
 ### The Program
 
-When the program starts, the program runs for few seconds and then pauses. This is so the lander can settle in to the launcher and allows you to find an epic camera angle before launching. You can then press SPACE to resume and release the launcher. You will have a target that the launcher is supposed to hit.
+The file you run is called Main.py and is quite short. Here you create a system, add modules and start the simulation. It is recommended that you copy this file and create your own local copy which you run instead. This way, you can freely modify your local file without running into issues when doing a pull from the repository.
+
+There are example modules in some files to check out, which makes you familiar with the code. Before modifying, it is recommended you create your own local file for this as well. You can either copy the example code and keep what you want, or start completely fresh. To access your local modules in your Main.py file, update the imports at the top to include your file.
 
 ### The Camera
 
-To rotate the camera, use the mouse with left-click to drag the view. You can use the arrow keys and _Page Up / Page Down_ to move the observation point the camera looks at, and the scroll wheel to move closer or further away from that point. Press _I_ and click _Help_ for a full list of camera controls. There are also several pre-configured camera positions you can use, as can be seen in the comments in the _Main.py_ file.
+Camera controls vary depending on API, but in the Main file you can find a function call Set_Perspective. This function controls where the camera is positioned and how it should behave. This is currently being reworked and may be outdated:
 
 There are two special camera functions you can use as well.
 
@@ -103,65 +163,25 @@ __Cycle:__ You can add `cycle = True` to the end of the input arguments. This wi
 
 _Note: Laptime means how many simulation time seconds it takes for the camera to complete one revolution, meaning a laptime of 10 will create a video that takes 50 seconds to complete the lap, using the default 60 fps video and 300 fps simulation speed._
 
-### The Coding
-
-You have four code files to work with: _Main.py_, _Landers.py_, _Launchers.py_ and _CustomComponents.py_. Any code in the subfolders are free to read if you are curious, but do not change them. You will only submit up to the four files, unless otherwise agreed upon.
-
-_Main.py_ is the file that starts the program. Here you can change camera views, rendering resolution and initial start delay. You can also compute any arguments you want to pass along to your Lander or Launcher. An important feature here is __Speedmode__ which you find is set to __False__. Setting this to __True__ will remove many details in the program, speeding up the simulation. This is most likely more conviniet to use when running tests and so on.
-
-_Landers.py_ is where you can define you Lander. You have a demo where a simple lander is built by adding a bottom and top plate and connecting them with rods. Note how the top plate is rotated 180 degrees so the connection points are at the bottom, and the order of the components being connected. Start by modifying this lander, try to add more components etc.
-
-_Launchers.py_ defines your Launcher in the same way as above. To try different designs, you can define several Launchers here and choose which one to try out in the _Main.py:_ file.
-
-_CustomComponents.py_ is where you can define your custom components that you either have imported from an object file (.obj) or agreed to create from component template function, like MC0XX. You do not have to use this file if you do not feel the need to.
-
-There is also a _test\_main.py_ file which is a copy of the _Main.py_ file and will run the program as well. It shows some other tricks you can use for testing and camera controls. You can also use this file to try stuff out without having to change the Main file.
-
-Before you start coding, copy these files in the same directory and rename them by adding _local. There should in other words be a Main.py file and a Main_local.py file etc. You can then edit the local files and still do a git pull to get the latest version of the Simulint files, and you also keep the original files as a refernce.
-
-To do a git pull, go to Source Control _(View -> SCM)_ and click the three dots button ... to show the dropdown menu, then click Pull. If there are changes showing in the list, you need to discard them first. Save your changes in some way if you need to keep them, then discard them with the revert-like arrow button.
-
-Your Lander and Launcher are both built as MiroModules using MiroComponents. This means that you add the components you need, rotate them properly and then assemble them into a complete module. The order here is important, as connecting components 1 and 2 will move component 2 so that the connection points match. If you connect first and rotate the object after, things are going to get messy. However, that doesn't mean you shouldn't try it :bowtie:.
-
-### The Goal
-
-The challenge is to create a compact, portable launcher, that can hit a specified target. The ultimate goal is that the launcher is automatically calibrated by knowing its own position and the position of the target, adjusting aim and power to hit the target with the lander without any manual tweaking.
-
-### Create a Video File
-
-We installed ffmpeg into the MiroSim environment to enable creating a video file from the simulation. For this to work properly, open your Display Settings and set scaling to 100%, otherwise the images will get skewed. Also, set the resolution of the simulation to something suitable for your monitor. Then, to generate the video, follow the steps below.
-
-First, start the simulation as usual. When you press PrintScreen the program will start saving images into a directory called video_capture. Press PrtSc to start recording, then press it again or close the window to stop. You can move the camera during capture, and you can pause to change camera angle, no frames are saved while paused. You can also add "record": True to the simulation config, and it will record from the start. To then convert these images into a video file, we use ffmpeg.
-
-From VS Code you can run the command below in the terminal window. If the terminal is not showing, click _View -> Terminal_ to open it. If you are not using VS Code, you can run the same command from the Anaconda Prompt in the MiroSimulint directory, just make sure MiroSim is your active environment as in Step 3c. The command to run is:
-
-    ffmpeg -framerate 60 -i video_capture/screenshot%05d.bmp -b:v 128M video_capture/MiroSim.avi
-
-This will put the screenshot files into a video file called MiroSim.avi in the video\_capture folder. The framerate of 60 can be changed to alter the speed of the video. A value of 300 is full speed, so using 60 renders the video in slow motion, but this is more suitable for seeing details. You can also change the quality and file size by changing the _128M_ to another number.
-
-You can also add audio by supplying an audio file as input between the _d.bmp_ and _-b:v_ like below. If the audio file is too short and the video cuts too early, remove the -shortest command.
-
-    ...d.bmp -i audiofile.mp3 -shortest -b:v...
-
-__Convert to .mp4:__ The default video format is .avi which you can import in most video editors. If you just want to render a .mp4 file to play directly, you can use the command below.
-
-    ffmpeg -i video_capture/MiroSim.avi -preset slow -codec:v libx264 -pix_fmt yuv420p -b:v 128M video_capture/MiroSim.mp4
-
-Then open the MiroSim.mp4 file in the video_capture directory.
+Your modules are built as MiroModules using MiroComponents. This means that you add the components you need, rotate them properly and then assemble them into a complete module. The order here is important, as connecting components 1 and 2 will move component 2 so that the connection points match. If you connect first and rotate the object after, things are going to get messy. However, that doesn't mean you shouldn't try it :bowtie:.
 
 ### Keeping MiroSimulint up to date
 
-To get the latest updates we push to the repository, you can follow a simple procedure to set up the way you work. After that, it's as simple as a couple clicks to always get the latest version.
+To get the latest updates we push to the repository, it's as simple as a couple clicks to always get the latest version. Go to _View_ -> _SCM_ or _Source Control_ click the three dots button ... and click Pull. This will get the latest versions of the files from the repository.
+
+This requires that you have not modified the original files, and only work in local files. If this is not the case, follow these simple steps to reset, but keep your files intact.
 
 Step 1) Rename the files you will or have worked with by adding the suffix "_local" to their names, e.g. Main_local.py and GroupLogo_local.png and so on. This will make git ignore the files.
 
-Step 2) Go to _View_ -> _SCM_ or _Source Control_, which is the same as clicking the "fork" or "graph" symbol on your left side panel. Here, discard all changes in the list by hovering over the file name and clicking the "reverse" style arrow. This should reset the original file.
+Step 2) , which is the same as clicking the "fork" or "graph" symbol on your left side panel. Here, discard all changes in the list by hovering over the file name and clicking the "reverse" style arrow. This should reset the original file.
 
-Step 3) Once the list is completely empty, click the three dots button ... and click Pull. This will get the latest versions of the files from the repository.
-
-You then work in the files named _local instead of the ordinary files. After doing this once, you only need to redo step 3 to get the latest version again.
+You then work in the files named _local instead of the ordinary files. After doing this once, you can always just pull directly to get the latest version again.
 
 ___
+
+## OUTDATED
+
+The following sections are outdated, but remain just in case. If you are having trouble, your can give these a look. Most of this is mentioned above, and the MiroAPI is now using AGX by default.
 
 ## Using AGX
 
