@@ -24,7 +24,6 @@ from agxPythonModules.utils.callbacks import StepEventCallback, KeyboardCallback
 import time as TIME
 import math
 import numpy as np
-import agx_playground_1 as axp
 import random
 
 try:
@@ -61,7 +60,6 @@ def RunPureAGX(MiroSystem):
     
     # CreateDigger(sim, [1,0,0.2])
     CustomAgxFunction([sim, app, root])
-    axp.RunPureAGX(MiroSystem)
     # addGround(sim, app, root)
     return
 
@@ -99,7 +97,7 @@ def CustomAgxFunction(SystemList):
 
         sim.add(CameraConroller(app))
         try:
-            botBody = robot_local.buildBots(sim, root, bot_pos, controller='Arrows', drivetrain = 'RWD', texture='flames.png', camera=Cam, scale=scale)
+            botBody = robot_local.buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'RWD', texture='flames.png', camera=Cam, scale=scale)
         except:
             botBody = buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'RWD', texture='flames.png', camera=Cam, scale=scale)
 
@@ -821,11 +819,13 @@ def buildBot(sim, root, bot_pos, controller='Arrows', drivetrain = 'FWD', color=
     sim.add(plate_back)
     plate_vis = agxOSG.createVisual(plate_back, root)
     agxOSG.setTexture(plate_vis, 'textures/brumbo.png', True, agxOSG.DIFFUSE_TEXTURE, 1.0, 1.0)
+    
     hf = agx.HingeFrame()
     hf.setAxis(agx.Vec3(0,1,0))
     hf.setCenter(plate_back.getPosition() + agx.Vec3( body_wid/2.5, plate_dep, 0))
     hing = agx.Hinge(hf, body, plate_back)
     sim.add(hing)
+    
     hf = agx.HingeFrame()
     hf.setAxis(agx.Vec3(0,1,0))
     hf.setCenter(plate_back.getPosition() + agx.Vec3(-body_wid/2.5, plate_dep, 0))

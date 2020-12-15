@@ -20,45 +20,21 @@ from src import Environments
 from src import Props
 import numpy as np
 
-# Imports any local files first, otherwise uses repo files
-try:
-    import Landers_local as Landers
-except:
-    import Landers
-
-try:
-    import Launchers_local as Launchers
-except:
-    import Launchers
+# Import Demomodules
+import DemoModules
 
 # Function that runs the simulation
 def buildScene():
     # Initialize a Miro System
-    simulation_system = MS.MiroSystem()
+    Simulation = MS.MiroSystem()
 
     # Set the environment to MIT place.
     # If the simulation is too slow, set Speedmode to True.
-    simulation_system.Set_Speedmode(False)
-    simulation_system.Set_Environment(Environments.MIT_place)
+    Simulation.Set_Speedmode(False)
+    Simulation.Set_Environment(Environments.MIT_place)
 
-    # Get the position of the target as [x, y, z]
-    target = simulation_system.Get_Target()
-
-    # COMPUTE THE ARGUMENTS YOU NEED FOR YOUR LAUNCHER AND LANDER HERE
-    # You can pass any arguments you want to your launcher or lander
-    # that you compute from the target coordinates
-    aim = -10      # Example of direction to shoot
-    pullback = 5   # Example of how much strength is needed
-
-    # Add the DemoLauncher to the system at the specified position
-    launcher_position = [10, 6.69, -2.2]
-    simulation_system.Add_MiroModule(Launchers.DemoLauncher([aim, pullback]), 'Launcher', launcher_position)
-
-    # Add the DemoLander to the system
-    simulation_system.Add_MiroModule(Landers.DemoLander([aim, pullback]), 'Lander')
-
-    # Move the Lander to the point set by the Launcher
-    simulation_system.MoveToReference('Lander', 'Launcher')
+    # Add a DemoModule to the system with a name and position.
+    Simulation.Add_MiroModule(DemoModules.DemoRobot1(), 'MyRobot', [11, 8,-3])
 
     # Set camera viewing perspective, options are:
     # 1: '2nd (ground) floor front view'
@@ -71,21 +47,14 @@ def buildScene():
     # Special: 'follow', 'Module Name', [x, y, z]
     # Use mouse, scroll wheel, arrow keys and pg up & pg down to move
     # Press I and see the help section for a full list of controls
-    simulation_system.Set_Perspective('4th floor observing launcher')
+    Simulation.Set_Perspective('4th floor observing launcher')
 
+    # Entry point for custom AGX code
     if MiroAPI.API == 'AGX':
-        from agx_playground import RunPureAGX as RunAGX
-        RunAGX(simulation_system)
+        from agx_playground import RunPureAGX
+        RunPureAGX(Simulation)
 
-    # Run the system simulation at [w, h] resolution and X seconds delay to let
-    # the lander settle in before pausing (which is then released by SPACEBAR)
-    config = {
-        'resolution': [1920, 1080],
-        'delay': 3,
-        'datalog': False,
-        'print module info': True,
-    }
-    simulation_system.Run(config)
+    Simulation.Run()
 
 # Initializes and runs the system
 MS.MiroSetup(buildScene)
