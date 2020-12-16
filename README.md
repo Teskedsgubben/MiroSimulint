@@ -42,6 +42,8 @@ Open the AGX download page
 
 Find the download link that matches your system. Using Windows, which platform you install for will not matter for this library, but **make sure** you have the correct bits, most likely x64. If you are unsure, go to Control Panel $\to$ System to see your System type.
 
+__Note:__ When installing in Windows, you will get prompted that Windows is blocking the installer. Click on _More information_ to show the _Run anyway_ button.
+
 #### 4a.2) *Prepare License File*
 
 When installed, you need a license file to place in your install directory. If you do not already have one, contact us. The directory should be:
