@@ -31,7 +31,10 @@ class MiroSystem():
         self.follow = False
         self.cycle = False
         self.fps = 300
-
+        #tests camera properties
+        self.follow_angle = np.deg2rad(-20)
+        self.distance = 3
+        self.follow_default = False
         self.camviews = {
             'default': {
                 'pos': [0, 3, 0],
@@ -70,17 +73,19 @@ class MiroSystem():
     def Get_APIsystem(self):
         return self.system_list
     
-    def Set_Perspective(self, camname, follow_module_name = False, follow_position = [1.5, 0.75, 0], follow_distance = 0, cycle = False, cycle_laptime = 4):
+    def Set_Perspective(self, camname, follow_module_name = False, follow_position = [1.5, 0.75, 0], follow_distance = 0, cycle = False, cycle_laptime = 4, follow_angle=20):
         '''Sets the camera perspective configuration for the simulation. Available perspectives depend on the MiroEnvironment used.'''
+        self.follow_angle = np.deg2rad(-follow_angle)
+        self.distance = follow_distance
         if cycle:
             self.cycle = True
             self.cycle_angle = -2*np.pi/cycle_laptime
-        if camname == 'follow':
+        if camname == 'follow_default':
             if not follow_module_name:
                 print('Camera Error: Input a module name to use follow perspective, using default')
             else:
                 if follow_module_name in self.modules:
-                    self.follow = True
+                    self.follow_default = True
                     self.followmod = self.modules[follow_module_name]
                     self.cam_to_obs = -np.array(follow_position)
                     self.obs_pos = self.followmod.GetCenterOfMass()
@@ -101,6 +106,8 @@ class MiroSystem():
             else:
                 print('Camera Error: "'+camname+'" is not a recognized camera position, using default')
         
+        MiroAPI.SetCamera(self.system_list, self.cam_pos, self.obs_pos)
+
 
     def Add_Camview(self, name, position = [0,0,0], direction = [1,0,0], distance = 1, look_at_point = False):
         '''Add your own camera perspective to the environment. \n
@@ -132,11 +139,28 @@ class MiroSystem():
             self.cam_to_obs = MiroAPI.rotateVector(self.cam_to_obs, self.cycle_angle/self.fps, [0,1,0], rotDegrees=False)
             self.cam_to_obs = (49*self.cam_to_obs + self.followmod.GetCenterOfMassVelocity())/50
             self.cam_to_obs = self.cam_to_obs/np.linalg.norm(self.cam_to_obs)
-        if self.follow:
-            self.obs_pos = self.followmod.GetCenterOfMass()
-        self.cam_pos = self.obs_pos - self.cam_to_obs
-        MiroAPI.SetCamera(self.system_list, self.cam_pos, self.obs_pos)
+            self.cam_pos = self.obs_pos - self.cam_to_obs
+            MiroAPI.SetCamera(self.system_list, self.cam_pos, self.obs_pos)
 
+        
+        if self.follow_default:
+            cam_to_obs = self.followmod.GetCenterOfMassVelocity()/np.linalg.norm(self.followmod.GetCenterOfMassVelocity())
+            
+            if np.linalg.norm(self.followmod.GetCenterOfMassVelocity()) > 1E-2:
+                cam_to_obs = cam_to_obs * self.distance
+                cam_to_obs = (49 * self.cam_to_obs + cam_to_obs) / (49 + 1) 
+                cam_to_obs[0] = cam_to_obs[0]# * np.cos(self.angle)
+                cam_to_obs[1] = self.distance * np.sin(self.follow_angle)
+                cam_to_obs[2] = cam_to_obs[2]# * np.cos(self.angle)
+                
+                self.cam_to_obs = cam_to_obs
+                self.obs_pos = self.followmod.GetCenterOfMass()
+                self.cam_pos = self.obs_pos - self.cam_to_obs
+                MiroAPI.SetCamera(self.system_list, self.cam_pos, self.obs_pos)
+
+        if not self.cycle and not self.follow:
+            return
+        
     def Add_MiroComponent(self, component, position = False, vel = False):
         component.AddToSystem(self)
 
