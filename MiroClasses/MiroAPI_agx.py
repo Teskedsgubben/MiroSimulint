@@ -551,7 +551,7 @@ def addGround(MiroSystem, size_x, size_y, size_z, pos, heightmap, texture='test.
 
     ground_geometry = agxCollide.Geometry(hf)
     ground = agx.RigidBody(ground_geometry)
-    ground.setPosition(agxVecify([2,-1,40]))
+    ground.setPosition(agxVecify(pos))
     ground.setMotionControl(agx.RigidBody.STATIC)
     node = agxOSG.createVisual( ground, agxRoot )
     agxOSG.setShininess(node, 5)
