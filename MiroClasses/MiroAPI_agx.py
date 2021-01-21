@@ -178,7 +178,7 @@ def SetupSystem():
 def RunSimulation(MiroSystem):
     [sim, app, root] = MiroSystem.Get_APIsystem()
     MiroSystem.Set_Camera()
-    # sim.add(SimStepper(MiroSystem))
+    sim.add(SimStepper(MiroSystem))
     sim.add(ModuleReleaser(MiroSystem))
     return
 
@@ -535,3 +535,55 @@ class SimStepper(agxSDK.StepEventListener):
 
     def post(self, time):
         return
+
+
+def addGround(MiroSystem, size_x, size_y, size_z, pos, heightmap, texture='test.jpg', scale=[4,3], Collide=True, Fixed=True, rotX=0, rotY=0, rotZ=0, rotOrder=['x','y','z'], rotAngle=0, rotAxis=[1,0,0], rotDegrees=True, mass=False, density=1000, dynamic=False, color=[0.5, 0.5, 0.5]):
+
+    agxSim = agxPython.getContext().environment.getSimulation()
+    agxApp = agxPython.getContext().environment.getApplication()
+    agxRoot = agxPython.getContext().environment.getSceneRoot()
+
+    # Create the ground
+    ground_material = agx.Material("Ground")
+
+    # Create the height field from a heightmap
+    hf = agxCollide.HeightField.createFromFile("textures/"+heightmap, size_x, size_z, 0, size_y)
+
+    ground_geometry = agxCollide.Geometry(hf)
+    ground = agx.RigidBody(ground_geometry)
+    ground.setPosition(agxVecify([2,-1,40]))
+    ground.setMotionControl(agx.RigidBody.STATIC)
+    node = agxOSG.createVisual( ground, agxRoot )
+    agxOSG.setShininess(node, 5)
+
+    # Add a visual texture.
+    agxOSG.setTexture(node, "textures/"+texture, True, agxOSG.DIFFUSE_TEXTURE, 100, 100)
+    agxSim.add(ground)
+
+
+def create_water_visual(geo, root):
+    node = agxOSG.createVisual(geo, root)
+
+    diffuse_color = agxRender.Color(0.0, 0.75, 1.0, 1)
+    ambient_color = agxRender.Color(1, 1, 1, 1)
+    specular_color = agxRender.Color(1, 1, 1, 1)
+    agxOSG.setDiffuseColor(node, diffuse_color)
+    agxOSG.setAmbientColor(node, ambient_color)
+    agxOSG.setSpecularColor(node, specular_color)
+    agxOSG.setShininess(node, 120)
+    agxOSG.setAlpha(node, 0.5)
+    return node
+
+def createPond(sim, root):
+    water_material = agx.Material("waterMaterial")
+    water_material.getBulkMaterial().setDensity(1025)
+    
+    water = agxCollide.Geometry(agxCollide.Box(30, 50, 5))
+    water.setMaterial(water_material)
+    water.setPosition(agxVec([10,-8,45]))
+    sim.add(water)
+    
+    controller = agxModel.WindAndWaterController()
+    controller.addWater(water)
+    create_water_visual(water, root)
+    sim.add(controller)
