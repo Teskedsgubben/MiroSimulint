@@ -31,9 +31,15 @@ class MiroSystem():
         self.follow = False
         self.cycle = False
         self.fps = 300
+        self.camera_sweep = False
+        self.sweep_cam = []
+        self.sweep_obs = []
+        self.sweepstep = 0
+        self.sweepnr = 0
+
         #tests camera properties
-        self.follow_angle = np.deg2rad(-20)
-        self.distance = 3
+        self.follow_distance = 3
+        self.follow_height = 0.5
         self.follow_default = False
         self.camviews = {
             'default': {
@@ -73,10 +79,10 @@ class MiroSystem():
     def Get_APIsystem(self):
         return self.system_list
     
-    def Set_Perspective(self, camname, follow_module_name = False, follow_position = [1.5, 0.75, 0], follow_distance = 0, cycle = False, cycle_laptime = 4, follow_angle=20):
+    def Set_Perspective(self, camname, follow_module_name = False, follow_position = [1.5, 0.75, 0], follow_distance = 0, cycle = False, cycle_laptime = 4, follow_height=0.5):
         '''Sets the camera perspective configuration for the simulation. Available perspectives depend on the MiroEnvironment used.'''
-        self.follow_angle = np.deg2rad(-follow_angle)
-        self.distance = follow_distance
+        self.follow_distance = follow_distance
+        self.follow_height = follow_height
         if cycle:
             self.cycle = True
             self.cycle_angle = -2*np.pi/cycle_laptime
@@ -144,23 +150,53 @@ class MiroSystem():
 
         
         if self.follow_default:
-            cam_to_obs = self.followmod.GetCenterOfMassVelocity()/np.linalg.norm(self.followmod.GetCenterOfMassVelocity())
             
-            if np.linalg.norm(self.followmod.GetCenterOfMassVelocity()) > 1E-2:
-                cam_to_obs = cam_to_obs * self.distance
-                cam_to_obs = (49 * self.cam_to_obs + cam_to_obs) / (49 + 1) 
-                cam_to_obs[0] = cam_to_obs[0]# * np.cos(self.angle)
-                cam_to_obs[1] = self.distance * np.sin(self.follow_angle)
-                cam_to_obs[2] = cam_to_obs[2]# * np.cos(self.angle)
+            if np.linalg.norm(self.followmod.GetCenterOfMassVelocity()) > 1e-2:
                 
-                self.cam_to_obs = cam_to_obs
+                #oldest working
+                #cam_to_obs[0] = cam_to_obs[0] * np.cos(self.follow_angle)
+                #cam_to_obs[1] = cam_to_obs[0] * np.sin(self.follow_angle)
+                #cam_to_obs[2] = cam_to_obs[2] * np.cos(self.follow_angle)
                 self.obs_pos = self.followmod.GetCenterOfMass()
+                
+                
+                cam_to_obs = (self.followmod.GetCenterOfMassVelocity()/np.linalg.norm(self.followmod.GetCenterOfMassVelocity()))
+                cam_to_obs *= self.follow_distance
                 self.cam_pos = self.obs_pos - self.cam_to_obs
+                self.cam_pos[1] += self.follow_height             # good val = 1/2
                 MiroAPI.SetCamera(self.system_list, self.cam_pos, self.obs_pos)
+
+                cam_to_obs = (49 * self.cam_to_obs + cam_to_obs)/(49 + 1)
+
+                self.cam_to_obs = cam_to_obs
+        
+        if self.camera_sweep:
+            i = self.sweepstep
+            sweep_divs = 100
+            self.cam_pos = ((sweep_divs-i)*self.sweep_cam[self.sweepnr-1]+(i)*self.sweep_cam[self.sweepnr])/sweep_divs
+            self.obs_pos = ((sweep_divs-i)*self.sweep_obs[self.sweepnr-1]+(i)*self.sweep_obs[self.sweepnr])/sweep_divs
+            MiroAPI.SetCamera(self.system_list, self.cam_pos, self.obs_pos) 
+            self.sweepstep += 1
+            if self.sweepstep > sweep_divs:
+                self.sweepstep = 0
+                self.sweepnr += 1
+            if self.sweepnr >= self.sweepsteps:
+                self.camera_sweep = False
 
         if not self.cycle and not self.follow:
             return
-        
+
+    def Set_CameraSweep(self, cam_positions, obs_positions):
+           
+        self.sweepsteps = min(len(cam_positions)+1, len(obs_positions)+1)
+        self.sweep_cam = [np.array(cam_positions[i]) for i in range(len(cam_positions))]
+        self.sweep_obs = [np.array(obs_positions[i]) for i in range(len(obs_positions))]
+        self.sweep_obs.append(np.array(self.obs_pos))
+        self.sweep_cam.append(np.array(self.cam_pos))
+        self.camera_sweep = True
+        self.sweepnr = 1
+        self.sweepstep = 0
+
     def Add_MiroComponent(self, component, position = False, vel = False):
         component.AddToSystem(self)
 
