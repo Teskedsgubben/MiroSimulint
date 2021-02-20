@@ -18,6 +18,8 @@ class Module():
         self.name = name
         self.graph_nodes=[]
         self.graph_links=[]
+        self.controller = False
+        self.max_force = 100
 
         # Extra bodies or links for props, not to be counted into module
         self.hidden_bodies = []
@@ -168,11 +170,9 @@ class Module():
         else:
             print('MarkComponent is currently only supported in the chrono API')
 
-    def ConnectComponents(self, name_A, point_A, name_B, point_B, dist = 0, move = True, show_warning = True):
+    def ConnectComponents(self, name_A, point_A, name_B, point_B, dist = 0, move = True, show_warning = True, link_name = False):
         comp_A = self.components[name_A]
         comp_B = self.components[name_B]
-
-        name = name_A+"."+point_A + "_TO_" + name_B+"."+point_B
 
         if(move):
             self.GetComponent(name_B).MoveToMatch(point_B, self.GetComponent(name_A), point_A, dist)
@@ -201,7 +201,12 @@ class Module():
         hinge_link = MiroAPI.LinkBodies_Hinge(comp_A.GetBody(), comp_B.GetBody(), linkpos, linkdir)
         
         # Add the link to the module's dictionary of links
-        self.links.update({name: hinge_link})
+        if link_name:
+            self.links.update({link_name: hinge_link})
+        else:
+            name = name_A+"."+point_A + "_TO_" + name_B+"."+point_B
+            self.links.update({name: hinge_link})
+
         self.graph_links.append({'Source': name_A, 'Target': name_B, 'Weight': 1})
 
     def SetSpring(self, name_A, point_A, name_B, point_B, L, K, marking_radius = 0.005, draw_spring = False, spring_radius = 0.005, spring_turns = 40):
@@ -343,4 +348,24 @@ class Module():
                 self.hidden_links = []
             if remove_future:
                 self.use_helpers = False
-        
+
+
+
+    def AddController(self, Controller):
+        self.controller = Controller
+        MiroAPI.AddController(self)
+
+    def UseController(self, keydown, key, alt, x = False, y = False):
+        self.controller(self, keydown, key, alt)
+
+    def Set_Max_Force(self, MAX_FORCE):
+        self.max_force = MAX_FORCE
+
+    def Get_Max_Force(self):
+        return self.max_force
+
+    def EnableMotor(self, link):
+        self.links[link].getMotor1D().setEnable(True)
+
+    def SetMotorSpeed(self, link, speed):
+        self.links[link].getMotor1D().setSpeed(speed)

@@ -587,3 +587,26 @@ def createPond(sim, root):
     controller.addWater(water)
     create_water_visual(water, root)
     sim.add(controller)
+
+
+class UserController(agxSDK.GuiEventListener):
+    def __init__(self, Module):
+        super().__init__(agxSDK.GuiEventListener.KEYBOARD)
+        self.module = Module
+    
+    def keyboard(self, key, alt, x, y, keydown):
+        if self.module.controller:
+            self.module.UseController(keydown, key, alt)
+            return True
+        else: 
+            print('No controller added to Module!')
+            return False
+
+def AddController(Module):
+    sim = agxPython.getContext().environment.getSimulation()
+    app = agxPython.getContext().environment.getApplication()
+    root = agxPython.getContext().environment.getSceneRoot()
+    
+    controller = UserController(Module)
+
+    sim.add(controller)
