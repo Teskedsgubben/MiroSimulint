@@ -37,7 +37,7 @@ def buildScene():
     # Set the camera perspective
     view = [BotPosition1[0]-0.17, BotPosition1[1], BotPosition1[2]+0.17]
     Simulation.Add_Camview('testpos', [10.3, 8.2, 2.65], [-0.25,-0.2,-1],look_at_point=view)
-    Simulation.Set_Perspective('follow', follow_module_name='MyBot1', cycle=True)
+    Simulation.Set_Perspective('follow_default', follow_module_name='MyBot1', cycle=True)
 
     TestController.AddDummController(Simulation, 'MyBot1')
     # CustomController.ControlModule(Simulation.Get_MiroModule('MyBot2'))
