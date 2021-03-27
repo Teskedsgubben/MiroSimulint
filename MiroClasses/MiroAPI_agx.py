@@ -11,6 +11,7 @@ import agxPython
 import agxIO
 import agxModel
 import agxRender
+import collections
 
 import time as TIME
 import math
@@ -610,3 +611,150 @@ def AddController(Module):
     controller = UserController(Module)
 
     sim.add(controller)
+
+class LidarSensor1D(agxSDK.StepEventListener):
+    '''
+    A 1D lidar simulated using agxCollide::Line and collision detection.
+    '''
+    def __init__(self,
+                 sim: agxSDK.Simulation,
+                 root,
+                 size, 
+                 world_position: agx.Vec3,
+                 world_direction: agx.Vec3,
+                 num_side_rays: int,
+                 rad_range_side: float,
+                 max_length: float,
+                 rb_origin: agx.RigidBody = None,
+                 draw_lines: bool = False):
+        '''
+        Creates the lidar sensor. The Lidar sensor is placed at the given world_position and
+        directed towards the specified world_direction. It always has at least one ray in the world direction.
+
+        :param sim: Simulation that the Lines and Listeners are added to
+        :param world_position: World position of the lidar
+        :param world_direction: World direction of the lidar
+        :param num_side_rays: Number of rays created on either side of the middle ray. Can be 0.
+        :param rad_range_side: The range within the side rays are created.
+        :param max_length: The maximum length of the lidar rays
+        :param rb_origin: Rigidbody to lock the lidar body to. Will lock to world if None
+        :param draw_lines: debug rendering of the rays
+        '''
+        super().__init__(agxSDK.StepEventListener.PRE_COLLIDE + agxSDK.StepEventListener.POST_STEP)
+#CHECK WHEELCONTROLLER REMOTE I PLAYGROUND
+        geom = agxCollide.Geometry(agxCollide.Box(size[0], size[1], size[2]))
+        geom.setName("lidar_geom")
+        geom.setSensor(True)
+        self.lidar_body = agx.RigidBody(geom)
+        self.lidar_body.setMotionControl(agx.RigidBody.DYNAMICS)
+
+        self.lidar_body.setRotation(agx.Quat(agx.Vec3().X_AXIS(), world_direction))
+        self.lidar_body.setPosition(world_position)
+ 
+
+        # if rb_origin is not None:
+        #     self._relative_transform = lidar_body.getTransform() * rb_origin.getTransform().inverse()
+
+        rays_dict = collections.OrderedDict()
+
+        delta = 0
+        start = 0
+        if num_side_rays > 0:
+            delta = rad_range_side/num_side_rays
+            start = -rad_range_side
+
+        for i in range(2*num_side_rays + 1):
+            angle = start + i * delta
+            x = max_length*math.cos(angle)
+            y = max_length*math.sin(angle)
+            ray = agxCollide.Geometry(agxCollide.Line(agx.Vec3(0), agx.Vec3(x, y, 0)))
+            ray.setSensor(True)
+            ray.setEnableSerialization(False)
+            ray.addGroup("LidarGeom")
+            ray.setName("Ray")
+            ray.setEnableCollisions(geom, False)
+            self.lidar_body.add(ray)
+            rays_dict[ray.getUuid()] = [ray, max_length]
+
+        self.cel = LidarContactSensor(self.lidar_body, rays_dict, max_length)
+        sim.add(self.cel)
+        sim.add(self.lidar_body)
+
+       # self._lidar_body = lidar_body
+        self._rb_origin = rb_origin
+        self._rays_dict = rays_dict
+        self._max_length = max_length
+        self._draw_lines = draw_lines
+
+        render_manager = sim.getRenderManager()
+        if render_manager and self._draw_lines:
+            render_manager.disableFlags(agxRender.RENDER_GEOMETRIES)
+
+    def preCollide(self, t):
+        if self._draw_lines:
+            pos = self.lidar_body.getPosition()
+            for k, v in self._rays_dict.items():
+                color = v[1] / self._max_length
+                ray = v[0].getShapes()[0].asLine()
+                f = v[0].getFrame()
+                d = f.transformPointToWorld(ray.getSecondPoint()) - pos
+                agxRender.RenderSingleton.instance().add(pos, pos + v[1] * d.normal(), 0.025, agx.Vec4f(1-color**0.4, color**0.4, 0, 1))
+
+        # clear rays
+        for k in self._rays_dict.keys():
+            self._rays_dict[k][1] = self._max_length
+
+#       if self._relative_transform:
+#            self._lidar_body.setTransform(self._relative_transform * self._rb_origin.getTransform())
+
+    def get_distances(self):
+        d = []
+        for k, v in self._rays_dict.items():
+            d.append(v[1])
+        return d
+    
+    def getBody(self):
+        return self.lidar_body
+
+    def post(self, t):
+        print(self.get_distances())
+
+class LidarContactSensor(agxSDK.ContactEventListener):
+    def __init__(self, lidar_body, rays_dict, max_length):
+        super().__init__(agxSDK.ContactEventListener.IMPACT+agxSDK.ContactEventListener.CONTACT)
+
+        self.setFilter(agxSDK.RigidBodyFilter(lidar_body))
+        self.lidar_body = lidar_body
+        self.rays_dict = rays_dict
+        self.max_length = max_length
+
+    def contact(self, t, gc):
+        return self.handle(t, gc)
+
+    def impact(self, t, gc):
+        return self.handle(t, gc)
+
+    def handle(self, t, gc):
+        g0 = gc.geometry(0)
+        g1 = gc.geometry(1)
+
+        point = None
+        g = None
+        if g0.getUuid() in self.rays_dict:
+            point = gc.points()[0].getPoint()
+            g = g0
+        elif g1.getUuid() in self.rays_dict:
+            point = gc.points()[0].getPoint()
+            g = g1
+        else:
+            # Something is in contact with lidar_geom
+            return agxSDK.ContactEventListener.REMOVE_CONTACT_IMMEDIATELY
+        distance = (self.lidar_body.getPosition() - point).length()
+
+        if distance < self.rays_dict[g.getUuid()][1]:
+            self.rays_dict[g.getUuid()][1] = distance
+
+        return agxSDK.ContactEventListener.REMOVE_CONTACT_IMMEDIATELY
+# def AddSensorLidar():
+
+
