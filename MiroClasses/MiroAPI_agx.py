@@ -610,3 +610,77 @@ def AddController(Module):
     controller = UserController(Module)
 
     sim.add(controller)
+
+
+def MiniCam(MiroSystem):
+    sim = agxPython.getContext().environment.getSimulation()
+    app = agxPython.getContext().environment.getApplication()
+    sim.add(SideViewer(MiroSystem, sim, app))
+
+
+class SideViewer(agxSDK.StepEventListener):
+    def __init__(self, MiroSystem, sim, app):
+        super().__init__(agxSDK.StepEventListener.PRE_COLLIDE+agxSDK.StepEventListener.PRE_STEP+agxSDK.StepEventListener.POST_STEP)
+        self.system = MiroSystem
+        self.app = app
+        self.theta = 0
+        self.dec = self.app.getSceneDecorator()
+        self.dec.setEnableLogo(True)
+        self.dec.setLogoLocation(agxOSG.SceneDecorator.FREE)
+        width = 0.45
+        self.dec.setLogoPosition(0.01, 0.01)
+        self.dec.setMaximumLogoDimension(width, 3.0)
+        addSecondCam(sim, app)
+        
+
+    def preCollide(self, time):
+        return
+
+    def pre(self, time):
+        self.dec.setLogoFile('Second_cam.png')
+        return
+
+    def post(self, time):
+        return
+
+
+
+def addSecondCam(sim, app):
+    size_color = (256, 256, 4)
+    size_depth = (256, 256, 1)
+    fovy = 64
+    near_plane = 0.1
+    far_plane = 30.0
+
+
+    rti_color = agxOSG.RenderToImage(size_color[0], size_color[1])
+    app.addRenderTarget(rti_color)
+
+
+    rti_color.setViewMatrixAsLookAt(agx.Vec3(0,0,10), agx.Vec3(0,0,0), agx.Vec3(0,1,0))
+    rti_color.setProjectionMatrixAsPerspective(fovy, size_color[1]/size_color[0], near_plane, far_plane)
+    # Do not want near and far plane to move
+    # rti_color.setComputeNearFarMode(agxOSG.RenderTarget.DO_NOT_COMPUTE_NEAR_FAR)
+
+    # Create stepEventListener that extracts the image after every simulation time step
+    show_images = ShowImages(rti_color, size_color)
+    sim.add(show_images)
+
+
+class ShowImages(agxSDK.StepEventListener):
+    def __init__(self, rti_color, size_color):
+        super().__init__()
+
+        self.rti_color = rti_color
+        self.size_color = size_color
+
+    def post(self, t):
+
+        eye = agxVecify([0,8,0])
+
+        pos = agxVecify([0,0,0])
+        
+        self.rti_color.setViewMatrixAsLookAt(eye, pos, agx.Vec3(0,1,0))
+
+        filename_color = "Second_cam.png"
+        self.rti_color.saveImage(filename_color)
