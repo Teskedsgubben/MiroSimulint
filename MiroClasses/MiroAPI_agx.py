@@ -613,6 +613,7 @@ def AddController(Module):
     sim.add(controller)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 def MiniCam(MiroSystem):
     sim = agxPython.getContext().environment.getSimulation()
@@ -687,6 +688,8 @@ class ShowImages(agxSDK.StepEventListener):
         filename_color = "Second_cam.png"
         self.rti_color.saveImage(filename_color)
 =======
+=======
+>>>>>>> 50a596603c5cb72315eaf7eea1edf8b8959f5b1b
 class LidarSensor1D(agxSDK.StepEventListener):
     '''
     A 1D lidar simulated using agxCollide::Line and collision detection.
@@ -833,4 +836,7 @@ class LidarContactSensor(agxSDK.ContactEventListener):
 # def AddSensorLidar():
 
 
+<<<<<<< HEAD
+>>>>>>> 50a596603c5cb72315eaf7eea1edf8b8959f5b1b
+=======
 >>>>>>> 50a596603c5cb72315eaf7eea1edf8b8959f5b1b
