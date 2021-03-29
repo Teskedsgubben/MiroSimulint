@@ -19,17 +19,8 @@ from MiroClasses.MiroAPI_selector import SelectedAPI as MiroAPI
 from MiroClasses import MiroAPI_agx as agxAPI 
 
 
-#Controller requires these input arguments to function, removing arguments or changing order will result in errors
-def MyController(module, keydown, key, alt):
-
-    #Input arguments
-    #module: Module to control
-    #keydown: Boolean, true when key is pressed, false when released
-    #key: Key pressed, latest key pressed if multiple keys are pressed simultaniously
-    #alt: Alternative key pressed, 'alt', 'shift' etc.  
-
-    #Setup for keys that will be used
-    controls = {
+#Setup for keys that will be used
+controls = {
     'KEY_UP': agxSDK.GuiEventListener.KEY_Up,
     'KEY_DOWN': agxSDK.GuiEventListener.KEY_Down,
     'KEY_LEFT': agxSDK.GuiEventListener.KEY_Left,
@@ -41,7 +32,17 @@ def MyController(module, keydown, key, alt):
     'PAGW_DOWN': agxSDK.GuiEventListener.KEY_Page_Up,
     'INSERT': agxSDK.GuiEventListener.KEY_Insert,
     'END': agxSDK.GuiEventListener.KEY_End
-    }
+}
+
+
+#Controller requires these input arguments to function, removing arguments or changing order will result in errors
+def MyController(module, keydown, key, alt):
+
+    #Input arguments
+    #module: Module to control
+    #keydown: Boolean, true when key is pressed, false when released
+    #key: Key pressed, latest key pressed if multiple keys are pressed simultaniously
+    #alt: Alternative key pressed, 'alt', 'shift' etc.  
 
     #Arguments in module.SetMotorSpeed('LINK_NAME', SPEED)
     #Link needs to have motor enabled
@@ -51,20 +52,20 @@ def MyController(module, keydown, key, alt):
         module.SetMotorSpeed('FR_tire', 0)
     else:
         if key == controls['KEY_UP']:
-            module.SetMotorSpeed('FL_tire', -30)
-            module.SetMotorSpeed('FR_tire', 30)
-
+            module.SetMotorSpeed('FL_tire', -50)
+            module.SetMotorSpeed('FR_tire', 50)
+                
         elif key == controls['KEY_DOWN']:
-            module.SetMotorSpeed('FL_tire', 10)
-            module.SetMotorSpeed('FR_tire', -10)
+            module.SetMotorSpeed('FL_tire', 15)
+            module.SetMotorSpeed('FR_tire', -15)
 
         elif key == controls['KEY_LEFT']:
-            module.SetMotorSpeed('FL_tire', -2)
-            module.SetMotorSpeed('FR_tire', 15)
+            module.SetMotorSpeed('FL_tire', -3)
+            module.SetMotorSpeed('FR_tire', 25)
     
         elif key == controls['KEY_RIGHT']:
-            module.SetMotorSpeed('FL_tire', -15)
-            module.SetMotorSpeed('FR_tire', 2)
+            module.SetMotorSpeed('FL_tire', -25)
+            module.SetMotorSpeed('FR_tire', 3)
 
         elif key == controls['SPACE']:
             module.SetMotorSpeed('FL_tire', 0)

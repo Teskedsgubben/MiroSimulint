@@ -210,7 +210,7 @@ def add_boxShape(MiroSystem, size_x, size_y, size_z, pos, texture=False, scale=[
     if mass:
         body_box.getMassProperties().setMass(mass)
     else:
-        body_box.getMassProperties().setMass(size_x*size_y*size_z*density)
+        body_box.getMassProperties().setMass(body_geo.calculateVolume()*density)
     if Fixed:
         body_box.setMotionControl(1)
     body_box.setPosition(agxPos)
@@ -270,6 +270,7 @@ def add_cylinderShape(MiroSystem, radius, height, density, pos, texture='test.jp
     body_geo = agxCollide.Geometry(agxCollide.Cylinder(radius, height))
     body_geo.setEnableCollisions(Collide)
     body_cylinder = agx.RigidBody(body_geo)
+    body_cylinder.getMassProperties().setMass(body_geo.calculateVolume()*density)
     if Fixed:
         body_cylinder.setMotionControl(1)
     body_cylinder.setPosition(agxPos)
