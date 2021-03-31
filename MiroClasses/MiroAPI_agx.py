@@ -1,8 +1,13 @@
 import sys
 try:
-    import agx
+    import agxfd
 except:
-    sys.exit("Could not import AGX. Make sure the system is setup script is run, i.e. \"C:\Program Files\Algoryx\AGX-2.29.2.0\setup_env.bat\" in the terminal. Also check that you are using the correct Pyhton Interpreter.")
+    sys.exit(
+    "Could not import AGX. Make sure the system setup script is run, and check that you are using the correct Pyhton Interpreter.\n" \
+    "\nRun the startup script by (may need changing to your agx version):\n"\
+    "  Windows: \"C:\Program Files\Algoryx\AgX-2.30.0.0\setup_env.bat\"\n"\
+    "  Mac OS : source /opt/Algoryx/AgX-2.30.0.0/setup_env.bash"
+    )
 
 import agxCollide
 import agxOSG
