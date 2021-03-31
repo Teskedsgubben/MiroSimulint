@@ -22,6 +22,7 @@ from src import Props
 import numpy as np
 
 from Example_Controller import MyController as Mycontrol
+from Example_Controller import controls as Controls
 import TestBots as TB
 
 
@@ -37,16 +38,18 @@ def buildScene():
 
     #Creates robot defined in 'TestBots.py', adds controller defined in 'Example_Controller.py' to robot.
     MyBot = TB.MyRobot()
-    MyBot.AddController(Mycontrol)
-    MyBot.Set_Max_Force(100)
+    MyBot.AddController(Mycontrol, Controls)
+
+    #Sets max force for motors
+    MyBot.Set_Max_Force(1)
 
     #Adds robot to system
     simulation_system.Add_MiroModule(MyBot, 'MyBot', [6,2,0])
 
     #Camera settings
-    simulation_system.Add_Camview('at_origo', position=[3,2,-2], look_at_point=[6,0,0])
-    simulation_system.Set_Perspective('at_origo')
-    #simulation_system.Set_Perspective('follow_default', follow_module_name = 'MyTireBot', follow_distance=2)
+    # simulation_system.Add_Camview('at_origo', position=[3,2,-2], look_at_point=[6,0,0])
+    # simulation_system.Set_Perspective('at_origo')
+    simulation_system.Set_Perspective('follow_default', follow_module_name = 'MyBot', follow_distance=2)
     
     config = {
         'resolution': [1920, 1080],
@@ -59,3 +62,6 @@ def buildScene():
 
 # Initializes and runs the system
 MS.MiroSetup(buildScene)
+
+
+

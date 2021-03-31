@@ -7,6 +7,7 @@ class Module():
         self.components = {}
         self.sensors = {}
         self.links = {}
+        self.motors = {}
         self.nonames_comp = 0
         self.nonames_sens = 0
         self.nonames_boos = 0
@@ -19,6 +20,7 @@ class Module():
         self.graph_nodes=[]
         self.graph_links=[]
         self.controller = False
+        self.controls = False
         self.max_force = 100
 
         # Extra bodies or links for props, not to be counted into module
@@ -351,8 +353,9 @@ class Module():
 
 
 
-    def AddController(self, Controller):
+    def AddController(self, Controller, Controls):
         self.controller = Controller
+        self.controls = Controls
         MiroAPI.AddController(self)
 
     def UseController(self, keydown, key, alt, x = False, y = False):
@@ -360,12 +363,17 @@ class Module():
 
     def Set_Max_Force(self, MAX_FORCE):
         self.max_force = MAX_FORCE
+        for i in self.motors:
+            self.motors[i].getMotor1D().setForceRange(-(self.max_force), self.max_force)
 
     def Get_Max_Force(self):
         return self.max_force
 
     def EnableMotor(self, link):
         self.links[link].getMotor1D().setEnable(True)
+        self.links[link].getMotor1D().setForceRange(-(self.max_force), self.max_force)
+        self.motors.update({link: self.links[link]})
+        
 
     def SetMotorSpeed(self, link, speed):
         self.links[link].getMotor1D().setSpeed(speed)

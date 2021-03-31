@@ -275,3 +275,4 @@ class MiroBooster(MiroSensor):
             self.filestream.write(str(f)+'\n')
         return
 
+
