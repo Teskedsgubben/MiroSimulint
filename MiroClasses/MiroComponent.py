@@ -222,7 +222,7 @@ class MiroSensor_Odometer(MiroSensor):
 
 class MiroSensor_Lidar(MiroSensor):
     def SetupBeams(self, nr_of_beams, angle, ray_length):
-        MiroAPI.createLidar1D(self.body, nr_of_beams, angle, ray_length)
+        MiroAPI.CreateLidar1D(self.body, nr_of_beams, angle, ray_length)
 
 # Booster class extends Sensor class
 class MiroBooster(MiroSensor):
