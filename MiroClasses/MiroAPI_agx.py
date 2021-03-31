@@ -1,6 +1,6 @@
 import sys
 try:
-    import agxfd
+    import agx
 except:
     sys.exit(
     "Could not import AGX. Make sure the system setup script is run, and check that you are using the correct Pyhton Interpreter.\n" \
