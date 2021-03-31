@@ -207,6 +207,7 @@ def add_boxShape(MiroSystem, size_x, size_y, size_z, pos, texture=False, scale=[
        
     # Create a box
     body_geo = agxCollide.Geometry( agxCollide.Box(size_x/2, size_y/2, size_z/2))
+    body_geo.setName("body")
     if friction:
         high_friction_tires = agx.Material('Tires', 0.05, friction)
         body_geo.setMaterial(high_friction_tires)
@@ -274,6 +275,7 @@ def add_cylinderShape(MiroSystem, radius, height, density, pos, texture='test.jp
        
     # Create a cylinder
     body_geo = agxCollide.Geometry(agxCollide.Cylinder(radius, height))
+    body_geo.setName("body")
     body_geo.setEnableCollisions(Collide)
     body_cylinder = agx.RigidBody(body_geo)
     body_cylinder.getMassProperties().setMass(body_geo.calculateVolume()*density)
@@ -323,6 +325,7 @@ def add_sphereShape(MiroSystem, radius, pos, texture='test.jpg', density=1000, s
        
     # Create a box
     body_geo = agxCollide.Geometry(agxCollide.Sphere(radius))
+    body_geo.setName("body")
     body_geo.setEnableCollisions(Collide)
     body_ball = agx.RigidBody(body_geo)
     if Fixed:
@@ -825,7 +828,7 @@ class LidarContactSensor(agxSDK.ContactEventListener):
         g0 = gc.geometry(0)
         g1 = gc.geometry(1)
 
-        if self.rb_origin:
+        if self.rb_origin is not None:
             grb_id = self.rb_origin.getGeometry("body").getUuid()
             if(grb_id == g0.getUuid() or grb_id == g1.getUuid()):
                 return agxSDK.ContactEventListener.REMOVE_CONTACT_IMMEDIATELY
