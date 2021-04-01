@@ -2,7 +2,12 @@ import sys
 try:
     import agx
 except:
-    sys.exit("Could not import AGX. Make sure the system is setup script is run, i.e. \"C:\Program Files\Algoryx\AGX-2.29.2.0\setup_env.bat\" in the terminal. Also check that you are using the correct Pyhton Interpreter.")
+    sys.exit(
+    "Could not import AGX. Make sure the system setup script is run, and check that you are using the correct Pyhton Interpreter.\n" \
+    "\nRun the startup script by (may need changing to your agx version):\n"\
+    "  Windows: \"C:\Program Files\Algoryx\AgX-2.30.0.0\setup_env.bat\"\n"\
+    "  Mac OS : source /opt/Algoryx/AgX-2.30.0.0/setup_env.bash"
+    )
 
 import agxCollide
 import agxOSG
@@ -202,6 +207,7 @@ def add_boxShape(MiroSystem, size_x, size_y, size_z, pos, texture=False, scale=[
        
     # Create a box
     body_geo = agxCollide.Geometry( agxCollide.Box(size_x/2, size_y/2, size_z/2))
+    body_geo.setName("body")
     if friction:
         high_friction_tires = agx.Material('Tires', 0.05, friction)
         body_geo.setMaterial(high_friction_tires)
@@ -269,6 +275,7 @@ def add_cylinderShape(MiroSystem, radius, height, density, pos, texture='test.jp
        
     # Create a cylinder
     body_geo = agxCollide.Geometry(agxCollide.Cylinder(radius, height))
+    body_geo.setName("body")
     body_geo.setEnableCollisions(Collide)
     body_cylinder = agx.RigidBody(body_geo)
     body_cylinder.getMassProperties().setMass(body_geo.calculateVolume()*density)
@@ -318,6 +325,7 @@ def add_sphereShape(MiroSystem, radius, pos, texture='test.jpg', density=1000, s
        
     # Create a box
     body_geo = agxCollide.Geometry(agxCollide.Sphere(radius))
+    body_geo.setName("body")
     body_geo.setEnableCollisions(Collide)
     body_ball = agx.RigidBody(body_geo)
     if Fixed:
@@ -686,18 +694,26 @@ class ShowImages(agxSDK.StepEventListener):
         filename_color = "Second_cam.png"
         self.rti_color.saveImage(filename_color)
 
+def CreateLidar1D(lidar_body, nr_of_beams, angle, reach):
+    sim = agxPython.getContext().environment.getSimulation()
+    # lidar = LidarSensor1D(lidar_body, nr_of_beams, np.deg2rad(angle), range, draw_lines=True)
+    
+    lidar = LidarSensor1D(sim, lidar_body.getPosition(), agxVecify([-1,0,0]), nr_of_beams, np.deg2rad(angle), reach, lidar_body, True)
+    # sim, lidar_body.getPosition(), agxVecify([0,1,0]), nr_of_beams, angle, reach, lidar_body, True
+    # (sim, world_position, world_direction, num_side_rayst, rad_range_side, max_length, rb_origin, draw_lines):
+    sim.add(lidar)
+
+
 class LidarSensor1D(agxSDK.StepEventListener):
     '''
     A 1D lidar simulated using agxCollide::Line and collision detection.
     '''
     def __init__(self,
                  sim: agxSDK.Simulation,
-                 root,
-                 size, 
                  world_position: agx.Vec3,
                  world_direction: agx.Vec3,
                  num_side_rays: int,
-                 rad_range_side: float,
+                 rad_range_side: int,
                  max_length: float,
                  rb_origin: agx.RigidBody = None,
                  draw_lines: bool = False):
@@ -715,19 +731,18 @@ class LidarSensor1D(agxSDK.StepEventListener):
         :param draw_lines: debug rendering of the rays
         '''
         super().__init__(agxSDK.StepEventListener.PRE_COLLIDE + agxSDK.StepEventListener.POST_STEP)
-#CHECK WHEELCONTROLLER REMOTE I PLAYGROUND
-        geom = agxCollide.Geometry(agxCollide.Box(size[0], size[1], size[2]))
+
+        geom = agxCollide.Geometry(agxCollide.Box(0.1, 0.1, 0.1))
         geom.setName("lidar_geom")
         geom.setSensor(True)
-        self.lidar_body = agx.RigidBody(geom)
-        self.lidar_body.setMotionControl(agx.RigidBody.DYNAMICS)
+        lidar_body = agx.RigidBody(geom)
+        lidar_body.setMotionControl(agx.RigidBody.KINEMATICS)
 
-        self.lidar_body.setRotation(agx.Quat(agx.Vec3().X_AXIS(), world_direction))
-        self.lidar_body.setPosition(world_position)
- 
+        lidar_body.setRotation(agx.Quat(agx.Vec3().Z_AXIS(), world_direction))
+        lidar_body.setPosition(world_position)
 
-        # if rb_origin is not None:
-        #     self._relative_transform = lidar_body.getTransform() * rb_origin.getTransform().inverse()
+        if rb_origin is not None:
+            self._relative_transform = lidar_body.getTransform() * rb_origin.getTransform().inverse()
 
         rays_dict = collections.OrderedDict()
 
@@ -739,22 +754,22 @@ class LidarSensor1D(agxSDK.StepEventListener):
 
         for i in range(2*num_side_rays + 1):
             angle = start + i * delta
-            x = max_length*math.cos(angle)
+            z = max_length*math.cos(angle)
             y = max_length*math.sin(angle)
-            ray = agxCollide.Geometry(agxCollide.Line(agx.Vec3(0), agx.Vec3(x, y, 0)))
+            ray = agxCollide.Geometry(agxCollide.Line(agx.Vec3(0), agx.Vec3(0, y, z)))
             ray.setSensor(True)
             ray.setEnableSerialization(False)
             ray.addGroup("LidarGeom")
             ray.setName("Ray")
             ray.setEnableCollisions(geom, False)
-            self.lidar_body.add(ray)
+            lidar_body.add(ray)
             rays_dict[ray.getUuid()] = [ray, max_length]
 
-        self.cel = LidarContactSensor(self.lidar_body, rays_dict, max_length)
+        self.cel = LidarContactSensor(lidar_body, rays_dict, max_length, rb_origin)
         sim.add(self.cel)
-        sim.add(self.lidar_body)
 
-       # self._lidar_body = lidar_body
+        sim.add(lidar_body)
+        self._lidar_body = lidar_body
         self._rb_origin = rb_origin
         self._rays_dict = rays_dict
         self._max_length = max_length
@@ -766,7 +781,7 @@ class LidarSensor1D(agxSDK.StepEventListener):
 
     def preCollide(self, t):
         if self._draw_lines:
-            pos = self.lidar_body.getPosition()
+            pos = self._lidar_body.getPosition()
             for k, v in self._rays_dict.items():
                 color = v[1] / self._max_length
                 ray = v[0].getShapes()[0].asLine()
@@ -778,8 +793,8 @@ class LidarSensor1D(agxSDK.StepEventListener):
         for k in self._rays_dict.keys():
             self._rays_dict[k][1] = self._max_length
 
-#       if self._relative_transform:
-#            self._lidar_body.setTransform(self._relative_transform * self._rb_origin.getTransform())
+        if self._relative_transform:
+            self._lidar_body.setTransform(self._relative_transform * self._rb_origin.getTransform())
 
     def get_distances(self):
         d = []
@@ -794,13 +809,14 @@ class LidarSensor1D(agxSDK.StepEventListener):
         print(self.get_distances())
 
 class LidarContactSensor(agxSDK.ContactEventListener):
-    def __init__(self, lidar_body, rays_dict, max_length):
+    def __init__(self, lidar_body, rays_dict, max_length, rb_origin = None):
         super().__init__(agxSDK.ContactEventListener.IMPACT+agxSDK.ContactEventListener.CONTACT)
 
         self.setFilter(agxSDK.RigidBodyFilter(lidar_body))
         self.lidar_body = lidar_body
         self.rays_dict = rays_dict
         self.max_length = max_length
+        self.rb_origin = rb_origin
 
     def contact(self, t, gc):
         return self.handle(t, gc)
@@ -811,6 +827,11 @@ class LidarContactSensor(agxSDK.ContactEventListener):
     def handle(self, t, gc):
         g0 = gc.geometry(0)
         g1 = gc.geometry(1)
+
+        if self.rb_origin is not None:
+            grb_id = self.rb_origin.getGeometry("body").getUuid()
+            if(grb_id == g0.getUuid() or grb_id == g1.getUuid()):
+                return agxSDK.ContactEventListener.REMOVE_CONTACT_IMMEDIATELY
 
         point = None
         g = None
@@ -829,5 +850,4 @@ class LidarContactSensor(agxSDK.ContactEventListener):
             self.rays_dict[g.getUuid()][1] = distance
 
         return agxSDK.ContactEventListener.REMOVE_CONTACT_IMMEDIATELY
-# def AddSensorLidar():
 
