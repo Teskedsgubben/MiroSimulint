@@ -87,7 +87,8 @@ def buildArena(arena_pos):
     floor.setPosition(arena_pos[0], arena_pos[1], arena_pos[2]-arena_size[2]/2)
     floor.setMotionControl(1)
     sim.add(floor)
-    agxOSG.setDiffuseColor(agxOSG.createVisual(floor, root), agxRender.Color.Gray())
+    agxOSG.setDiffuseColor(agxOSG.createVisual(floor, root), agxRender.Color.Black())
+    agxOSG.setShininess(agxOSG.createVisual(floor, root), 128)
 
     sides = 8
     side_len = width/(1+np.sqrt(2)) + arena_size[2]/2/np.sqrt(2)
@@ -102,7 +103,7 @@ def buildArena(arena_pos):
             wall.setMotionControl(1)
             wall.setRotation(rot)
             sim.add(wall)
-            agxOSG.setDiffuseColor(agxOSG.createVisual(wall, root), agxRender.Color.DarkGray())
+            agxOSG.setDiffuseColor(agxOSG.createVisual(wall, root), agxRender.Color.DarkOrange())
     # Build the remaining edge of the arena
 
     # Square corner 1 
@@ -115,7 +116,7 @@ def buildArena(arena_pos):
     wall.setMotionControl(1)
     wall.setRotation(rot)
     sim.add(wall)
-    agxOSG.setDiffuseColor(agxOSG.createVisual(wall, root), agxRender.Color.DarkGray())
+    agxOSG.setDiffuseColor(agxOSG.createVisual(wall, root), agxRender.Color.DarkOrange())
 
     # Square corner 2
     theta = -4*np.pi/4  
@@ -127,7 +128,7 @@ def buildArena(arena_pos):
     wall.setMotionControl(1)
     wall.setRotation(rot)
     sim.add(wall)
-    agxOSG.setDiffuseColor(agxOSG.createVisual(wall, root), agxRender.Color.DarkGray())
+    agxOSG.setDiffuseColor(agxOSG.createVisual(wall, root), agxRender.Color.DarkOrange())
 
     obstacles(sim, root, arena_pos[2])
 
@@ -135,10 +136,6 @@ def obstacles(sim, root, height):
     #--------------------------------
     # Central stuff like walls and tower and stuff
     #---------------------------------
-    #Start plattform
-    dims = [1.5*(width/14), 1.5*(width/14), 0.06]
-    pos = [-3.5*(width/14), 0, height+0.405]
-    startbox = addboxx(sim, root, dims, pos)
    
     addVolcano(sim, root)
     createLava(sim, root)
@@ -157,19 +154,23 @@ def obstacles(sim, root, height):
     # lid.setRotation(agx.Quat(np.pi/2, agx.Vec3(1,0,0)))
 
     # Texture: white_bricks.jpg
-
+    wallHeight = 0.12
     #West Wall
-    dims = [7.0*(width/14), 0.3*(width/14) ,0.4]
+    dims = [7.0*(width/14), 0.3*(width/14) ,wallHeight]
     pos = [-3.5*(width/14), 0, height+dims[2]/2]
     addboxx(sim, root, dims, pos, texture='textures/stone.png')
 
-    #East Wall
-    dims = [7.0*(width/14), 0.3*(width/14) ,0.4]
-    pos = [+3.5*(width/14), 0, height+dims[2]/2]
-    addboxx(sim, root, dims, pos, texture='textures/arenatextures/plankis.png')
+    #East Walls
+    dims = [1.0*(width/14), 0.3*(width/14) ,wallHeight + 0.4] # Added height for the heightmap
+    pos = [3.8, 0, height+dims[2]/2]
+    addboxx(sim, root, dims, pos, texture='textures/stone.png')
+
+    dims = [4.0*(width/14), 0.3*(width/14) ,wallHeight + 0.4]
+    pos = [+2.5*(width/14), 0, height+dims[2]/2]
+    addboxx(sim, root, dims, pos, texture='textures/stone.png')
 
     #South Wall
-    dims = [0.3*(width/14), 7.0*(width/14), 0.4]
+    dims = [0.3*(width/14), 7.0*(width/14), wallHeight]
     pos = [0, -3.5*(width/14), height+dims[2]/2]
     addboxx(sim, root, dims, pos, texture='textures/stone.png')
 
@@ -179,18 +180,24 @@ def obstacles(sim, root, height):
     #addboxx(sim, root, dims, pos)
 
     #-------------- Zone 1 --------------
-    buildRamp(agx.Vec3(-1.5,2,height), sim, root)
+    # BIG JUMP
+    buildRamp(agx.Vec3(-1.2,2.1,height), sim, root)
+    
+    # Ramp to bridge
+    ramp_dim = [1, 2, wallHeight+0.14] # *np.cos(np.pi/4)
+    ramp_pos = agx.Vec3(-3.2,1.31,0)
+    ramp = agx.RigidBody( agxCollide.Geometry( agxCollide.Box(ramp_dim[0]/2, ramp_dim[1]/2, ramp_dim[2]/2)))
+    theta = -np.arcsin(ramp_dim[2]/ramp_dim[0])/2
+    ramp.setPosition(ramp_pos) # +arena_size[1]/2-ramp_dim[1]/2
+    ramp.setRotation(agx.Quat(theta, agx.Vec3(1,0,0)))
+    ramp.setMotionControl(1)
+    sim.add(ramp)
+    agxOSG.setDiffuseColor(agxOSG.createVisual(ramp, root), agxRender.Color.DarkOrange())
 
-    # 
-    # ramp_dim = [1.4, 2, 0.2] # *np.cos(np.pi/4)
-    # ramp_pos = agx.Vec3(0,1,1)
-    # ramp = agx.RigidBody( agxCollide.Geometry( agxCollide.Box(ramp_dim[0]/2, ramp_dim[1]/2, ramp_dim[2]/2)))
-    # theta = -np.arcsin(ramp_dim[2]/ramp_dim[0])/2
-    # ramp.setPosition(ramp_pos) # +arena_size[1]/2-ramp_dim[1]/2
-    # ramp.setRotation(agx.Quat(theta, agx.Vec3(0,1,0)))
-    # ramp.setMotionControl(1)
-    # sim.add(ramp)
-    # agxOSG.setDiffuseColor(agxOSG.createVisual(ramp, root), agxRender.Color.Gray())
+    #Startbox
+    dims = [1, 0.5, 0.06]
+    pos = [-3.2, 0.115, height+wallHeight+0.02]
+    startbox = addboxx(sim, root, dims, pos, texture='textures/arenatextures/start.png')
 
     #-------------- Zone 2 --------------
     addField(sim, root)
@@ -209,17 +216,30 @@ def obstacles(sim, root, height):
         pos.set(height+dims[2]/2, 2)
         addboxx(sim, root, dims, pos, texture = 'textures/arenatextures/windows.png')
 
-    #Floor 
-    #dims = [6.8*(width/14), 6.8*(width/14), 0.06]
-    #pos = [3.5*(width/14),-3.5*(width/14), height+0.4]
-    #addboxx(sim, root, dims, pos)
+
+
+    # Ramp to bridge
+    ramp_dim = [2, 1, wallHeight+0.24] # *np.cos(np.pi/4)
+    ramp_pos = agx.Vec3(1, -3.305 ,0)
+    ramp = agx.RigidBody( agxCollide.Geometry( agxCollide.Box(ramp_dim[0]/2, ramp_dim[1]/2, ramp_dim[2]/2)))
+    theta = -np.arcsin(ramp_dim[2]/ramp_dim[0])/2
+    ramp.setPosition(ramp_pos) # +arena_size[1]/2-ramp_dim[1]/2
+    ramp.setRotation(agx.Quat(theta, agx.Vec3(0,-1,0)))
+    ramp.setMotionControl(1)
+    sim.add(ramp)
+    agxOSG.setDiffuseColor(agxOSG.createVisual(ramp, root), agxRender.Color.DarkOrange())
+
+    #Startbox
+    dims = [0.2, 1, 0.06]
+    pos = [-0.05, -3.305, height+wallHeight+0.02]
+    addboxx(sim, root, dims, pos, texture='textures/arenatextures/plankis.png')
 
     #--------------
     #   Zone 4
     #--------------
 
     #Halfcircle track
-    buildTurn2(agx.Vec3(0.1*(width/14),-5.8*(width/14), height+0.4), sim, root)
+    buildTurn2(agx.Vec3(0.1*(width/14),-5.8*(width/14), height+wallHeight+0.02), sim, root)
 
     # Swinging ball over bridge
     rad = 0.4
@@ -247,17 +267,30 @@ def create_water_visual(geo, root):
     agxOSG.setAlpha(node, 0.999)
     
     agxOSG.setTexture(agxOSG.createVisual(geo, root), 'textures/arenatextures/lava.png', True, agxOSG.DIFFUSE_TEXTURE, 20, 20)
-
-
     return node
 
 def createPond(sim, root):
+    # water_material = agx.Material("waterMaterial")
+    # water_material.getBulkMaterial().setDensity(4025)
+    
+    # water = agxCollide.Geometry(agxCollide.Box(2, 2, 0.15))
+    # water.setMaterial(water_material)
+    # water.setPosition(agxVec([2, 0, 2]))
+    # sim.add(water)
+    
+    # controller = agxModel.WindAndWaterController()
+    # controller.addWater(water)
+    # create_water_visual(water, root)
+    # sim.add(controller)
+    
     water_material = agx.Material("waterMaterial")
     water_material.getBulkMaterial().setDensity(4025)
-    
-    water = agxCollide.Geometry(agxCollide.Box(2, 2, 0.3))
+
+    hf = agxCollide.HeightField.createFromFile("textures/arenatextures/lavapond.png", 4, 3.9, 0, 0.15)
+
+    water = agxCollide.Geometry(hf)
     water.setMaterial(water_material)
-    water.setPosition(agxVec([2, 0, 2]))
+    water.setPosition(agxVec([1.9, 0, 1.9]))
     sim.add(water)
     
     controller = agxModel.WindAndWaterController()
@@ -305,36 +338,15 @@ def addball(sim, root, rad, pos, Fixed=True):
     if(Fixed):
         ball.setMotionControl(1)
     sim.add(ball)
-    # agxOSG.setDiffuseColor(agxOSG.createVisual(ball, root), 'textures/headlight_off.png', True, agxOSG.DIFFUSE_TEXTURE, 1.0, 1.0)
-    agxOSG.setDiffuseColor(agxOSG.createVisual(ball, root), agxRender.Color.Black())
+    # agxOSG.setDiffuseColor(agxOSG.createVisual(ball, root), agxRender.Color.Black())
+    agxOSG.setTexture(agxOSG.createVisual(ball , root), 'textures_lowres/eyeball.png', True, agxOSG.DIFFUSE_TEXTURE, 1, 1)
     return ball
-
-def buildTurn(ramp_pos, sim, root):    
-    off_angle = np.pi/2
-    parts = 25
-    ramp_width = 1 
-    ramp_length = 3 
-    ramp_height = 0.06
-    eps_x=-0.0
-    eps_z=0.0
-    part_pos = agx.Vec3(ramp_pos)
-    for i in range(parts):
-        ramp_dim = [ramp_width,ramp_length/parts, ramp_height]
-        ramp = agx.RigidBody( agxCollide.Geometry( agxCollide.Box(ramp_dim[0]/2, ramp_dim[1]/2, ramp_dim[2]/2)))
-        theta = -(i)/parts*off_angle
-        part_pos = part_pos -  agx.Vec3(np.sin(theta)*ramp_dim[1]-eps_x, -np.cos(theta)*ramp_dim[1]-eps_z, 0)
-        ramp.setPosition(part_pos) 
-        ramp.setRotation(agx.Quat(theta - off_angle/parts/2, agx.Vec3(0,0,1)))
-        ramp.setMotionControl(1)
-        sim.add(ramp)
-        agxOSG.setTexture(agxOSG.createVisual(ramp, root), 'textures/arenatextures/wood.png', True, agxOSG.DIFFUSE_TEXTURE, 1.0, 1.0)
-        # agxOSG.setDiffuseColor(agxOSG.createVisual(ramp, root), agxRender.Color.Red())
 
 def buildTurn2(ramp_pos, sim, root):    
     off_angle = np.pi/2
     parts = 40
     ramp_width = 1 
-    ramp_length = 5 
+    ramp_length = 5
     ramp_height = 0.06
     eps_x=-0.0
     eps_z=0.0
@@ -356,7 +368,7 @@ def buildRamp(ramp_pos, sim, root):
     parts = 10
     ramp_length = 1.2
     ramp_height = 2
-    ramp_width = 4
+    ramp_width = 3.9
     ramp_pos = ramp_pos - agx.Vec3(0,0,ramp_height/2)
     eps_x=-0.0
     eps_z=0.0
@@ -370,7 +382,8 @@ def buildRamp(ramp_pos, sim, root):
         ramp.setRotation(agx.Quat(theta - off_angle/parts/2, agx.Vec3(0,1,0)))
         ramp.setMotionControl(1)
         sim.add(ramp)
-        agxOSG.setTexture(agxOSG.createVisual(ramp, root), 'textures/arenatextures/plankis.png', True, agxOSG.DIFFUSE_TEXTURE, 5, 5)
+        # agxOSG.setTexture(agxOSG.createVisual(ramp, root), 'textures/arenatextures/plankis.png', True, agxOSG.DIFFUSE_TEXTURE, 5, 5)
+        agxOSG.setDiffuseColor(agxOSG.createVisual(ramp, root), agxRender.Color.Black())
     
     ramp_dim = [0.6,ramp_width, ramp_height] # *np.cos(np.pi/4)
     ramp = agx.RigidBody( agxCollide.Geometry( agxCollide.Box(ramp_dim[0]/2, ramp_dim[1]/2, ramp_dim[2]/2)))
@@ -380,18 +393,19 @@ def buildRamp(ramp_pos, sim, root):
     ramp.setRotation(agx.Quat(theta - off_angle/parts/2, agx.Vec3(0,1,0)))
     ramp.setMotionControl(1)
     sim.add(ramp)
-    agxOSG.setTexture(agxOSG.createVisual(ramp, root), 'textures/arenatextures/plankis.png', True, agxOSG.DIFFUSE_TEXTURE, 5, 5)
+    # agxOSG.setTexture(agxOSG.createVisual(ramp, root), 'textures/arenatextures/plankis.png', True, agxOSG.DIFFUSE_TEXTURE, 5, 5)
+    agxOSG.setDiffuseColor(agxOSG.createVisual(ramp, root), agxRender.Color.Black())
 
 def addField(sim, root):
     # Create the ground
     ground_material = agx.Material("Ground")
 
     # Create the height field from a heightmap
-    hf = agxCollide.HeightField.createFromFile("textures/arenatextures/heightmapsmaller.png", 4, 4, 0.1, 0.4)
+    hf = agxCollide.HeightField.createFromFile("textures/arenatextures/heightmaptest2.png", 3.9, 3.8, 0.05, 0.5)
 
     ground_geometry = agxCollide.Geometry(hf)
     ground = agx.RigidBody(ground_geometry)
-    ground.setPosition(agxVec([-2, 0, -2]))
+    ground.setPosition(agxVec([-1.95, 0, -1.95]))
     ground.setMotionControl(agx.RigidBody.STATIC)
     # ground.setMaterial(agx.Material("groundmaterial"))
     node = agxOSG.createVisual( ground, root )
@@ -440,22 +454,8 @@ def createLava(sim, root):
     hf = agxCollide.HeightField.createFromFile("textures/arenatextures/lavariver.png", 1.99, 2, 0, 1.323)
 
     water = agxCollide.Geometry(hf)
-    #water.setMaterial(water_material)
-    water.setPosition(agxVec([0, 0, 0.41]))
-    sim.add(water)
-    
-    controller = agxModel.WindAndWaterController()
-    controller.addWater(water)
-    create_water_visual(water, root)
-    sim.add(controller)
-
-def createLavaRiver(sim, root):
-    water_material = agx.Material("waterMaterial")
-    water_material.getBulkMaterial().setDensity(4025)
-
-    water = agxCollide.Geometry(agxCollide.Box(0.15, 0.15, 0.1))
     water.setMaterial(water_material)
-    water.setPosition(agxVec([0, 1.2, 0.37]))
+    water.setPosition(agxVec([0, 0, 0.41]))
     sim.add(water)
     
     controller = agxModel.WindAndWaterController()
