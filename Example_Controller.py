@@ -48,28 +48,37 @@ def MyController(module, keydown, key, alt):
     #Link needs to have motor enabled
 
     if not keydown:
+        
         module.SetMotorSpeed('FL_tire', 0)
         module.SetMotorSpeed('FR_tire', 0)
     else:
-        if key == controls['KEY_UP']:
+        if key == module.controls['KEY_UP']:
             module.SetMotorSpeed('FL_tire', -50)
             module.SetMotorSpeed('FR_tire', 50)
                 
-        elif key == controls['KEY_DOWN']:
+        elif key == module.controls['KEY_DOWN']:
             module.SetMotorSpeed('FL_tire', 15)
             module.SetMotorSpeed('FR_tire', -15)
 
-        elif key == controls['KEY_LEFT']:
+        elif key == module.controls['KEY_LEFT']:
             module.SetMotorSpeed('FL_tire', -3)
             module.SetMotorSpeed('FR_tire', 25)
     
-        elif key == controls['KEY_RIGHT']:
+        elif key == module.controls['KEY_RIGHT']:
             module.SetMotorSpeed('FL_tire', -25)
             module.SetMotorSpeed('FR_tire', 3)
 
-        elif key == controls['SPACE']:
+        elif key == module.controls['SPACE']:
             module.SetMotorSpeed('FL_tire', 0)
             module.SetMotorSpeed('FR_tire', 0)
 
-    
-    
+
+
+
+
+
+
+
+
+
+
