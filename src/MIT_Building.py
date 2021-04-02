@@ -8,14 +8,19 @@ from src import MIT_Entrance
 from src import MIT_Props
 from src import MIT_Offices
 from src import MIT_Roof
+from src import Robotcourse_building
+from src import Robotcourse
 
-try:
-    from src import Robotcourse_local as Robotcourse
-except:
-    try:
-        from src import Robotcourse
-    except:
-        print('Robotcourse is only currently available in AGX')
+# Demotrack
+# try:
+#     from src import Robotcourse_local as Robotcourse
+# except:
+#     try:
+#         from src import Robotcourse
+#     except:
+#         print('Robotcourse is only currently available in AGX')
+
+# ---- CHOOSE YOUR COURSE ----
 
 def build_MIT(MiroSystem, SPEEDMODE = False):
     # Create the room floor: a simple fixed rigid body with a collision shape
@@ -28,7 +33,10 @@ def build_MIT(MiroSystem, SPEEDMODE = False):
     MIT_Roof.build(MiroSystem, SPEEDMODE)
 
     if MiroAPI.API == 'AGX':
-        Robotcourse.buildArena([0,0,0.1])
+        # CHOOSE YOUR COURSE HERE: Robotcouse is the democourse, Robotcourse_building is the main course.
+
+        Robotcourse_building.buildArena([0,0,0.1])
+        # Robotcourse.buildArena([0,0,0.1])
 
     mit_carpet_floor(MiroSystem)
     if not SPEEDMODE:

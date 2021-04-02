@@ -181,7 +181,7 @@ def obstacles(sim, root, height):
 
     #-------------- Zone 1 --------------
     # BIG JUMP
-    buildRamp(agx.Vec3(-1.2,2.1,height), sim, root)
+    buildRamp(agx.Vec3(-1.2,2,height), sim, root)
     
     # Ramp to bridge
     ramp_dim = [1, 2, wallHeight+0.14] # *np.cos(np.pi/4)
@@ -204,14 +204,14 @@ def obstacles(sim, root, height):
 
     #-------------- Zone 3 --------------
     
-    for i in range(15):
-        x = 6*(width/14) - random.random()*5*(width/14)
-        y = -6*(width/14) + random.random()*6*(width/14)
+    for i in range(10):
+        x = 6*(width/14) - random.random()*4*(width/14)
+        y = -6*(width/14) + random.random()*7*(width/14)
         dims = [random.random()*0.5*(width/14), random.random()*0.5*(width/14), random.random()*1.2*(width/14)]
         pos = agx.Vec3(x, y, 0)
         if pos.length() < 1.5*(width/14):
             pos.setLength(1.5*(width/14)+random.random()*5*(width/14))
-        if pos.length() > 7.0*(width/14):
+        if pos.length() > 6.0*(width/14):
             pos.setLength(1.5*(width/14)+random.random()*5*(width/14))
         pos.set(height+dims[2]/2, 2)
         addboxx(sim, root, dims, pos, texture = 'textures/arenatextures/windows.png')
@@ -286,7 +286,7 @@ def createPond(sim, root):
     water_material = agx.Material("waterMaterial")
     water_material.getBulkMaterial().setDensity(4025)
 
-    hf = agxCollide.HeightField.createFromFile("textures/arenatextures/lavapond.png", 4, 3.9, 0, 0.15)
+    hf = agxCollide.HeightField.createFromFile("textures/arenatextures/lavapond.png", 4, 3.9, 0, 0.18)
 
     water = agxCollide.Geometry(hf)
     water.setMaterial(water_material)
@@ -368,7 +368,7 @@ def buildRamp(ramp_pos, sim, root):
     parts = 10
     ramp_length = 1.2
     ramp_height = 2
-    ramp_width = 3.9
+    ramp_width = 4
     ramp_pos = ramp_pos - agx.Vec3(0,0,ramp_height/2)
     eps_x=-0.0
     eps_z=0.0
@@ -455,7 +455,7 @@ def createLava(sim, root):
 
     water = agxCollide.Geometry(hf)
     water.setMaterial(water_material)
-    water.setPosition(agxVec([0, 0, 0.41]))
+    water.setPosition(agxVec([0, 0, 0.42]))
     sim.add(water)
     
     controller = agxModel.WindAndWaterController()
