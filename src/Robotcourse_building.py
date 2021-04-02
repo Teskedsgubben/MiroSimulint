@@ -407,7 +407,8 @@ def addField(sim, root):
     ground = agx.RigidBody(ground_geometry)
     ground.setPosition(agxVec([-1.95, 0, -1.95]))
     ground.setMotionControl(agx.RigidBody.STATIC)
-    # ground.setMaterial(agx.Material("groundmaterial"))
+    ground.getGeometry("").setMaterial(ground_material)
+    #ground.setMaterial(agx.Material("groundmaterial"))
     node = agxOSG.createVisual( ground, root )
     agxOSG.setShininess(node, 5)
 

@@ -99,6 +99,7 @@ class Module():
 
     def GetSensor(self, name='unnamed'):
         return self.sensors[name]
+        
     def GetSensorList(self):
         return self.sensors
 
