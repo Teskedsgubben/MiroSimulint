@@ -739,6 +739,8 @@ def CreateLidar1D(lidar_body, nr_of_beams, angle, reach):
     # sim, lidar_body.getPosition(), agxVecify([0,1,0]), nr_of_beams, angle, reach, lidar_body, True
     # (sim, world_position, world_direction, num_side_rayst, rad_range_side, max_length, rb_origin, draw_lines):
     sim.add(lidar)
+    return lidar.get_distances
+
 
 
 class LidarSensor1D(agxSDK.StepEventListener):
