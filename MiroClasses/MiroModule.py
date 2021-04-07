@@ -245,6 +245,7 @@ class Module():
             MiroSystem.Add(hidbod)
         for hidlink in self.hidden_links:
             MiroSystem.Add(hidlink)
+        self.system = MiroSystem
 
     def Move(self, displacement):
         if(self.refpoint):
@@ -357,15 +358,22 @@ class Module():
     def AddController(self, Controller, Controls):
         self.controller = Controller
         self.controls = Controls
-        MiroAPI.AddController(self)
+        area = self.system.Get_Environment().Get_Area('AI')
+        MiroAPI.AddController(self, area)
 
-    def AddControllerAi(self, Controller, Controls):
-        self.controller = Controller
-        self.controls = Controls
-        MiroAPI.AddController(self)  
+    def AddControllerAI(self, ControllerAI):
+        self.controllerAI = ControllerAI
+        area = self.system.Get_Environment().Get_Area('AI')
+        MiroAPI.AddControllerAI(self, area)  
 
-    def UseController(self, keydown, key, alt, x = False, y = False):
-        self.controller(self, keydown, key, alt)
+    def UseController(self, keydown, key, alt, x = False, y = False, AI = False):
+        if AI:
+            try:
+                self.controllerAI(self)
+            except:
+                print('Entering No-Control-Zone, but no AI controller is defined. Robot has died....')
+        else:
+            self.controller(self, keydown, key, alt)
 
     def Set_Max_Force(self, MAX_FORCE):
         self.max_force = MAX_FORCE

@@ -599,25 +599,62 @@ def createPond(sim, root):
     sim.add(controller)
 
 
-class UserController(agxSDK.GuiEventListener):
-    def __init__(self, Module):
-        super().__init__(agxSDK.GuiEventListener.KEYBOARD)
+class AutoController(agxSDK.StepEventListener):
+    def __init__(self, Module, Area):
+        super().__init__(agxSDK.StepEventListener.PRE_STEP)
         self.module = Module
-    
-    def keyboard(self, key, alt, x, y, keydown):
-        if self.module.controller:
-            self.module.UseController(keydown, key, alt)
-            return True
-        else: 
-            print('No controller added to Module!')
-            return False
+        self.area = Area
 
-def AddController(Module):
+    def pre(self, time):
+        if self.module.controllerAI:
+            modpos = self.module.GetCenterOfMass()
+            hasControl = False
+            if(modpos[0] > self.area[0][0] and modpos[0] < self.area[0][1]):
+                if(modpos[2] > self.area[1][0] and modpos[2] < self.area[1][1]):
+                    hasControl = True
+            if hasControl:
+                self.module.UseController(True, 1, False, AI = True)
+            return
+        else: 
+            print('No AI controller added to Module!')
+            return 
+
+def AddControllerAI(Module, Area):
     sim = agxPython.getContext().environment.getSimulation()
     app = agxPython.getContext().environment.getApplication()
     root = agxPython.getContext().environment.getSceneRoot()
     
-    controller = UserController(Module)
+    controller = AutoController(Module, Area)
+
+    sim.add(controller)
+
+class UserController(agxSDK.GuiEventListener):
+    def __init__(self, Module, Area):
+        super().__init__(agxSDK.GuiEventListener.KEYBOARD)
+        self.module = Module
+        self.area = Area
+    
+    def keyboard(self, key, alt, x, y, keydown):
+        if self.module.controller:
+            modpos = self.module.GetCenterOfMass()
+            hasControl = True
+            if(modpos[0] > self.area[0][0] and modpos[0] < self.area[0][1]):
+                if(modpos[2] > self.area[1][0] and modpos[2] < self.area[1][1]):
+                    hasControl = False
+            if hasControl:
+                self.module.UseController(keydown, key, alt)
+            return True
+        else: 
+            print('No controller added to Module!')
+            return False
+    
+
+def AddController(Module, Area):
+    sim = agxPython.getContext().environment.getSimulation()
+    app = agxPython.getContext().environment.getApplication()
+    root = agxPython.getContext().environment.getSceneRoot()
+    
+    controller = UserController(Module, Area)
 
     sim.add(controller)
 

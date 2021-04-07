@@ -5,6 +5,7 @@ class MiroEnvironment():
         self.notifier = False
         self.camviews = {}
         self.lights = []
+        self.areas = {}
 
     def Add_Camview(self, camviews):
         self.camviews.update(camviews)
@@ -22,6 +23,18 @@ class MiroEnvironment():
                 'lah': 5
             }
         })
+
+    def Add_Area(self, interval, name):
+        self.areas.update({
+            name: interval,
+        })
+
+    def Get_Area(self, name):
+        if name in self.areas.keys():
+            return self.areas[name]
+        else:
+            print('Found no area with name '+name)
+            return [[0,0],[0,0]]
     
     def Get_Target(self):
         return self.target

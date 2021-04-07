@@ -23,6 +23,7 @@ import numpy as np
 
 from Example_Controller import MyController as Mycontrol
 from Example_Controller import controls as Controls
+from Example_Controller import sensor_Controller
 import TestBots as TB
 
 
@@ -36,15 +37,20 @@ def buildScene():
     simulation_system.Set_Speedmode(False)
     simulation_system.Set_Environment(Environments.MIT_place)
 
-    #Creates robot defined in 'TestBots.py', adds controller defined in 'Example_Controller.py' to robot.
+    # Creates robot defined in 'TestBots.py'
     MyBot = TB.MyRobot()
+    
+    # Adds robot to system
+    simulation_system.Add_MiroModule(MyBot, 'MyBot', [2,2,0])
+    
+    # Adds controllers defined in 'Example_Controller.py' to robot.
     MyBot.AddController(Mycontrol, Controls)
+    MyBot.AddControllerAI(sensor_Controller)
 
     #Sets max force for motors
     MyBot.Set_Max_Force(1)
 
-    #Adds robot to system
-    simulation_system.Add_MiroModule(MyBot, 'MyBot', [6,2,0])
+    
 
     #Camera settings
     # simulation_system.Add_Camview('at_origo', position=[3,2,-2], look_at_point=[6,0,0])
