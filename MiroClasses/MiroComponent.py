@@ -225,7 +225,7 @@ class MiroSensor_Lidar(MiroSensor):
             super().__init__(sensor_body)
             self.distanceGetter = MiroAPI.CreateLidar1D(sensor_body, nr_of_beams, angle, ray_length)
     
-    def getDistances(self):
+    def GetDistances(self):
         d = self.distanceGetter()
         return d
 

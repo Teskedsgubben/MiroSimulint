@@ -1,5 +1,6 @@
 from MiroClasses.MiroModule import Module as MiroModule
 from src import Components
+from src import Sensors
 
 def DemoRobot1():
     MyRobot = MiroModule('MyRobot')
@@ -10,8 +11,8 @@ def DemoRobot1():
     MyRobot.RotateX('Top', 180)
     
     # Connect the components. The first remains in position, and the second component is moved to match
-    MyRobot.ConnectComponents('Base', 'A', 'Top', 'A')
-    MyRobot.ConnectComponents('Base', 'C', 'Top', 'B')
+    MyRobot.ConnectComponents('Base', 'C', 'Top', 'A')
+    MyRobot.ConnectComponents('Base', 'A', 'Top', 'C')
 
     # Add left wheel components
     MyRobot.AddComponent(Components.MC242(), 'Wheel: Left, Back')
@@ -20,7 +21,7 @@ def DemoRobot1():
  
     # Attach the left wheels
     MyRobot.ConnectComponents('Base', 'G', 'Wheel: Left, Back', 'A')
-    MyRobot.ConnectComponents('Base', 'F', 'Wheel: Left, Front', 'A')
+    MyRobot.ConnectComponents('Base', 'F', 'Wheel: Left, Front', 'A', link_name='FL_tire')
 
     # # Add right wheel components
     MyRobot.AddComponent(Components.MC242(), 'Wheel: Right, Back')
@@ -29,7 +30,15 @@ def DemoRobot1():
 
     # Attach the right wheels
     MyRobot.ConnectComponents('Base', 'I', 'Wheel: Right, Back', 'A')
-    MyRobot.ConnectComponents('Base', 'H', 'Wheel: Right, Front', 'A')
+    MyRobot.ConnectComponents('Base', 'H', 'Wheel: Right, Front', 'A', link_name='FR_tire')
+
+    # Add Sensor at the front
+    MyRobot.AddSensor(Sensors.MSL01(), "Lidar1")
+    MyRobot.ConnectComponents('Base', 'J', "Lidar1", 'Linkpoint2')
+
+    # Enables motors on the front wheels
+    MyRobot.EnableMotor('FL_tire')
+    MyRobot.EnableMotor('FR_tire')
     
     # Set custom textures
     # MyRobot.SetTexture(['Base', 'Top'], 'mirobooster.png', [1,1])

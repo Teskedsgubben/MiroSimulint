@@ -73,8 +73,8 @@ def MyController(module, keydown, key, alt):
             module.SetMotorSpeed('FR_tire', 0)
 
 def sensor_Controller(module):    
-    Front_Sensor=module.GetSensor('lidar')
-    d = Front_Sensor.get_distances()
+    Front_Sensor=module.GetSensor('Lidar1')
+    d = Front_Sensor.GetDistances()
 
     keydown=True
     if d[1] < 0.5: 
@@ -88,10 +88,10 @@ def sensor_Controller(module):
             key = module.controls['KEY_LEFT']
             module.UseController(keydown, key, alt=0)
         else:
-            keydown = 'KEY_RIGHT'
+            key = module.controls['KEY_RIGHT']
             module.UseController(keydown, key, alt=0)
     else:
-        keydown = 'KEY_UP'
+        key = module.controls['KEY_UP']
         module.UseController(keydown, key, alt=0)
 
 
