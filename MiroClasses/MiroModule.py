@@ -359,6 +359,11 @@ class Module():
         self.controls = Controls
         MiroAPI.AddController(self)
 
+    def AddControllerAi(self, Controller, Controls):
+        self.controller = Controller
+        self.controls = Controls
+        MiroAPI.AddController(self)  
+
     def UseController(self, keydown, key, alt, x = False, y = False):
         self.controller(self, keydown, key, alt)
 
