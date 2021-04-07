@@ -48,28 +48,59 @@ def MyController(module, keydown, key, alt):
     #Link needs to have motor enabled
 
     if not keydown:
+        
         module.SetMotorSpeed('FL_tire', 0)
         module.SetMotorSpeed('FR_tire', 0)
     else:
-        if key == controls['KEY_UP']:
+        if key == module.controls['KEY_UP']:
             module.SetMotorSpeed('FL_tire', -50)
             module.SetMotorSpeed('FR_tire', 50)
                 
-        elif key == controls['KEY_DOWN']:
+        elif key == module.controls['KEY_DOWN']:
             module.SetMotorSpeed('FL_tire', 15)
             module.SetMotorSpeed('FR_tire', -15)
 
-        elif key == controls['KEY_LEFT']:
+        elif key == module.controls['KEY_LEFT']:
             module.SetMotorSpeed('FL_tire', -3)
             module.SetMotorSpeed('FR_tire', 25)
     
-        elif key == controls['KEY_RIGHT']:
+        elif key == module.controls['KEY_RIGHT']:
             module.SetMotorSpeed('FL_tire', -25)
             module.SetMotorSpeed('FR_tire', 3)
 
-        elif key == controls['SPACE']:
+        elif key == module.controls['SPACE']:
             module.SetMotorSpeed('FL_tire', 0)
             module.SetMotorSpeed('FR_tire', 0)
 
-    
-    
+def sensor_Controller(module)    
+    Front_Sensor=module.GetSensor('lidar')
+    d = Front_Sensor.get_distances()
+
+    keydown=True
+        if d[1] < 0.5: 
+            key = module.controls['KEY_RIGHT']
+            module.UseController(keydown, key, alt=0)
+        elif d[3] < 0.5:  
+            key = module.controls['KEY_LEFT']
+            module.UseController(keydown, key, alt=0)
+        elif d[2] < 0.5:
+            if d[1] > d[3]:
+                key = module.controls['KEY_LEFT']
+                module.UseController(keydown, key, alt=0)
+            else:
+                keydown = 'KEY_RIGHT'
+                module.UseController(keydown, key, alt=0)
+        else:
+            keydown = 'KEY_UP'
+            module.UseController(keydown, key, alt=0)
+
+
+
+
+
+
+
+
+
+
+

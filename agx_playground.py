@@ -65,7 +65,7 @@ def RunPureAGX(MiroSystem):
 
 def CustomAgxFunction(SystemList): 
     [sim, app, root] = SystemList
-    bot_pos = [-11, 1, 7.5]
+    bot_pos = [-3.2, -0.01, 3]
     # bot_pos = [-287, -151.43, 23.77]
     # bot_pos[0] = bot_pos[0] - 460
     # bot_pos[1] = bot_pos[1] + 2

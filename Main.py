@@ -34,7 +34,7 @@ def buildScene():
     Simulation.Set_Environment(Environments.MIT_place)
 
     # Add a DemoModule to the system with a name and position.
-    Simulation.Add_MiroModule(DemoModules.DemoRobot1(), 'MyRobot', [11, 8,-3])
+    Simulation.Add_MiroModule(DemoModules.DemoRobot1(), 'MyRobot', [-3.2, 0, 3])
 
     # Set camera viewing perspective, options are:
     # 1: '2nd (ground) floor front view'
