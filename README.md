@@ -18,11 +18,9 @@ Download and install Git from:
 
 ### Step 2) *Download MiroSimulint*
 
-When git is installed, you can clone this repository into a local directory. Open *Git Bash* on your computer, then download the MiroSimulint code by typing:
+When git is installed, you can clone this repository into a local directory. Open *Git Bash* on your computer. You can change where to put MiroSimulint by first typing *cd NAMEOFDIRECTORY* which will change the directory git bash is in, and git will then put MiroSimulint into that directory. Then download the MiroSimulint code by typing:
 
     git clone https://github.com/Teskedsgubben/MiroSimulint
-
-You can change where to put MiroSimulint by first typing *cd NAMEOFDIRECTORY* which will change the directory git bash is in, and git clone will then put MiroSimulint into that directory.
 
 ### Step 3) *Install VS Code*
 
@@ -38,7 +36,7 @@ __On Windows:__ We will need to change default shell in VS Code. To do this, ope
 
 Open the AGX download page
 
-> <https://www.algoryx.se/download/?id=2079>
+> <https://www.algoryx.se/download/?id=2506>
 
 Find the download link that matches your system. Using Windows, which platform you install for will not matter for this library, but **make sure** you have the correct bits, most likely x64. If you are unsure, go to Control Panel $\to$ System to see your System type.
 
@@ -64,7 +62,7 @@ __On Windows:__
 __On Mac/Unix:__
 
     cd /opt/Algoryx/AgX-YOURAGXVERSION
-    source_env.bash
+    source setup_env.bash
     agxViewer --version
 
 ### Step 4b) *Install API: PyChrono*
