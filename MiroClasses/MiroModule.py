@@ -173,7 +173,7 @@ class Module():
         else:
             print('MarkComponent is currently only supported in the chrono API')
 
-    def ConnectComponents(self, name_A, point_A, name_B, point_B, dist = 0, move = True, show_warning = True, link_name = False):
+    def ConnectComponents(self, name_A, point_A, name_B, point_B, dist = 0, move = True, show_warning = True, link_name = False, lock_link = False):
         comp_A = self.components[name_A]
         comp_B = self.components[name_B]
 
@@ -201,7 +201,7 @@ class Module():
             if show_warning:
                 print('Warning: Non-facing links. The links between '+name_A+'.'+point_A+' and '+name_B+'.'+point_B+' are not facing eachother, check linkpoint and object orientation. Consider removing with MiroModule.RemoveHelpers() before running.')            
 
-        hinge_link = MiroAPI.LinkBodies_Hinge(comp_A.GetBody(), comp_B.GetBody(), linkpos, linkdir)
+        hinge_link = MiroAPI.LinkBodies_Hinge(comp_A.GetBody(), comp_B.GetBody(), linkpos, linkdir, infDamping=lock_link)
         
         # Add the link to the module's dictionary of links
         if link_name:
