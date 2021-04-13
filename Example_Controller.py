@@ -72,27 +72,72 @@ def MyController(module, keydown, key, alt):
             module.SetMotorSpeed('FL_tire', 0)
             module.SetMotorSpeed('FR_tire', 0)
 
-def sensor_Controller(module):    
+def SensorController(module):    
+    # Get sensor that we called 'Lidar1' when building the bot
     Front_Sensor=module.GetSensor('Lidar1')
+
+    # Get measurements from sensor as list
     d = Front_Sensor.GetDistances()
 
-    keydown=True
-    if d[1] < 0.5: 
-        key = module.controls['KEY_RIGHT']
-        module.UseController(keydown, key, alt=0)
-    elif d[3] < 0.5:  
-        key = module.controls['KEY_LEFT']
-        module.UseController(keydown, key, alt=0)
-    elif d[2] < 0.5:
-        if d[1] > d[3]:
-            key = module.controls['KEY_LEFT']
-            module.UseController(keydown, key, alt=0)
-        else:
-            key = module.controls['KEY_RIGHT']
-            module.UseController(keydown, key, alt=0)
+    # Prints distances for debugging:
+    print("print distances: d =", d)
+    
+    # Check if obstacle straight ahead
+    if d[1] > 0.35: 
+        front_clear=True
     else:
-        key = module.controls['KEY_UP']
-        module.UseController(keydown, key, alt=0)
+        front_clear=False
+
+    # If obstacle straight ahead, back up and turn
+    if not front_clear:     
+        # positive valued turn if left is more clear
+        turn = 12
+        
+        # turn changed to negative value if right is more clear
+        if d[0] < d[2]:
+            turn=-turn
+        
+        # back up and turn slightly
+        module.SetMotorSpeed('FL_tire', 15+turn)
+        module.SetMotorSpeed('FR_tire', -15+turn)
+        return
+    
+    # Controls when left is clear
+    if d[0] > 0.35:
+        left_clear=True
+    else:
+        left_clear=False 
+    
+    # Controls when right is clear
+    if d[2] > 0.35:
+        right_clear=True
+    else:
+        right_clear=False
+
+    # If no obstacle move forward
+    if left_clear and right_clear:
+        module.SetMotorSpeed('FL_tire', -50)
+        module.SetMotorSpeed('FR_tire', 50)
+        return
+
+    # Narrow path 
+    if not left_clear and not right_clear:
+        if d[0]>d[2]:
+            left_clear = True
+        else:
+            right_clear = True    
+
+    # If obstacle on the right        
+    if not right_clear:
+        module.SetMotorSpeed('FL_tire', -3)
+        module.SetMotorSpeed('FR_tire', 25)
+
+    # If obstacle on the left 
+    if not left_clear:
+        module.SetMotorSpeed('FL_tire', -25)
+        module.SetMotorSpeed('FR_tire', 3)
+
+
 
 
 

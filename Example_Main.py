@@ -32,7 +32,7 @@ def buildScene():
     MyBot1 = MiroBots.DemoRobot1()
     Simulation.Add_MiroModule(MyBot1, 'MyBot1', BotPosition1)
     MyBot1.AddController(Controller.MyController, Controller.controls)
-    MyBot1.AddControllerAI(Controller.sensor_Controller)
+    MyBot1.AddControllerAI(Controller.SensorController)
 
     # BotPosition2 = [9.3, 7.8, 1.7]
     # MyBot2 = MiroBots.DemoRobot2()

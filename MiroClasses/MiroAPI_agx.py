@@ -839,6 +839,7 @@ class LidarSensor1D(agxSDK.StepEventListener):
         d = []
         for k, v in self._rays_dict.items():
             d.append(v[1])
+        d.reverse()
         return d
     
     def getBody(self):

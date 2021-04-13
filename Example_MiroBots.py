@@ -34,7 +34,7 @@ def DemoRobot1():
 
     # Add Sensor at the front
     MyRobot.AddSensor(Sensors.MSL01(), "Lidar1")
-    MyRobot.ConnectComponents('Base', 'J', "Lidar1", 'Linkpoint2')
+    MyRobot.ConnectComponents('Base', 'J', "Lidar1", 'Linkpoint2', lock_link=True)
 
     # Enables motors on the front wheels
     MyRobot.EnableMotor('FL_tire')
