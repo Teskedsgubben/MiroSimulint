@@ -471,13 +471,11 @@ def ChangeBodyTexture(body, texture_file, scale=[1,1]):
 
 ####### LINKS AND CONSTRAINTS #######
 # Links
-def LinkBodies_Hinge(body1, body2, link_position, link_direction, MiroSystem=False, infDamping=False):
+def LinkBodies_Hinge(body1, body2, link_position, link_direction, MiroSystem=False, ):
     hf = agx.HingeFrame()
     hf.setAxis(agxVecify(link_direction))
     hf.setCenter(agxVecify(link_position))
     link = agx.Hinge(hf, body1, body2)
-    if(infDamping):
-        link.setDamping(float('inf'))
     if MiroSystem:
         MiroSystem.Add(link)
     return link

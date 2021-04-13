@@ -201,7 +201,8 @@ class Module():
             if show_warning:
                 print('Warning: Non-facing links. The links between '+name_A+'.'+point_A+' and '+name_B+'.'+point_B+' are not facing eachother, check linkpoint and object orientation. Consider removing with MiroModule.RemoveHelpers() before running.')            
 
-        hinge_link = MiroAPI.LinkBodies_Hinge(comp_A.GetBody(), comp_B.GetBody(), linkpos, linkdir, infDamping=lock_link)
+        hinge_link = MiroAPI.LinkBodies_Hinge(comp_A.GetBody(), comp_B.GetBody(), linkpos, linkdir)
+        
         
         # Add the link to the module's dictionary of links
         if link_name:
@@ -211,6 +212,18 @@ class Module():
             self.links.update({name: hinge_link})
 
         self.graph_links.append({'Source': name_A, 'Target': name_B, 'Weight': 1})
+
+        if lock_link:
+            rotVec = np.array([1,1,1])
+            rotVec = rotVec - np.dot(rotVec, linkdir)*linkdir
+            rotVec = rotVec/np.linalg.norm(rotVec)
+            # 90 degree rotated link to emulate 0-spin link
+            hinge_link = MiroAPI.LinkBodies_Hinge(comp_A.GetBody(), comp_B.GetBody(), linkpos, MiroAPI.rotateVector(linkdir, 90, rotVec))
+            if link_name:
+                self.links.update({link_name+'_locker': hinge_link})
+            else:
+                name = name_A+"."+point_A + "_TO_" + name_B+"."+point_B+'_locker'
+                self.links.update({name: hinge_link})
 
     def SetSpring(self, name_A, point_A, name_B, point_B, L, K, marking_radius = 0.005, draw_spring = False, spring_radius = 0.005, spring_turns = 40):
         '''Sets a spring of rest length L and spring constant K between the points on components A and B in the module. 
