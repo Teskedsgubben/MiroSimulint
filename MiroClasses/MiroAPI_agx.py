@@ -769,7 +769,7 @@ class LidarSensor1D(agxSDK.StepEventListener):
         :param rb_origin: Rigidbody to lock the lidar body to. Will lock to world if None
         :param draw_lines: debug rendering of the rays
         '''
-        super().__init__(agxSDK.StepEventListener.PRE_COLLIDE + agxSDK.StepEventListener.POST_STEP)
+        super().__init__(agxSDK.StepEventListener.PRE_COLLIDE)
 
         geom = agxCollide.Geometry(agxCollide.Box(0.1, 0.1, 0.1))
         geom.setName("lidar_geom")
@@ -843,9 +843,6 @@ class LidarSensor1D(agxSDK.StepEventListener):
     
     def getBody(self):
         return self.lidar_body
-
-    def post(self, t):
-        print(self.get_distances())
 
 class LidarContactSensor(agxSDK.ContactEventListener):
     def __init__(self, lidar_body, rays_dict, max_length, rb_origin = None):

@@ -368,10 +368,8 @@ class Module():
 
     def UseController(self, keydown, key, alt, x = False, y = False, AI = False):
         if AI:
-            try:
-                self.controllerAI(self)
-            except:
-                print('Entering No-Control-Zone, but no AI controller is defined. Robot has died....')
+            self.controllerAI(self)
+
         else:
             self.controller(self, keydown, key, alt)
 
