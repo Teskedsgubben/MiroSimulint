@@ -25,6 +25,9 @@ empty = [
         [_, _, _, _, _, _, _, _, _, _, _, _],
     ]
 
+def GetMaze():
+    return maze1()
+
 def maze1():
     return [
         [X, X, X, _, _, _, _, X, _, _, X, X],

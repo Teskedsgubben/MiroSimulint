@@ -87,7 +87,7 @@ def buildArena(arena_pos):
 
     arena_size = [width, width, 0.2]
 
-    maze = Gridmazes.maze1()
+    maze = Gridmazes.GetMaze()
     # grid [[x_min, x_max], [z_min, z_max]]
     grid = [[0.1,3.9], [-0.1,-2.8]]
     x_n = len(maze[0])
