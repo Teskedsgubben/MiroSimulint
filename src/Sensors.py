@@ -99,8 +99,7 @@ def MSL02(rot = [0,0,0]):
     sensor_body = MiroAPI.add_boxShape(False, size_x, size_y, size_z, [0,0,0], texture='MSA01.png', Fixed=False)
 
     # Generate MiroComponent based MiroSensor with above ChBody
-    SENSOR = mc.MiroSensor_Lidar(sensor_body)
-    SENSOR.SetupBeams(3, 90, 2)
+    SENSOR = mc.MiroSensor_Lidar(sensor_body, 3, 90, 2)
 
     # Top
     SENSOR.AddLinkPoint('Linkpoint', [0, 1, 0], [0, size_y/2, 0])
@@ -116,8 +115,7 @@ def MSL03(rot = [0,0,0]):
     sensor_body = MiroAPI.add_boxShape(False, size_x, size_y, size_z, [0,0,0], texture='MSA01.png', Fixed=False)
 
     # Generate MiroComponent based MiroSensor with above ChBody
-    SENSOR = mc.MiroSensor_Lidar(sensor_body)
-    SENSOR.SetupBeams(50, 90, 2)
+    SENSOR = mc.MiroSensor_Lidar(sensor_body, 50, 90, 2)
 
     # Top
     SENSOR.AddLinkPoint('Linkpoint', [0, 1, 0], [0, size_y/2, 0])
