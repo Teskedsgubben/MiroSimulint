@@ -34,6 +34,10 @@ import agxTerrain
 import time as TIME
 import math
 import random
+try:
+    import Gridmazes
+except:
+    from src import Gridmazes
 
 # Banans mått
 width = 8
@@ -82,6 +86,31 @@ def buildArena(arena_pos):
     root = agxPython.getContext().environment.getSceneRoot()
 
     arena_size = [width, width, 0.2]
+
+    maze = Gridmazes.maze1()
+    # grid [[x_min, x_max], [z_min, z_max]]
+    grid = [[0.1,3.9], [-0.1,-2.8]]
+    x_n = len(maze[0])
+    y_n = len(maze)
+    dx = (grid[0][1] - grid[0][0])/x_n
+    dy = (grid[1][1] - grid[1][0])/y_n
+    dz = 1
+    for yi in range(y_n):
+        for xi in range(x_n):
+            if maze[yi][xi] > 0:
+                x = grid[0][0] + dx*(0.5 + xi)
+                y = grid[1][0] + dy*(0.5 + yi)
+                # box = agx.RigidBody( agxCollide.Geometry( agxCollide.Box(dx/2, dy/2, 0.3)))
+                box = agx.RigidBody( agxCollide.Geometry( agxCollide.Cylinder(dx/2, 0.3)))
+                box.setRotation(agx.Quat(np.pi/2, agx.Vec3(1,0,0)))
+                box.setPosition(x, y, arena_size[2])
+                box.setMotionControl(1)
+                sim.add(box)
+                agxOSG.setDiffuseColor(agxOSG.createVisual(box, root), agxRender.Color.Red())
+                agxOSG.setShininess(agxOSG.createVisual(box, root), 128)
+
+
+
     
     floor = agx.RigidBody( agxCollide.Geometry( agxCollide.Box(arena_size[0]/2, arena_size[1]/2, arena_size[2]/2)))
     floor.setPosition(arena_pos[0], arena_pos[1], arena_pos[2]-arena_size[2]/2)
@@ -204,17 +233,17 @@ def obstacles(sim, root, height):
 
     #-------------- Zone 3 --------------
     
-    for i in range(10):
-        x = 6*(width/14) - random.random()*4*(width/14)
-        y = -6*(width/14) + random.random()*7*(width/14)
-        dims = [random.random()*0.5*(width/14), random.random()*0.5*(width/14), random.random()*1.2*(width/14)]
-        pos = agx.Vec3(x, y, 0)
-        if pos.length() < 1.5*(width/14):
-            pos.setLength(1.5*(width/14)+random.random()*5*(width/14))
-        if pos.length() > 6.0*(width/14):
-            pos.setLength(1.5*(width/14)+random.random()*5*(width/14))
-        pos.set(height+dims[2]/2, 2)
-        addboxx(sim, root, dims, pos, texture = 'textures/arenatextures/windows.png')
+    # for i in range(10):
+    #     x = 6*(width/14) - random.random()*4*(width/14)
+    #     y = -6*(width/14) + random.random()*7*(width/14)
+    #     dims = [random.random()*0.5*(width/14), random.random()*0.5*(width/14), random.random()*1.2*(width/14)]
+    #     pos = agx.Vec3(x, y, 0)
+    #     if pos.length() < 1.5*(width/14):
+    #         pos.setLength(1.5*(width/14)+random.random()*5*(width/14))
+    #     if pos.length() > 6.0*(width/14):
+    #         pos.setLength(1.5*(width/14)+random.random()*5*(width/14))
+    #     pos.set(height+dims[2]/2, 2)
+    #     addboxx(sim, root, dims, pos, texture = 'textures/arenatextures/windows.png')
 
 
 

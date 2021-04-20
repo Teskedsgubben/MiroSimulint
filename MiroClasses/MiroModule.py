@@ -215,6 +215,8 @@ class Module():
 
         if lock_link:
             rotVec = np.array([1,1,1])
+            if np.dot(rotVec, linkdir)/(np.linalg.norm(rotVec)*np.linalg.norm(rotVec)) < 0.01:
+                rotVec = np.array([1,-1,1])
             rotVec = rotVec - np.dot(rotVec, linkdir)*linkdir
             rotVec = rotVec/np.linalg.norm(rotVec)
             # 90 degree rotated link to emulate 0-spin link
