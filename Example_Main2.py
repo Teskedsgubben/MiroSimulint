@@ -50,8 +50,6 @@ def buildScene():
     #Sets max force for motors
     MyBot.Set_Max_Force(1)
 
-    
-
     #Camera settings
     # simulation_system.Add_Camview('at_origo', position=[3,2,-2], look_at_point=[6,0,0])
     # simulation_system.Set_Perspective('at_origo')
