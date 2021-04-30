@@ -35,7 +35,7 @@ def build_MIT(MiroSystem, SPEEDMODE = False):
     if MiroAPI.API == 'AGX':
         # CHOOSE YOUR COURSE HERE: Robotcouse is the democourse, Robotcourse_building is the main course.
 
-        Robotcourse_building.buildArena([0,0,0.1])
+        Robotcourse_building.buildArena(MiroSystem, [0,0,0])
         # Robotcourse.buildArena([0,0,0.1])
 
     mit_carpet_floor(MiroSystem)
