@@ -301,6 +301,16 @@ class Module():
         for _, comp in self.components.items():
             comp.SetVelocity(vel)
 
+    def RotateModuleY(self, angle):
+        '''Rotate a complete module about the Y axis in degrees'''
+        ref = self.GetBaseComponent().GetPosition()
+        for _, comp in self.components.items():
+            comp.RotateAxis(angle, [0,1,0])
+            dr = comp.GetPosition() - ref
+            if np.linalg.norm(dr) > 0:
+                dr_new = MiroAPI.rotateVector(dr, angle, [0,1,0])
+                comp.MoveToPosition(ref + dr_new)
+
     def Rotate(self, component_name, theta, axis):
         '''Rotates a specific component in the module theta degrees about the provided axis.'''
         if type(component_name) == type([]):
