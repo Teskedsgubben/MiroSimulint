@@ -405,6 +405,60 @@ def add_stepShape(MiroSystem, position_front, direction_front, position_back, di
 def stepShape(position_front, direction_front, position_back, direction_back, width, height, clr = [0.5,0.5,0.5]):
     return add_stepShape(False, position_front, direction_front, position_back, direction_back, width, height, clr)
 
+
+def add_OneBodyTire(MiroSystem, radius_tire, width, pos, density_tire=500, texture='test.jpg', scale=[1,1], Collide=True, Fixed=False, rotX=90, rotY=0, rotZ=0, rotOrder=['x','y','z'], rotAngle=0, rotAxis=[1,0,0], rotDegrees=True, color=[0.5, 0.5, 0.5]):
+    tire_body = add_cylinderShape(False, radius_tire, width, density_tire, pos, texture, scale, Collide, Fixed, rotX, rotY, rotZ, rotOrder, rotAngle, rotAxis, rotDegrees, color)
+
+    tire = agxModel.OneBodyTire(tire_body, radius_tire)
+
+    tire.setImplicitFrictionMultiplier(agx.Vec2(1.5, 0.5))
+    
+    agxSim = agxPython.getContext().environment.getSimulation()
+    agxApp = agxPython.getContext().environment.getApplication()
+    agxRoot = agxPython.getContext().environment.getSceneRoot()
+
+    agxSim.add(tire)
+    
+    return tire_body
+
+
+def add_TwoBodyTire(MiroSystem, radius_rim, radius_tire, width, pos, density_rim=1000, density_tire= 500, stiffness=10^5, damping=10^3, material = None, texture='test.jpg', scale=[1,1], Collide=True, Fixed=False, rotX=90, rotY=0, rotZ=0, rotOrder=['x','y','z'], rotAngle=0, rotAxis=[1,0,0], rotDegrees=True, color=[0.5, 0.5, 0.5]):
+    agxSim = agxPython.getContext().environment.getSimulation()
+    agxApp = agxPython.getContext().environment.getApplication()
+    agxRoot = agxPython.getContext().environment.getSceneRoot()
+    
+    rim_body = add_cylinderShape(False, radius_rim, width, density_rim, pos, texture, scale, Collide, Fixed, rotX, rotY, rotZ, rotOrder, rotAngle, rotAxis, rotDegrees, color)
+    tire_body = add_cylinderShape(False, radius_tire, width, density_tire, pos, texture, scale, Collide, Fixed, rotX, rotY, rotZ, rotOrder, rotAngle, rotAxis, rotDegrees, color)
+    
+    # if material == None:
+    #     tire_material = agx.Material('TireMaterial')
+    #     rim_body.getGeometry("").setMaterial(tire_material)
+    #     tire_body.getGeometry("").setMaterial(tire_material)
+    #     agxSim.add(tire_material)
+
+    # else:
+    #     rim_body.getGeometry().setMaterial(material)
+    #     tire_body.getGeometry().setMaterial(material)
+    #     agxSim.add(tire_material)
+
+    tire = agxModel.TwoBodyTire(tire_body, radius_tire, rim_body, radius_rim)
+
+    tire.setStiffness(stiffness*2, agxModel.TwoBodyTire.RADIAL)
+    tire.setStiffness(stiffness*10, agxModel.TwoBodyTire.LATERAL)
+    tire.setStiffness(stiffness*4, agxModel.TwoBodyTire.BENDING)
+    tire.setStiffness(stiffness*0.1, agxModel.TwoBodyTire.TORSIONAL)
+
+    tire.setDampingCoefficient(damping*2, agxModel.TwoBodyTire.RADIAL)
+    tire.setDampingCoefficient(damping*10, agxModel.TwoBodyTire.LATERAL)
+    tire.setDampingCoefficient(damping*4, agxModel.TwoBodyTire.BENDING)
+    tire.setDampingCoefficient(damping*0.1, agxModel.TwoBodyTire.TORSIONAL)
+
+    tire.setImplicitFrictionMultiplier(agx.Vec2(1.5, 0.5))
+
+    agxSim.add(tire)
+
+    return [rim_body, tire_body]
+
 ####### RIGID BODY OPERATIONS #######
 # Import from file
 def LoadFromObj(filename, density=1000, color=[1,0.1,0.1]):
@@ -471,11 +525,12 @@ def ChangeBodyTexture(body, texture_file, scale=[1,1]):
 
 ####### LINKS AND CONSTRAINTS #######
 # Links
-def LinkBodies_Hinge(body1, body2, link_position, link_direction, MiroSystem=False, ):
+def LinkBodies_Hinge(body1, body2, link_position, link_direction, MiroSystem=False):
     hf = agx.HingeFrame()
     hf.setAxis(agxVecify(link_direction))
     hf.setCenter(agxVecify(link_position))
     link = agx.Hinge(hf, body1, body2)
+    link.setSolveType(agx.Constraint.DIRECT_AND_ITERATIVE)
     if MiroSystem:
         MiroSystem.Add(link)
     return link
@@ -489,6 +544,17 @@ def LinkBodies_Spring(body1, pos1, body2, pos2, length, KS, KD, visible=False, s
     spring.setElasticity(KS)
     spring.setDamping(KD)
     return spring
+
+def LinkBodies_WheelJoint(wheel_body, chassi_body, wheel_joint_pos, wheel_axis, steer_axis, compliance = 1e5, MiroSystem=False):
+
+    wjf = agx.WheelJointFrame(agxVecify(wheel_joint_pos), agxVecify(wheel_axis), agxVecify(steer_axis))
+    
+    wj = agx.WheelJoint(wjf, wheel_body, chassi_body)
+    wj.setCompliance(compliance)
+    wj.setSolveType(agx.Constraint.DIRECT_AND_ITERATIVE)
+    if MiroSystem:
+        MiroSystem.Add(wj)
+    return wj
 
 ####### SCENE CONFIGURATION #######
 # Simulation stuff

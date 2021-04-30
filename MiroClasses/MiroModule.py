@@ -394,7 +394,6 @@ class Module():
     def UseController(self, keydown, key, alt, x = False, y = False, AI = False):
         if AI:
             self.controllerAI(self)
-
         else:
             self.controller(self, keydown, key, alt)
 

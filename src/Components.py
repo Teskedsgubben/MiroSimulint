@@ -4,6 +4,7 @@ import numpy as np
 
 density = {
     'ABS': 950,
+    'Rubber': 1200,
     'PVC': 1380,
     'Aluminium': 2700,
     'Steel Forged Concrete': 5000,
@@ -556,3 +557,77 @@ def MC907(rot = [0,0,0], pos = [0,0,0], Fixed = False):
     COMPONENT.Rotate(rot)
 
     return COMPONENT
+
+
+#Tires
+def MCTXX(radius_tire, width, rot = [0,0,0], pos = [0,0,0], Fixed = False):
+    density_tire = density['Rubber']
+
+    tire = MiroAPI.add_OneBodyTire(False, radius_tire, width, pos, density_tire, texture='MITstol.jpg')
+
+    COMPONENT = mc.MiroComponent(tire)
+
+    COMPONENT.AddLinkPoint('A', [0, 0, 1], [0,0, width/2])
+    COMPONENT.AddLinkPoint('B', [0,0,-1], [0,0, -width/2])
+
+    COMPONENT.Rotate(rot)
+
+    return COMPONENT
+
+
+def MCT01():
+    return MCTXX(0.04, 0.02, rot = [0,0,0], pos = [0,0,0], Fixed = False)
+def MCT02():
+    return MCTXX(0.06, 0.02, rot = [0,0,0], pos = [0,0,0], Fixed = False)
+def MCT03():
+    return MCTXX(0.12, 0.02, rot = [0,0,0], pos = [0,0,0], Fixed = False)
+def MCT04():
+    return MCTXX(0.16, 0.02, rot = [0,0,0], pos = [0,0,0], Fixed = False)
+
+def MCT11():
+    return MCTXX(0.08, 0.04, rot = [0,0,0], pos = [0,0,0], Fixed = False)
+def MCT12():
+    return MCTXX(0.12, 0.04, rot = [0,0,0], pos = [0,0,0], Fixed = False)
+def MCT13():
+    return MCTXX(0.16, 0.04, rot = [0,0,0], pos = [0,0,0], Fixed = False)
+def MCT14():
+    return MCTXX(0.20, 0.04, rot = [0,0,0], pos = [0,0,0], Fixed = False)
+
+
+def MC2TXX(rim_radius, wheel_radius, width, rot = [0,0,0], pos = [0,0,0], Fixed = False):
+    density_tire = density['Steel Forged Concrete']
+
+    [rim, wheel] = MiroAPI.add_TwoBodyTire(False, rim_radius, wheel_radius, width, pos, density_tire, texture='MITstol.jpg')
+
+    COMPONENT_Rim = mc.MiroComponent(rim)
+    COMPONENT_Wheel = mc.MiroComponent(wheel)
+
+    COMPONENT_Rim.AddLinkPoint('A', [0, 0, 1], [0,0, width/2])
+    COMPONENT_Rim.AddLinkPoint('B', [0,0,-1], [0,0, -width/2])
+
+    COMPONENT_Wheel.AddLinkPoint('A', [0, 0, 1], [0,0, width/2])
+    COMPONENT_Wheel.AddLinkPoint('B', [0,0,-1], [0,0, -width/2])
+
+    COMPONENT_Rim.Rotate(rot)
+    COMPONENT_Wheel.Rotate(rot)
+
+    return [COMPONENT_Rim, COMPONENT_Wheel]
+
+
+def MC2T01():
+    return MC2TXX(0.04, 0.05, 0.02, rot = [0,0,0], pos = [0,0,0], Fixed = False)
+def MC2T02():
+    return MC2TXX(0.08, 0.10, 0.02, rot = [0,0,0], pos = [0,0,0], Fixed = False)
+def MC2T03():
+    return MC2TXX(0.12, 0.14, 0.02, rot = [0,0,0], pos = [0,0,0], Fixed = False)
+def MC2T04():
+    return MC2TXX(0.16, 0.20, 0.02, rot = [0,0,0], pos = [0,0,0], Fixed = False)
+
+def MC2T11():
+    return MC2TXX(0.04, 0.05, 0.04, rot = [0,0,0], pos = [0,0,0], Fixed = False)
+def MC2T12():
+    return MC2TXX(0.08, 0.10, 0.04, rot = [0,0,0], pos = [0,0,0], Fixed = False)
+def MC2T13():
+    return MC2TXX(0.12, 0.14, 0.04, rot = [0,0,0], pos = [0,0,0], Fixed = False)
+def MC2T14():
+    return MC2TXX(0.16, 0.20, 0.04, rot = [0,0,0], pos = [0,0,0], Fixed = False)

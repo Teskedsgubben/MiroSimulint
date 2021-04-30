@@ -72,6 +72,9 @@ def MyController(module, keydown, key, alt):
             module.SetMotorSpeed('FL_tire', 0)
             module.SetMotorSpeed('FR_tire', 0)
 
+
+
+
 def SensorController(module):    
     # Get sensor that we called 'Lidar1' when building the bot
     Front_Sensor=module.GetSensor('Lidar1')
