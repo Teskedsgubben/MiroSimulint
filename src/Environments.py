@@ -14,7 +14,7 @@ MIT_place.Set_Initializer(MIT.build_MIT)
 MIT_place.Set_Notifier(MN.MiroNotifier([13.41, 8.5, 1.55], 84.125, 0))
 
 # Self control region
-MIT_place.Add_Area([[-4,0],[0,4]], 'AI')
+MIT_place.Add_Area([[-3.9,-0.1],[0.1,2.8]], 'AI')
 
 MIT_place.Add_Lightsource([  5, 25,  20], [3, 0, -5], 100, 15, 40, 40)
 MIT_place.Add_Lightsource([13, 6.67,-6], power = 80, shadows=False)
