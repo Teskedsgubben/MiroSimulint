@@ -47,7 +47,7 @@ def xyzTransform(vec, sizes = False, reverse = False):
     newvec = [-vec[0], -vec[2], vec[1]]
     if reverse:
         newvec = [-vec[0], vec[2], -vec[1]]
-    return newvec
+    return np.array(newvec)
 
 def scaleLimit(scale):
     max_scale = [1, 1]
