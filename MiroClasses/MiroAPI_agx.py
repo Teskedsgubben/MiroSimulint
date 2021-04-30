@@ -530,7 +530,8 @@ def LinkBodies_Hinge(body1, body2, link_position, link_direction, MiroSystem=Fal
     hf.setAxis(agxVecify(link_direction))
     hf.setCenter(agxVecify(link_position))
     link = agx.Hinge(hf, body1, body2)
-    link.setSolveType(agx.Constraint.DIRECT_AND_ITERATIVE)
+    # The line below is disabled because it messes up the steering of the example bot. 
+    # link.setSolveType(agx.Constraint.DIRECT_AND_ITERATIVE)
     if MiroSystem:
         MiroSystem.Add(link)
     return link
