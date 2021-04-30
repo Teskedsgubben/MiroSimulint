@@ -80,86 +80,153 @@ class Timer(agxSDK.ContactEventListener):
                 self.checks[i] = False
         return agxSDK.ContactEventListener.KEEP_CONTACT
 
-def buildArena(arena_pos):
+def buildArena(MiroSystem, arena_pos):
     sim = agxPython.getContext().environment.getSimulation()
     app = agxPython.getContext().environment.getApplication()
     root = agxPython.getContext().environment.getSceneRoot()
 
-    arena_size = [width, width, 0.2]
-
-    maze = Gridmazes.GetMaze()
-    # grid [[x_min, x_max], [z_min, z_max]]
-    grid = [[0.1,3.9], [-0.1,-2.8]]
-    x_n = len(maze[0])
-    y_n = len(maze)
-    dx = (grid[0][1] - grid[0][0])/x_n
-    dy = (grid[1][1] - grid[1][0])/y_n
-    dz = 1
-    for yi in range(y_n):
-        for xi in range(x_n):
-            if maze[yi][xi] > 0:
-                x = grid[0][0] + dx*(0.5 + xi)
-                y = grid[1][0] + dy*(0.5 + yi)
-                # box = agx.RigidBody( agxCollide.Geometry( agxCollide.Box(dx/2, dy/2, 0.3)))
-                box = agx.RigidBody( agxCollide.Geometry( agxCollide.Cylinder(dx/2, 0.3)))
-                box.setRotation(agx.Quat(np.pi/2, agx.Vec3(1,0,0)))
-                box.setPosition(x, y, arena_size[2])
-                box.setMotionControl(1)
-                sim.add(box)
-                agxOSG.setDiffuseColor(agxOSG.createVisual(box, root), agxRender.Color.Red())
-                agxOSG.setShininess(agxOSG.createVisual(box, root), 128)
-
+    arena_size = np.array([width, 0.2, width])
+    arena_pos = np.array(arena_pos)
 
 
     
-    floor = agx.RigidBody( agxCollide.Geometry( agxCollide.Box(arena_size[0]/2, arena_size[1]/2, arena_size[2]/2)))
-    floor.setPosition(arena_pos[0], arena_pos[1], arena_pos[2]-arena_size[2]/2)
-    floor.setMotionControl(1)
-    sim.add(floor)
-    agxOSG.setDiffuseColor(agxOSG.createVisual(floor, root), agxRender.Color.Black())
-    agxOSG.setShininess(agxOSG.createVisual(floor, root), 128)
+    MiroAPI.add_boxShape(MiroSystem, arena_size[0]/2, arena_size[1]/10, arena_size[2]/2, arena_pos+np.array([ arena_size[0]/4,arena_size[1]/20, arena_size[2]/4]), texture='white concrete.jpg')
+    MiroAPI.add_boxShape(MiroSystem, arena_size[0]/2, arena_size[1], arena_size[2]/2, arena_pos+np.array([-arena_size[0]/4,arena_size[1]/2, arena_size[2]/4]), texture='white concrete.jpg')
+    MiroAPI.add_boxShape(MiroSystem, arena_size[0]/2, arena_size[1], arena_size[2]/2, arena_pos+np.array([-arena_size[0]/4,arena_size[1]/2,-arena_size[2]/4]), texture='white concrete.jpg')
+    MiroAPI.add_boxShape(MiroSystem, arena_size[0]/2, arena_size[1], arena_size[2]/2, arena_pos+np.array([ arena_size[0]/4,arena_size[1]/2,-arena_size[2]/4]), texture='white concrete.jpg')
 
     sides = 8
-    side_len = width/(1+np.sqrt(2)) + arena_size[2]/2/np.sqrt(2)
-    base_pos = agx.Vec3(arena_pos[0], arena_pos[1], arena_pos[2]-arena_size[2]/2+height/2)
-    for w in [1, 2, 4, 5, 6, 7, 8]: # Build sides for an octagon, except the fourth in the iteration
+    side_len = width/(1+np.sqrt(2)) + arena_size[1]/2/np.sqrt(2)
+    for w in [1, 2, 3, 4, 5, 6, 7, 8]: # Build sides for an octagon, except the fourth in the iteration
             theta = -w*np.pi/4
             rot = agx.Quat(theta, agx.Vec3(0,0,1))
-            rot_pos = agx.Vec3(np.sin(theta)*width/2, -np.cos(theta)*width/2, 0)
+            rot_pos = MiroAPI.xyzTransform([np.sin(theta)*width/2, -np.cos(theta)*width/2, height/2], reverse=True)
+            if w in [3]: # Create box corner
+                MiroAPI.add_boxShape(MiroSystem, side_len/np.sqrt(2)+0.15, height*1.1, arena_size[1], arena_pos + rot_pos + np.array([0, 0, rot_pos[2]/abs(rot_pos[2])])*(width/2 - abs(rot_pos[2])), texture='black_smere.jpg', rotY=-theta+np.pi/4, rotDegrees=False)
+                MiroAPI.add_boxShape(MiroSystem, side_len/np.sqrt(2)+0.15, height, arena_size[1], arena_pos + rot_pos + np.array([rot_pos[0]/abs(rot_pos[0]), 0, 0])*(width/2 - abs(rot_pos[0])), texture='black_smere.jpg', rotY=-theta-np.pi/4, rotDegrees=False)
+            else: # Create octagon side
+                MiroAPI.add_boxShape(MiroSystem, side_len, height, arena_size[1], arena_pos + rot_pos, texture='black_smere.jpg', rotY=-theta, rotDegrees=False)
 
-            wall = agx.RigidBody( agxCollide.Geometry( agxCollide.Box(side_len/2, arena_size[2]/2, height/2)))
-            wall.setPosition(base_pos + rot_pos)
-            wall.setMotionControl(1)
-            wall.setRotation(rot)
-            sim.add(wall)
-            agxOSG.setDiffuseColor(agxOSG.createVisual(wall, root), agxRender.Color.DarkOrange())
-    # Build the remaining edge of the arena
 
-    # Square corner 1 
-    theta = -2*np.pi/4 
-    rot = agx.Quat(theta, agx.Vec3(0,0,1))
-    rot_pos = agx.Vec3(np.sin(theta)*width/2, -np.cos(theta)*width/2, 0)
+    MiroAPI.add_boxShape(MiroSystem, side_len, 0.2, 0.2, arena_pos + rot_pos, texture='black_smere.jpg', rotY=-theta, rotDegrees=False)
+    
+    # Quadrant 1
+    easyRamp(MiroSystem, np.array([arena_size[0]/4, arena_pos[1]+arena_size[1]/3.5, -arena_size[2]/2]), height-arena_size[1]/3.5)
 
-    wall = agx.RigidBody( agxCollide.Geometry( agxCollide.Box(side_len/2, arena_size[2]/2, height/2)))
-    wall.setPosition(base_pos + rot_pos + agx.Vec3(0, side_len - 1, 0))
-    wall.setMotionControl(1)
-    wall.setRotation(rot)
-    sim.add(wall)
-    agxOSG.setDiffuseColor(agxOSG.createVisual(wall, root), agxRender.Color.DarkOrange())
+    # Quadrant 2
+    # First big dirt
+    pos = arena_pos + np.array([-0.3, arena_size[1]+0.4/2, -arena_size[2]/4])
+    MiroAPI.add_boxShape(MiroSystem, 0.6, 0.4, arena_size[2]/2-0.2, pos, texture='dirt.png', rotY=0)
 
-    # Square corner 2
-    theta = -4*np.pi/4  
-    rot = agx.Quat(theta, agx.Vec3(0,0,1))
-    rot_pos = agx.Vec3(np.sin(theta)*width/2, -np.cos(theta)*width/2, 0)
+    # Steep slope dirt
+    pos = arena_pos + np.array([-1.54, arena_size[1]+0.005, -1.35])
+    MiroAPI.add_boxShape(MiroSystem, 2.0, 0.4, 2.6, pos, texture='dirt.png', rotZ=11.5)
 
-    wall = agx.RigidBody( agxCollide.Geometry( agxCollide.Box(side_len/2, arena_size[2]/2, height/2)))
-    wall.setPosition(base_pos + rot_pos + agx.Vec3(-(side_len - 1), 0, 0))
-    wall.setMotionControl(1)
-    wall.setRotation(rot)
-    sim.add(wall)
-    agxOSG.setDiffuseColor(agxOSG.createVisual(wall, root), agxRender.Color.DarkOrange())
+    # Far side hill dirt
+    pos = arena_pos + np.array([-2.24, arena_size[1]-0.085, -2.35])
+    MiroAPI.add_boxShape(MiroSystem, 3.0, 0.4, 1.6, pos, texture='dirt.png', rotX=5, rotY=45, rotZ=11.5, rotOrder=['x', 'y', 'z'])
 
-    obstacles(sim, root, arena_pos[2])
+    # Far side flat dirt
+    pos = arena_pos + np.array([-3.0, arena_size[1]-0.085, -1.95])
+    MiroAPI.add_boxShape(MiroSystem, 2.0, 0.4, 0.9, pos, texture='dirt.png', rotY=45, rotZ=-1.5)
+
+    # Last flat dirt
+    dh = 0.45*np.sin(np.deg2rad(1.0))
+    pos = arena_pos + np.array([-3.0, arena_size[1]-0.085+dh, -1.35])
+    MiroAPI.add_boxShape(MiroSystem, 1.9, 0.4, 0.9, pos, texture='dirt.png', rotZ=-1.5, rotX=-1.0)
+
+    # Small filling dirt at the top
+    pos = arena_pos + np.array([-1.45, arena_size[1]+0.05, -3.65])
+    MiroAPI.add_boxShape(MiroSystem, 0.5, 0.4, 0.5, pos, texture='dirt.png', rotY=0)
+
+    # First big cylinder
+    pos = arena_pos + np.array([-0.85, arena_size[1]+0.15, -2.7])
+    MiroAPI.add_cylinderShape(MiroSystem, 0.4, 2.4, 1000, pos, texture='carbonfiber.png', rotX=90)
+    # Sphere at the end of the first big cylinder
+    pos = arena_pos + np.array([-0.85, arena_size[1]+0.15, -1.5])
+    MiroAPI.add_sphereShape(MiroSystem, 0.4, pos, texture='carbonfiber.png', rotX=90)
+
+    # Tiny cylinder at the top
+    pos = arena_pos + np.array([-1.35, arena_size[1]+0.3, -3.5])
+    MiroAPI.add_cylinderShape(MiroSystem, 0.09, 1.0, 1000, pos, texture='carbonfiber.png', rotX=86.5, rotY=45)
+    
+    # Cylinder from big middle sphere into the ground
+    pos = arena_pos + np.array([-2.7, arena_size[1]+0.1, -1.7])
+    MiroAPI.add_cylinderShape(MiroSystem, 0.15, 1.0, 1000, pos, texture='carbonfiber.png', rotZ=105, rotY=20, rotOrder=['z', 'y'])
+
+    # Big middle sphere
+    pos = arena_pos + np.array([-2.1, arena_size[1]+0.0, -1.95])
+    MiroAPI.add_sphereShape(MiroSystem, 0.5, pos, texture='carbonfiber.png', rotX=90)
+    
+    # Cylinder blocking the steep slope
+    pos = arena_pos + np.array([-1.8, arena_size[1]+0.18, -1.15])
+    MiroAPI.add_cylinderShape(MiroSystem, 0.15, 1.6, 1000, pos, texture='carbonfiber.png', rotX=90, rotY=12, rotZ=11.5)
+    
+    # Sphere joint between cylinder above and below
+    pos = arena_pos + np.array([-1.56, arena_size[1]+0.22, -0.30])
+    MiroAPI.add_sphereShape(MiroSystem, 0.35, pos, texture='carbonfiber.png', rotX=90)
+    
+    # Cylinder at the side of the steep slope
+    pos = arena_pos + np.array([-1.0, arena_size[1]+0.36, -0.2])
+    MiroAPI.add_cylinderShape(MiroSystem, 0.15, 1.3, 1000, pos, texture='carbonfiber.png', rotX=90, rotY=89, rotZ=11.5)
+    
+    # Sphere at the end of top path
+    pos = arena_pos + np.array([-0.3, arena_size[1]+0.4, -0.25])
+    MiroAPI.add_sphereShape(MiroSystem, 0.3, pos, texture='carbonfiber.png', rotX=90)
+
+    # Cylinder at the bottom
+    pos = arena_pos + np.array([-3.2, arena_size[1]+0.1, -1.0])
+    MiroAPI.add_cylinderShape(MiroSystem, 0.15, 1.5, 1000, pos, texture='carbonfiber.png', rotZ=-91.5)
+
+    # Sphere at the bottom
+    pos = arena_pos + np.array([-2.5, arena_size[1]+0.1, -1.0])
+    MiroAPI.add_sphereShape(MiroSystem, 0.18, pos, texture='carbonfiber.png', rotX=90)
+
+
+
+    #### Quadrant 3
+    y = arena_pos[1] + arena_size[1]
+    createMaze(MiroSystem, [[-0.1,-3.9], [y, y+0.3], [0.1,2.8]])
+
+
+    # Quadrant 4
+    obstacles(sim, root, arena_pos[1]+arena_size[1])
+
+    
+
+def easyRamp(MiroSystem, pos, h):
+    wid = 0.8
+    dep = 0.4
+    lng = 3
+    theta = np.arcsin(h/2/lng)
+
+    pos_up = pos + np.array([-(width/2 - lng)/2, 3/4*h-dep/2, wid/2])
+    pos_mid = pos + np.array([-width/4 + lng/2 + lng/2 + 0.6*wid - h/2*np.sin(theta)*1.1, 2/4*h-dep/2, wid])
+    pos_dn = pos + np.array([-(width/2 - lng)/2, 1/4*h-dep/2, 3*wid/2])
+    
+    MiroAPI.add_boxShape(MiroSystem, lng, dep, wid, pos_up, texture='MITbord.jpg', rotZ=-theta, rotDegrees=False)
+    MiroAPI.add_boxShape(MiroSystem, lng, dep, wid, pos_dn, texture='MITbord.jpg', rotZ=theta, rotDegrees=False)
+    MiroAPI.add_boxShape(MiroSystem, wid*1.2, dep, wid*2.05, pos_mid, texture='MITbord.jpg')
+
+def createMaze(MiroSystem, grid):
+    maze = Gridmazes.GetMaze()  
+    # grid [[x_min, x_max], [z_min, z_max]]
+    # grid = [[-0.1,-3.9], [0.1,2.8]]
+    x_n = len(maze[0])
+    z_n = len(maze)
+    dx = (grid[0][1] - grid[0][0])/x_n
+    dy = (grid[1][1] - grid[1][0])
+    dz = (grid[2][1] - grid[2][0])/z_n
+    y = grid[1][0]
+    dh = 0.008
+    for zi in range(z_n):
+        for xi in range(x_n):
+            if maze[zi][xi] > 0:
+                x = grid[0][0] + dx*(0.5 + xi)
+                z = grid[2][0] + dz*(0.5 + zi)
+                MiroAPI.add_cylinderShape(MiroSystem, abs(dx/2*0.99), dy, 1000, [x, y+dy/2, z], texture='Barrel.png', rotY=random.random()*360)
+                MiroAPI.add_cylinderShape(MiroSystem, abs(dx/2), dh, 1000, [x, y+dy+dh/2, z], texture='Barrel_lid.png', rotY=random.random()*360)
+
 
 def obstacles(sim, root, height):
     #--------------------------------
@@ -167,7 +234,7 @@ def obstacles(sim, root, height):
     #---------------------------------
    
     addVolcano(sim, root)
-    createLava(sim, root)
+    createLava(sim, root, height-0.18)
    
     # #Sodacan in the middle
     # dims = [0.28*(width/14), 1.4*(width/14)]
@@ -214,7 +281,7 @@ def obstacles(sim, root, height):
     
     # Ramp to bridge
     ramp_dim = [1, 2, wallHeight+0.14] # *np.cos(np.pi/4)
-    ramp_pos = agx.Vec3(-3.2,1.31,0)
+    ramp_pos = agx.Vec3(-3.2,1.339,0.11)
     ramp = agx.RigidBody( agxCollide.Geometry( agxCollide.Box(ramp_dim[0]/2, ramp_dim[1]/2, ramp_dim[2]/2)))
     theta = -np.arcsin(ramp_dim[2]/ramp_dim[0])/2
     ramp.setPosition(ramp_pos) # +arena_size[1]/2-ramp_dim[1]/2
@@ -229,7 +296,7 @@ def obstacles(sim, root, height):
     startbox = addboxx(sim, root, dims, pos, texture='textures/arenatextures/start.png')
 
     #-------------- Zone 2 --------------
-    addField(sim, root)
+    # addField(sim, root)
 
     #-------------- Zone 3 --------------
     
@@ -249,7 +316,7 @@ def obstacles(sim, root, height):
 
     # Ramp to bridge
     ramp_dim = [2, 1, wallHeight+0.24] # *np.cos(np.pi/4)
-    ramp_pos = agx.Vec3(1, -3.305 ,0)
+    ramp_pos = agx.Vec3(1, -3.305 ,0.1)
     ramp = agx.RigidBody( agxCollide.Geometry( agxCollide.Box(ramp_dim[0]/2, ramp_dim[1]/2, ramp_dim[2]/2)))
     theta = -np.arcsin(ramp_dim[2]/ramp_dim[0])/2
     ramp.setPosition(ramp_pos) # +arena_size[1]/2-ramp_dim[1]/2
@@ -319,7 +386,7 @@ def createPond(sim, root):
 
     water = agxCollide.Geometry(hf)
     water.setMaterial(water_material)
-    water.setPosition(agxVec([1.9, 0, 1.9]))
+    water.setPosition(agxVec([2.0, 0, 2.0]))
     sim.add(water)
     
     controller = agxModel.WindAndWaterController()
@@ -430,11 +497,11 @@ def addField(sim, root):
     ground_material = agx.Material("Ground")
 
     # Create the height field from a heightmap
-    hf = agxCollide.HeightField.createFromFile("textures/arenatextures/heightmaptest2.png", 3.9, 3.8, 0.05, 0.5)
+    hf = agxCollide.HeightField.createFromFile("textures_lowres/terrain.png", 3.9, 3.8, 0.05, 0.5)
 
     ground_geometry = agxCollide.Geometry(hf)
     ground = agx.RigidBody(ground_geometry)
-    ground.setPosition(agxVec([-1.95, 0, -1.95]))
+    ground.setPosition(agxVec([-1.95, 0.18, -1.95]))
     ground.setMotionControl(agx.RigidBody.STATIC)
     ground.getGeometry("").setMaterial(ground_material)
     #ground.setMaterial(agx.Material("groundmaterial"))
@@ -477,15 +544,16 @@ def addVolcano(sim, root):
     agxOSG.setTexture(node, "textures/stone.png", True, agxOSG.DIFFUSE_TEXTURE, 7, 7)
     sim.add(ground)
 
-def createLava(sim, root):
+def createLava(sim, root, h):
     water_material = agx.Material("waterMaterial")
     water_material.getBulkMaterial().setDensity(4025)
 
     hf = agxCollide.HeightField.createFromFile("textures/arenatextures/lavariver.png", 1.99, 2, 0, 1.323)
 
+
     water = agxCollide.Geometry(hf)
     water.setMaterial(water_material)
-    water.setPosition(agxVec([0, 0, 0.42]))
+    water.setPosition(agxVec([0, h, 0.44]))
     sim.add(water)
     
     controller = agxModel.WindAndWaterController()
