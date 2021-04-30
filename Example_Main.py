@@ -1,14 +1,24 @@
 #------------------------------------------------------------------------------
 # Name:         Miro Simulint
 # 
-# Purpose:      Main script to run a launcher + lander simulation designed for
-#               Physics students at Umeå University
+# Purpose:      Main script to run modular rigid body simulations with a simple 
+#               interface. Designed by and for students at Umeå University.
 # 
-# Usage:        Create a lander in the Landers.py file, or modify the DemoLander.
-#               Likewise, create a launcher in Launchers.py. This Main file will
-#               then insert your modules into the MIT environment where you test
-#               them out. You can also compute and pass along input arguments to
-#               use when creating your modules.
+# Usage:        Create local copies of the Example files and rename with suffix
+#               "_local" to indicate them as your local files. You will then have
+#               the original Example files intact to refer back to.
+# 
+#               Adjust the imports at the top of the files in your Main file to
+#               your chosen name for your local files. Example if your local file
+#               is named MyRobots_local.py:
+#                   import Example_MiroBots as MiroBots
+#                        - becomes -
+#                   import MyRobots_local as MiroBots
+#               
+#               Now, modify modules and controllers in your local files however
+#               you like! View the file MiroComponents Specs.pdf in the documents
+#               directory to see what predefined components you can use, and when
+#               you're ready you can create your own components.
 #
 # Authors:      Felix Djuphammar, William Nordberg, Marcus Lindbergh, 
 #               Johan Jonsson, Franz Wikner, Niklas Edlund
@@ -27,23 +37,22 @@ def buildScene():
     Simulation = MiroSystem()
     Simulation.Set_Environment(Environments.MIT_place)
 
-    # Add the DemoRobot to the system at the specified position
-    BotPosition1 = [0.75, 0.5, 3.25]
-    MyBot1 = MiroBots.DemoRobot1()
-    Simulation.Add_MiroModule(MyBot1, 'MyBot1', BotPosition1)
-    MyBot1.AddController(Controller.MyController, Controller.controls)
-    MyBot1.AddControllerAI(Controller.SensorController)
+    # Create and orient DemoRobot1
+    BotPosition = [3.2, 0.6, 0.1]  # Starting point
+    MyBot = MiroBots.DemoRobot1()  # Create robot
+    MyBot.RotateModuleY(-90)       # Rotate robot
 
-    # BotPosition2 = [9.3, 7.8, 1.7]
-    # MyBot2 = MiroBots.DemoRobot2()
-    # Simulation.Add_MiroModule(MyBot2, 'MyBot2', BotPosition2)
+    # Add the robot and controllers to the system 
+    Simulation.Add_MiroModule(MyBot, 'MyBot', BotPosition)
+    MyBot.AddController(Controller.MyController, Controller.controls)
+    MyBot.AddControllerAI(Controller.SensorController)
 
-    # Set the camera perspective
+    # Set the camera perspective using free camera
     Simulation.Add_Camview('Robotcourse', [0,20,0], [0,0,0],look_at_point=[0,0,0])
     Simulation.Set_Perspective('Robotcourse')
 
-    # Set follow cam
-    # Simulation.Set_Perspective('follow_default', follow_module_name='MyBot1', follow_distance=3, follow_height=1.25)
+    # Set the camera perspective to follow the robot 
+    # Simulation.Set_Perspective('follow_default', follow_module_name='MyBot', follow_distance=3, follow_height=1.25)
     
     Simulation.Run()
 
