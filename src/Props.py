@@ -129,3 +129,28 @@ def floorvent(MiroSystem, target, SPEEDMODE = False):
 def UNbox(MiroSystem, pos, goal_nr, skew):
     pos[1] = pos[1]+0.2
     MiroAPI.add_boxShape(MiroSystem, 0.4, 0.4, 0.4, pos, density=8, rotY=skew, texture='UN_'+str(goal_nr)+'.png', Fixed=False)
+
+def sponsorFlag(MiroSystem, pos, logo):
+    foot_h = 0.08
+    foot_r = 0.3
+    leg_h = 0.4
+    leg_r = 0.02
+    sign_h = 1.7
+    sign_w = 0.6
+    sign_t = 0.06
+
+    foot_pos = [pos[0], pos[1]+foot_h/2, pos[2]]
+    leg_pos = [pos[0], pos[1]+foot_h+leg_h/2, pos[2]]
+    sign_pos = [pos[0], pos[1]+foot_h+leg_h+sign_h/2, pos[2]]
+
+    # Foot
+    foot = MiroAPI.add_cylinderShape(MiroSystem, foot_r, foot_h, 1000, foot_pos, texture='gammal5kr.png', Fixed=False, scale=[1,-1])
+    # Pole
+    leg = MiroAPI.add_cylinderShape(MiroSystem, leg_r, leg_h, 500, leg_pos, texture='gammal5kr.png', Fixed=False, scale=[1,-1])
+    # Sign
+    sign = MiroAPI.add_boxShape(MiroSystem, sign_w, sign_h, sign_t, sign_pos, density=30, texture=logo, Fixed=False)
+    # Hinges
+    h1 = [pos[0], pos[1]+foot_h, pos[2]]
+    h2 = [pos[0], pos[1]+foot_h+leg_h, pos[2]]
+    MiroAPI.LinkBodies_Hinge(foot, leg, h1, [0,1,0], MiroSystem)
+    MiroAPI.LinkBodies_Hinge(leg, sign, h2, [0,1,0], MiroSystem)
