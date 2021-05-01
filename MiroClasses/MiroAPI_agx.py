@@ -557,6 +557,45 @@ def LinkBodies_WheelJoint(wheel_body, chassi_body, wheel_joint_pos, wheel_axis, 
         MiroSystem.Add(wj)
     return wj
 
+###### Controls shorthand #######
+def Keyboard(key):
+    '''Returns the numeric value of a keyboard input. Available binds are:\n
+    Letters such as 'a' where 'A' refers to Shift + 'a'.\n
+    Number pad numerics by 'Numpad_0' etc.\n
+    Others: 'KEY_UP' | 'KEY_DOWN' | 'KEY_LEFT' | 'KEY_RIGHT' | 'SPACE' | 'DELETE' | 'HOME' | 'PAGE_UP' | 'PAGE_DOWN' | 'INSERT' | 'END' '''
+
+    controls = {
+        'KEY_UP': agxSDK.GuiEventListener.KEY_Up,
+        'KEY_DOWN': agxSDK.GuiEventListener.KEY_Down,
+        'KEY_LEFT': agxSDK.GuiEventListener.KEY_Left,
+        'KEY_RIGHT': agxSDK.GuiEventListener.KEY_Right,
+        'SPACE': agxSDK.GuiEventListener.KEY_Space,
+        'DELETE': agxSDK.GuiEventListener.KEY_Delete,
+        'HOME': agxSDK.GuiEventListener.KEY_Home,
+        'PAGE_UP': agxSDK.GuiEventListener.KEY_Page_Down,
+        'PAGE_DOWN': agxSDK.GuiEventListener.KEY_Page_Up,
+        'INSERT': agxSDK.GuiEventListener.KEY_Insert,
+        'END': agxSDK.GuiEventListener.KEY_End,
+        'Numpad_1': agxSDK.GuiEventListener.KEY_KP_1,
+        'Numpad_2': agxSDK.GuiEventListener.KEY_KP_2,
+        'Numpad_3': agxSDK.GuiEventListener.KEY_KP_3,
+        'Numpad_4': agxSDK.GuiEventListener.KEY_KP_4,
+        'Numpad_5': agxSDK.GuiEventListener.KEY_KP_5,
+        'Numpad_6': agxSDK.GuiEventListener.KEY_KP_6,
+        'Numpad_7': agxSDK.GuiEventListener.KEY_KP_7,
+        'Numpad_8': agxSDK.GuiEventListener.KEY_KP_8,
+        'Numpad_9': agxSDK.GuiEventListener.KEY_KP_9,
+        'Numpad_0': agxSDK.GuiEventListener.KEY_KP_0,
+    }
+    if key in controls.keys():
+        return controls[key]
+    elif len(key) == 1:
+        return ord(key)
+    else:
+        print('Key',key,'is not configured')
+        return
+
+
 ####### SCENE CONFIGURATION #######
 # Simulation stuff
 def SetCamera(system_list, camera_position, look_at_point, up_direction=[0,1,0]):
