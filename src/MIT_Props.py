@@ -21,7 +21,7 @@ def AddProps(system):
     props.MIT_door(system, [17.6, 3.3, 12.22])
 
     # Marks global origin
-    props.sodacan(system, [0,0,0], 'schrodbull.png')
+    # props.sodacan(system, [0,0,0], 'schrodbull.png')
 
     props.painting(system, [13.8,2.0,-2], 'DemoBengan.png', wall_angle)
     props.painting(system, [13.94,1.8,-3.35], 'bungeebengan_notes.png', wall_angle, [0.2,0.27])
@@ -97,3 +97,7 @@ def AddProps(system):
 
     # for ball in range(400):
     #     props.eyeball(system, [grid_x[0] + rng.random()*dx, 50+rng.random(), grid_z[0] + rng.random()*dz], radius=0.15)
+
+
+    # props.sponsorFlag(system, [0,0,-5], 'zert1.png')
+    # props.sponsorFlag(system, [0,0,-7], 'zert2.png')
