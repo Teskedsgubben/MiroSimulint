@@ -44,11 +44,11 @@ def buildScene():
 
     # Add the robot and controllers to the system 
     Simulation.Add_MiroModule(MyBot, 'MyBot', BotPosition)
-    MyBot.AddController(Controller.MyController, Controller.controls)
+    MyBot.AddControllerGUI(Controller.MyController, Controller.controls_arrows)
     MyBot.AddControllerAI(Controller.SensorController)
 
     # Set the camera perspective using free camera
-    Simulation.Add_Camview('Robotcourse', [0,20,0], [0,0,0],look_at_point=[0,0,0])
+    Simulation.Add_Camview('Robotcourse', [10,10,-1], [0,0,0],look_at_point=[0,-1,-1])
     Simulation.Set_Perspective('Robotcourse')
 
     # Set the camera perspective to follow the robot 
