@@ -378,9 +378,11 @@ class Module():
             if remove_future:
                 self.use_helpers = False
 
-
-
+    
     def AddController(self, Controller, Controls):
+        self.AddControllerGUI(Controller, Controls)
+
+    def AddControllerGUI(self, Controller, Controls):
         self.controller = Controller
         self.controls = Controls
         area = self.system.Get_Environment().Get_Area('AI')
@@ -412,4 +414,8 @@ class Module():
         
 
     def SetMotorSpeed(self, link, speed):
-        self.links[link].getMotor1D().setSpeed(speed)
+        if speed is None:
+            self.links[link].getMotor1D().setEnable(False)
+        else:
+            self.links[link].getMotor1D().setEnable(True)
+            self.links[link].getMotor1D().setSpeed(speed)
