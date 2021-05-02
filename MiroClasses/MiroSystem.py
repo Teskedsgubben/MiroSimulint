@@ -76,6 +76,9 @@ class MiroSystem():
     def Get_Target(self):
         return self.Environment.Get_Target()
 
+    def Get_Area(self, area_name):
+        return self.Environment.Get_Area(area_name)
+
     def Get_APIsystem(self):
         return self.system_list
     
