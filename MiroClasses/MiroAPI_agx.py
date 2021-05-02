@@ -49,6 +49,25 @@ def xyzTransform(vec, sizes = False, reverse = False):
         newvec = [-vec[0], vec[2], -vec[1]]
     return np.array(newvec)
 
+def IsInArea(Area, agxBody):
+    pos = agxBody.getPosition()
+    pos = [pos.x(), pos.y(), pos.z()]
+    pos = xyzTransform(pos, reverse=True)
+    x = pos[0]
+    z = pos[2]
+    x_max = max(Area[0])
+    x_min = min(Area[0])
+    z_max = max(Area[1])
+    z_min = min(Area[1])
+
+    inArea = True
+    if(x < x_min or x > x_max):
+        inArea = False
+    if(x < x_min or x > x_max):
+        inArea = False
+    return inArea
+
+
 def scaleLimit(scale):
     max_scale = [1, 1]
     for i in range(len(scale)):
