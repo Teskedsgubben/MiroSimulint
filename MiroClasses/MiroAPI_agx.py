@@ -63,7 +63,7 @@ def IsInArea(Area, agxBody):
     inArea = True
     if(x < x_min or x > x_max):
         inArea = False
-    if(x < x_min or x > x_max):
+    if(z < z_min or z > z_max):
         inArea = False
     return inArea
 
