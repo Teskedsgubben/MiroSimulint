@@ -36,8 +36,8 @@ def DemoRobot1():
     MyRobot.AddSensor(Sensors.MSL01(), "Lidar1")
     MyRobot.ConnectComponents('Base', 'J', "Lidar1", 'Linkpoint2', lock_link=True)
 
-    # Enables motors on the front wheels
-    MyRobot.EnableMotor('FL_tire')
+    # Enables motors on the front wheels. Setting reverse_rotation=True swaps the positive direction of rotation.
+    MyRobot.EnableMotor('FL_tire', reverse_rotation=True)
     MyRobot.EnableMotor('FR_tire')
     
     # Set custom textures

@@ -55,20 +55,20 @@ def MyController(module, keydown, key, alt):
             # Set arguments in module.SetMotorSpeed('LINK_NAME', SPEED)
             # Link needs to have motor enabled. The speed values have 
             # opposing signs due to left and right orientetions.
-            module.SetMotorSpeed('FL_tire', -50)
+            module.SetMotorSpeed('FL_tire', 50)
             module.SetMotorSpeed('FR_tire', 50)
                 
         elif key == module.controls['Backward']:
-            module.SetMotorSpeed('FL_tire', 15)
+            module.SetMotorSpeed('FL_tire', -15)
             module.SetMotorSpeed('FR_tire', -15)
 
         elif key == module.controls['Left']:
-            module.SetMotorSpeed('FL_tire', -3)
+            module.SetMotorSpeed('FL_tire',  3)
             module.SetMotorSpeed('FR_tire', 25)
     
         elif key == module.controls['Right']:
-            module.SetMotorSpeed('FL_tire', -25)
-            module.SetMotorSpeed('FR_tire', 3)
+            module.SetMotorSpeed('FL_tire', 25)
+            module.SetMotorSpeed('FR_tire',  3)
 
         elif key == module.controls['Brake']:
             # Brake by forcing 0 speed
@@ -107,7 +107,7 @@ def SensorController(module):
             turn=-turn
         
         # back up and turn slightly
-        module.SetMotorSpeed('FL_tire', 15+turn)
+        module.SetMotorSpeed('FL_tire', -15-turn)
         module.SetMotorSpeed('FR_tire', -15+turn)
         return
     
@@ -125,7 +125,7 @@ def SensorController(module):
 
     # If no obstacle move forward
     if left_clear and right_clear:
-        module.SetMotorSpeed('FL_tire', -25)
+        module.SetMotorSpeed('FL_tire', 25)
         module.SetMotorSpeed('FR_tire', 25)
         return
 
@@ -138,13 +138,13 @@ def SensorController(module):
 
     # If obstacle on the right        
     if not right_clear:
-        module.SetMotorSpeed('FL_tire', -3)
+        module.SetMotorSpeed('FL_tire',  3)
         module.SetMotorSpeed('FR_tire', 25)
 
     # If obstacle on the left 
     if not left_clear:
-        module.SetMotorSpeed('FL_tire', -25)
-        module.SetMotorSpeed('FR_tire', 3)
+        module.SetMotorSpeed('FL_tire', 25)
+        module.SetMotorSpeed('FR_tire',  3)
 
 
 
