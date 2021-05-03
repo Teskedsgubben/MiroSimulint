@@ -8,6 +8,7 @@ class Module():
         self.sensors = {}
         self.links = {}
         self.motors = {}
+        self.motorsigns = {}
         self.nonames_comp = 0
         self.nonames_sens = 0
         self.nonames_boos = 0
@@ -407,15 +408,20 @@ class Module():
     def Get_Max_Force(self):
         return self.max_force
 
-    def EnableMotor(self, link):
+    def EnableMotor(self, link, reverse_rotation = False):
         self.links[link].getMotor1D().setEnable(True)
         self.links[link].getMotor1D().setForceRange(-(self.max_force), self.max_force)
         self.motors.update({link: self.links[link]})
-        
+        if not reverse_rotation:
+            default_sign = 1
+        else:
+            default_sign = -1
+        self.motorsigns.update({link: default_sign})
 
     def SetMotorSpeed(self, link, speed):
         if speed is None:
             self.links[link].getMotor1D().setEnable(False)
         else:
+            sign = self.motorsigns[link]
             self.links[link].getMotor1D().setEnable(True)
-            self.links[link].getMotor1D().setSpeed(speed)
+            self.links[link].getMotor1D().setSpeed(sign*speed)
