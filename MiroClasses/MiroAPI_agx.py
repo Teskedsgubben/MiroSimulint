@@ -767,7 +767,7 @@ class UserController(agxSDK.GuiEventListener):
                 if(modpos[2] > self.area[1][0] and modpos[2] < self.area[1][1]):
                     hasControl = False
             if hasControl:
-                self.module.UseController(keydown, key, alt)
+                self.module.UseController(keydown, key, 1*(alt>0))
             return True
         else: 
             print('No controller added to Module!')
