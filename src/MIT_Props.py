@@ -101,3 +101,5 @@ def AddProps(system):
 
     # props.sponsorFlag(system, [0,0,-5], 'zert1.png')
     # props.sponsorFlag(system, [0,0,-7], 'zert2.png')
+
+    props.measureBox(system, [-4,0.3,-6], [0.4,0.4,0.4])

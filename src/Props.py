@@ -154,3 +154,20 @@ def sponsorFlag(MiroSystem, pos, logo):
     h2 = [pos[0], pos[1]+foot_h+leg_h, pos[2]]
     MiroAPI.LinkBodies_Hinge(foot, leg, h1, [0,1,0], MiroSystem)
     MiroAPI.LinkBodies_Hinge(leg, sign, h2, [0,1,0], MiroSystem)
+
+def measureBox(MiroSystem, pos, dims):
+    pos = np.array(pos)
+    d = 0.02
+    lx = dims[0] + 2*d
+    ly = dims[1] + d
+    lz = dims[2]
+    # Base
+    MiroAPI.add_boxShape(MiroSystem, dims[0], d, dims[2], pos+np.array([0,d/2,0]), texture='wood_ikea_style.png')
+    # x -
+    MiroAPI.add_boxShape(MiroSystem, d, ly, lz, pos+np.array([-(dims[0]+d)/2, (dims[1]+d)/2, 0]), texture='wood_ikea_style.png')
+    # x +
+    MiroAPI.add_boxShape(MiroSystem, d, ly, lz, pos+np.array([ (dims[0]+d)/2, (dims[1]+d)/2, 0]), texture='wood_ikea_style.png')
+    # z -
+    MiroAPI.add_boxShape(MiroSystem, lx, ly, d, pos+np.array([ 0, (dims[1]+d)/2,-(dims[2]+d)/2]), texture='wood_ikea_style.png')
+    # z +
+    MiroAPI.add_boxShape(MiroSystem, lx, ly, d, pos+np.array([ 0, (dims[1]+d)/2, (dims[2]+d)/2]), texture='wood_ikea_style.png')
