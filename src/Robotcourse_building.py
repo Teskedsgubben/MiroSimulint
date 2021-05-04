@@ -105,7 +105,7 @@ def buildArena(MiroSystem, arena_pos):
                 MiroAPI.add_boxShape(MiroSystem, side_len/np.sqrt(2)+0.15, height*1.1, arena_size[1], arena_pos + rot_pos + np.array([0, 0, rot_pos[2]/abs(rot_pos[2])])*(width/2 - abs(rot_pos[2])), texture='black_smere.jpg', rotY=-theta+np.pi/4, rotDegrees=False)
                 MiroAPI.add_boxShape(MiroSystem, side_len/np.sqrt(2)+0.15, height, arena_size[1], arena_pos + rot_pos + np.array([rot_pos[0]/abs(rot_pos[0]), 0, 0])*(width/2 - abs(rot_pos[0])), texture='black_smere.jpg', rotY=-theta-np.pi/4, rotDegrees=False)
             else: # Create octagon side
-                MiroAPI.add_boxShape(MiroSystem, side_len, height, arena_size[1], arena_pos + rot_pos, texture='black_smere.jpg', rotY=-theta, rotDegrees=False)
+                MiroAPI.add_boxShape(MiroSystem, side_len, height-0.2*(w==1), arena_size[1], arena_pos + rot_pos, texture='black_smere.jpg', rotY=-theta, rotDegrees=False)
 
 
     MiroAPI.add_boxShape(MiroSystem, side_len, 0.2, 0.2, arena_pos + rot_pos, texture='black_smere.jpg', rotY=-theta, rotDegrees=False)
@@ -114,6 +114,58 @@ def buildArena(MiroSystem, arena_pos):
     easyRamp(MiroSystem, np.array([arena_size[0]/4, arena_pos[1]+arena_size[1]/3.5, -arena_size[2]/2]), height-arena_size[1]/3.5)
 
     # Quadrant 2
+    hillside(MiroSystem, arena_pos, arena_size)
+
+    #### Quadrant 3
+    y = arena_pos[1] + arena_size[1]
+    createMaze(MiroSystem, [[-0.1,-3.9], [y, y+0.3], [0.1,2.8]])
+
+
+    # Quadrant 4
+    pendulumSwing(MiroSystem, arena_pos, arena_size)
+    dr = np.array([1.885, 0.162, 1.55])
+    MiroAPI.add_boxShape(MiroSystem, 3.0, 0.05, 0.5, arena_pos + dr, texture='black_smere.jpg', rotZ=-7)
+    dr = np.array([0.15, 0.345, 2.05])
+    MiroAPI.add_boxShape(MiroSystem, 0.5, 0.05, 1.5, arena_pos + dr, texture='black_smere.jpg')
+    obstacles(sim, root, arena_pos[1]+arena_size[1])
+
+    
+
+def easyRamp(MiroSystem, pos, h):
+    wid = 0.8
+    dep = 0.4
+    lng = 3
+    theta = np.arcsin(h/2/lng)
+
+    pos_up = pos + np.array([-(width/2 - lng)/2, 3/4*h-dep/2, wid/2])
+    pos_mid = pos + np.array([-width/4 + lng/2 + lng/2 + 0.6*wid - h/2*np.sin(theta)*1.1, 2/4*h-dep/2, wid])
+    pos_dn = pos + np.array([-(width/2 - lng)/2, 1/4*h-dep/2, 3*wid/2])
+    
+    MiroAPI.add_boxShape(MiroSystem, lng, dep, wid, pos_up, texture='MITbord.jpg', rotZ=-theta, rotDegrees=False)
+    MiroAPI.add_boxShape(MiroSystem, lng, dep, wid, pos_dn, texture='MITbord.jpg', rotZ=theta, rotDegrees=False)
+    MiroAPI.add_boxShape(MiroSystem, wid*1.2, dep, wid*2.05, pos_mid, texture='MITbord.jpg')
+
+def createMaze(MiroSystem, grid):
+    maze = Gridmazes.GetMaze()  
+    # grid [[x_min, x_max], [z_min, z_max]]
+    # grid = [[-0.1,-3.9], [0.1,2.8]]
+    x_n = len(maze[0])
+    z_n = len(maze)
+    dx = (grid[0][1] - grid[0][0])/x_n
+    dy = (grid[1][1] - grid[1][0])
+    dz = (grid[2][1] - grid[2][0])/z_n
+    y = grid[1][0]
+    dh = 0.008
+    for zi in range(z_n):
+        for xi in range(x_n):
+            if maze[zi][xi] > 0:
+                x = grid[0][0] + dx*(0.5 + xi)
+                z = grid[2][0] + dz*(0.5 + zi)
+                MiroAPI.add_cylinderShape(MiroSystem, abs(dx/2*0.99), dy, 1000, [x, y+dy/2, z], texture='Barrel.png', rotY=random.random()*360)
+                MiroAPI.add_cylinderShape(MiroSystem, abs(dx/2), dh, 1000, [x, y+dy+dh/2, z], texture='Barrel_lid.png', rotY=random.random()*360)
+
+
+def hillside(MiroSystem, arena_pos, arena_size):
     # First big dirt
     pos = arena_pos + np.array([-0.3, arena_size[1]+0.4/2, -arena_size[2]/4])
     MiroAPI.add_boxShape(MiroSystem, 0.6, 0.4, arena_size[2]/2-0.2, pos, texture='dirt.png', rotY=0)
@@ -183,50 +235,43 @@ def buildArena(MiroSystem, arena_pos):
     MiroAPI.add_sphereShape(MiroSystem, 0.18, pos, texture='carbonfiber.png', rotX=90)
 
 
+def pendulumSwing(MiroSystem, arena_pos, arena_size):
+    # Sphere at the bottom
+    r_v = 0.08
+    h_v = 3
+    pos1 = arena_pos + np.array([arena_size[0]/20, height+h_v/2, arena_size[2]/2])
+    MiroAPI.add_cylinderShape(MiroSystem, r_v, h_v, 1000, pos1, texture='carbonfiber.png')
+    pos2 = arena_pos + np.array([arena_size[0]/2, height+h_v/2, arena_size[2]/20])
+    MiroAPI.add_cylinderShape(MiroSystem, r_v, h_v, 1000, pos2, texture='carbonfiber.png')
 
-    #### Quadrant 3
-    y = arena_pos[1] + arena_size[1]
-    createMaze(MiroSystem, [[-0.1,-3.9], [y, y+0.3], [0.1,2.8]])
-
-
-    # Quadrant 4
-    obstacles(sim, root, arena_pos[1]+arena_size[1])
-
+    pos = pos1 + np.array([0, h_v/2+r_v, 0])
+    MiroAPI.add_boxShapeHemi(MiroSystem, r_v, r_v, r_v, pos, texture='carbonfiber.png', rotY=45)
+    pos = pos2 + np.array([0, h_v/2+r_v, 0])
+    MiroAPI.add_boxShapeHemi(MiroSystem, r_v, r_v, r_v, pos, texture='carbonfiber.png', rotY=45)
     
-
-def easyRamp(MiroSystem, pos, h):
-    wid = 0.8
-    dep = 0.4
-    lng = 3
-    theta = np.arcsin(h/2/lng)
-
-    pos_up = pos + np.array([-(width/2 - lng)/2, 3/4*h-dep/2, wid/2])
-    pos_mid = pos + np.array([-width/4 + lng/2 + lng/2 + 0.6*wid - h/2*np.sin(theta)*1.1, 2/4*h-dep/2, wid])
-    pos_dn = pos + np.array([-(width/2 - lng)/2, 1/4*h-dep/2, 3*wid/2])
+    pos = (pos1+pos2)/2 + np.array([0, h_v/2 + r_v, 0])
+    length = np.linalg.norm(pos1-pos2)-2*r_v
+    toprod = MiroAPI.add_cylinderShape(MiroSystem, r_v/2, length, 1000, pos, texture='carbonfiber.png', rotX=90, rotY=-45)
     
-    MiroAPI.add_boxShape(MiroSystem, lng, dep, wid, pos_up, texture='MITbord.jpg', rotZ=-theta, rotDegrees=False)
-    MiroAPI.add_boxShape(MiroSystem, lng, dep, wid, pos_dn, texture='MITbord.jpg', rotZ=theta, rotDegrees=False)
-    MiroAPI.add_boxShape(MiroSystem, wid*1.2, dep, wid*2.05, pos_mid, texture='MITbord.jpg')
+    length = 3.25
+    rad = 0.35
+    
+    slant = 20
+    pos = (2*pos1+pos2)/3 + np.array([0,h_v/2+r_v,0])# + np.array([0, h_v/2 + r_v, 0])
+    dr = MiroAPI.rotateVector([0,-1,0], slant, pos1-pos2)
+    pendulum(MiroSystem, pos, toprod, pos1-pos2, slant, r_v/4, rad, length)
 
-def createMaze(MiroSystem, grid):
-    maze = Gridmazes.GetMaze()  
-    # grid [[x_min, x_max], [z_min, z_max]]
-    # grid = [[-0.1,-3.9], [0.1,2.8]]
-    x_n = len(maze[0])
-    z_n = len(maze)
-    dx = (grid[0][1] - grid[0][0])/x_n
-    dy = (grid[1][1] - grid[1][0])
-    dz = (grid[2][1] - grid[2][0])/z_n
-    y = grid[1][0]
-    dh = 0.008
-    for zi in range(z_n):
-        for xi in range(x_n):
-            if maze[zi][xi] > 0:
-                x = grid[0][0] + dx*(0.5 + xi)
-                z = grid[2][0] + dz*(0.5 + zi)
-                MiroAPI.add_cylinderShape(MiroSystem, abs(dx/2*0.99), dy, 1000, [x, y+dy/2, z], texture='Barrel.png', rotY=random.random()*360)
-                MiroAPI.add_cylinderShape(MiroSystem, abs(dx/2), dh, 1000, [x, y+dy+dh/2, z], texture='Barrel_lid.png', rotY=random.random()*360)
+    slant = -20
+    pos = (pos1+2*pos2)/3  + np.array([0,h_v/2+r_v,0])# + np.array([0, h_v/2 + r_v, 0])
+    dr = MiroAPI.rotateVector([0,-1,0], slant, pos1-pos2)
+    pendulum(MiroSystem, pos, toprod, pos1-pos2, slant, r_v/4, rad, length)
 
+def pendulum(MiroSystem, pos, stem_body, axis, slant, rad_rod, rad_ball, length):
+    dr=MiroAPI.rotateVector([0,-1,0], slant, axis)
+    pedulum_rod = MiroAPI.add_cylinderShape(MiroSystem, rad_rod, length-2*rad_ball, 1000, pos+dr*(length-2*rad_ball)/2, texture='carbonfiber.png', Fixed=False, rotAngle=slant, rotAxis=axis)
+    pedulum_ball = MiroAPI.add_sphereShape(MiroSystem, rad_ball, pos+dr*(length-rad_ball), texture='eyeball.png', Fixed=False, rotAngle=slant, rotAxis=axis)
+    MiroAPI.LinkBodies_Hinge(stem_body, pedulum_rod, pos, axis, MiroSystem)
+    MiroAPI.LinkBodies_Hinge(pedulum_rod, pedulum_ball, pos+dr*(length-2*rad_ball), dr, MiroSystem)
 
 def obstacles(sim, root, height):
     #--------------------------------
@@ -338,14 +383,14 @@ def obstacles(sim, root, height):
     buildTurn2(agx.Vec3(0.1*(width/14),-5.8*(width/14), height+wallHeight+0.02), sim, root)
 
     # Swinging ball over bridge
-    rad = 0.4
-    pendulum = addball(sim, root, rad, [-2.0*(width/14), -2.25*(width/14), height+0.4+0.45*(width/14)+rad+0.01], Fixed=False)
-    pendulum.setVelocity(agx.Vec3(0,4,0))
-    hf = agx.HingeFrame()
-    hf.setAxis(agx.Vec3( 1,-1,0))
-    hf.setCenter(agx.Vec3(-3.5*(width/14), -3.5*(width/14), 3.0 + height+0.45+rad+0.01))
-    axleP = agx.Hinge(hf, pendulum)
-    sim.add(axleP)
+    # rad = 0.4
+    # pendulum = addball(sim, root, rad, [-2.0*(width/14), -2.25*(width/14), height+0.4+0.45*(width/14)+rad+0.01], Fixed=False)
+    # pendulum.setVelocity(agx.Vec3(0,4,0))
+    # hf = agx.HingeFrame()
+    # hf.setAxis(agx.Vec3( 1,-1,0))
+    # hf.setCenter(agx.Vec3(-3.5*(width/14), -3.5*(width/14), 3.0 + height+0.45+rad+0.01))
+    # axleP = agx.Hinge(hf, pendulum)
+    # sim.add(axleP)
     # addboxx(sim, root, [1.5, 0.5, 0.08], )
 
     createPond(sim, root)
@@ -353,16 +398,16 @@ def obstacles(sim, root, height):
 def create_water_visual(geo, root):
     node = agxOSG.createVisual(geo, root)
 
-    diffuse_color = agxRender.Color.Red()
-    ambient_color = agxRender.Color.Orange()
-    specular_color = agxRender.Color.Red()
-    agxOSG.setDiffuseColor(node, diffuse_color)
-    agxOSG.setAmbientColor(node, ambient_color)
-    agxOSG.setSpecularColor(node, specular_color)
+    # diffuse_color = agxRender.Color.Red()
+    # ambient_color = agxRender.Color.Orange()
+    # specular_color = agxRender.Color.Red()
+    # agxOSG.setDiffuseColor(node, diffuse_color)
+    # agxOSG.setAmbientColor(node, ambient_color)
+    # agxOSG.setSpecularColor(node, specular_color)
     agxOSG.setShininess(node, 128)
-    agxOSG.setAlpha(node, 0.999)
+    agxOSG.setAlpha(node, 0.92)
     
-    agxOSG.setTexture(agxOSG.createVisual(geo, root), 'textures/arenatextures/lava.png', True, agxOSG.DIFFUSE_TEXTURE, 20, 20)
+    agxOSG.setTexture(node, 'textures/arenatextures/lava.png', True, agxOSG.DIFFUSE_TEXTURE, 20, 20)
     return node
 
 def createPond(sim, root):
@@ -456,7 +501,9 @@ def buildTurn2(ramp_pos, sim, root):
         ramp.setRotation(agx.Quat(theta - off_angle/parts/2, agx.Vec3(0,0,1)))
         ramp.setMotionControl(1)
         sim.add(ramp)
-        agxOSG.setTexture(agxOSG.createVisual(ramp, root), 'textures/arenatextures/plankis.png', True, agxOSG.DIFFUSE_TEXTURE, 1, 2)
+        vis = agxOSG.createVisual(ramp, root)
+        agxOSG.setAlpha(vis, 0.95)
+        agxOSG.setTexture(vis, 'textures/arenatextures/plankis.png', True, agxOSG.DIFFUSE_TEXTURE, 1, 2)
 
 
 def buildRamp(ramp_pos, sim, root):    
