@@ -130,7 +130,7 @@ def UNbox(MiroSystem, pos, goal_nr, skew):
     pos[1] = pos[1]+0.2
     MiroAPI.add_boxShape(MiroSystem, 0.4, 0.4, 0.4, pos, density=8, rotY=skew, texture='UN_'+str(goal_nr)+'.png', Fixed=False)
 
-def sponsorFlag(MiroSystem, pos, logo):
+def sponsorFlag(MiroSystem, pos, logo, spin=0):
     foot_h = 0.08
     foot_r = 0.3
     leg_h = 0.4
@@ -154,6 +154,8 @@ def sponsorFlag(MiroSystem, pos, logo):
     h2 = [pos[0], pos[1]+foot_h+leg_h, pos[2]]
     MiroAPI.LinkBodies_Hinge(foot, leg, h1, [0,1,0], MiroSystem)
     MiroAPI.LinkBodies_Hinge(leg, sign, h2, [0,1,0], MiroSystem)
+    if spin:
+        MiroAPI.SetBodyAngularFrequency(sign, spin)
 
 def measureBox(MiroSystem, pos, dims):
     pos = np.array(pos)
