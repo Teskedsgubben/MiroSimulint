@@ -27,7 +27,7 @@ from MiroClasses import BackupColors
 API = 'AGX'
 
 TEXTURES_ON = True
-TEXTURE_PATH ='textures/'
+TEXTURE_PATH ='textures_lowres/'
 TEXTURE_EXEPTIONS = {
     'MITfloor.png': False,
     'tf-logo.jpg': True,
@@ -1127,13 +1127,14 @@ class LaserTimer(agxSDK.StepEventListener):
         self.complete = False
         for i in range(len(self.checks)):
             self.checks[i] = False
-            self.app.getSceneDecorator().setText(i+1, str(i+1)+': '+self.getTime())
+            if i>0:
+                self.app.getSceneDecorator().setText(i, str(i)+': '+self.getTimeStr())
         for laser in self.lasers:
             laser.setTriggered(False)
             laser.setActive(False)
         self.lasers[0].setActive(True)
 
-    def simTime(self):
+    def getTime(self):
         if self.useRealTime:
             return TIME.time()
         else:
@@ -1143,19 +1144,19 @@ class LaserTimer(agxSDK.StepEventListener):
         # Check if all checkpoints have been reached
         isComplete = True
         self.time = time
-        self.app.getSceneDecorator().setText(0, 'Current time: '+self.getTime())
+        self.app.getSceneDecorator().setText(0, 'Current time: '+self.getTimeStr())
         N = len(self.checks)
         for i in range(N):
             if not self.checks[i]:
                 if self.lasers[i].getTriggered():
                     if i == 0:
-                        self.startTime = TIME.time()
+                        self.startTime = self.getTime()
                         self.started = True
                     if self.started:
                         self.checks[i] = True
                         app = agxPython.getContext().environment.getApplication()
-                        self.app.getSceneDecorator().setText(0, 'Last event: Checkpoint '+str(i+1)+' reached at '+self.getTime())
-                        self.app.getSceneDecorator().setText(i+1, str(i+1)+': '+self.getTime())
+                        if i > 0:
+                            self.app.getSceneDecorator().setText(i, str(i)+': '+self.getTimeStr())
                         if i < N-1:
                             self.lasers[i+1].setActive(True)
 
@@ -1166,39 +1167,16 @@ class LaserTimer(agxSDK.StepEventListener):
         
         if isComplete and not self.complete:
             self.complete = True
-            lapTime = self.simTime() - self.startTime
-            self.app.getSceneDecorator().setText(len(self.checks)+1, 'Finished in '+self.getTime())
+            lapTime = self.getTime() - self.startTime
+            self.app.getSceneDecorator().setText(len(self.checks)+1, 'Last lap: '+self.getTimeStr())
             self.reset()
 
-        # if(not self.complete and contact.contains(self.start_object) >= 0):
-        #     if TIME.time() - self.start > 10:
-        #         self.start = TIME.time()
-        #         self.checks = [False]*len(self.checks)
-        #         for i in range(len(self.checks)):
-        #             for j in range(len(self.checkpoints[i])):
-        #                 obj = self.checkpoints[i][j]
-        #                 obj.setPosition(self.check_positions[i][j])
-        #                 obj.setRotation(self.check_rotations[i][j])
-        #                 obj.setVelocity(agx.Vec3(0,0,0))
-        #                 obj.setAngularVelocity(agx.Vec3(0,0,0))
-        #         app = agxPython.getContext().environment.getApplication()
-        #         app.getSceneDecorator().setText(0, 'Starting the time, hit the '+str(len(self.checks))+' cones!')
-        #         for i in range(len(self.checks)):
-        #             app.getSceneDecorator().setText(i+1, str(i+1)+': --:--')
-        
-        # if(self.complete and contact.contains(self.end_object) >= 0):
-        #     if TIME.time() - self.start > 10:
-        #         self.app.getSceneDecorator().clearText()
-        #         self.app.getSceneDecorator().setText(2,'CHALLENGE COMPLETED!')
-        #         self.app.getSceneDecorator().setText(4,'Time: '+self.getTime())
-        #         self.complete = False
-        #         self.checks = [False]*len(self.checks)
-        return agxSDK.ContactEventListener.KEEP_CONTACT
+        return 
     
-    def getTime(self):
+    def getTimeStr(self):
         if not self.started:
             return "--:--:--"
-        timenum = TIME.time() - self.startTime
+        timenum = self.getTime() - self.startTime
         seconds = round(timenum % 60, 2)
         if seconds < 10:
             seconds = '0'+str(seconds)

@@ -129,6 +129,24 @@ def buildArena(MiroSystem, arena_pos):
     MiroAPI.add_boxShape(MiroSystem, 0.5, 0.05, 1.5, arena_pos + dr, texture='black_smere.jpg')
     obstacles(sim, root, arena_pos[1]+arena_size[1])
 
+    # Timer
+    buildTimer(MiroSystem)
+
+def buildTimer(MiroSystem):
+    timer = MiroAPI.LaserTimer(MiroSystem, useRealTime=False)
+    timer.addCheckpoint([3.675, 0.4, -0.3], [2.725, 0.4, -0.3])
+    
+    
+    timer.addCheckpoint([-0.5, 0.6, -3.85], [-0.05, 0.6, -0.45])
+    
+    timer.addCheckpoint([-3.51, 0.2, 0], [-2.58, 0.2, 0])
+    timer.addCheckpoint([-0.1, 0.4, 2.825], [-0.1, 0.4, 3.775])
+    timer.addCheckpoint([3.675, 0.4, 0.1], [2.725, 0.4, 0.1])
+
+    # timer.addCheckpoint([11, 0.0, 2], [9, 0.0, 2])
+    # timer.addCheckpoint([11, 0.0, 1], [9, 0.0, 1])
+    # timer.addCheckpoint([11, 0.0, 0], [9, 0.0, 0])
+    # timer.addCheckpoint([11, 0.0, -1], [9, 0.0, -1])
     
 
 def easyRamp(MiroSystem, pos, h):
@@ -373,7 +391,7 @@ def obstacles(sim, root, height):
     #Startbox
     dims = [0.2, 1, 0.06]
     pos = [-0.05, -3.305, height+wallHeight+0.02]
-    addboxx(sim, root, dims, pos, texture='textures/arenatextures/plankis.png')
+    addboxx(sim, root, dims, pos, texture='textures/arenatextures/plankis.png', alpha=0.95)
 
     #--------------
     #   Zone 4
@@ -440,7 +458,7 @@ def createPond(sim, root):
     sim.add(controller)
 
 
-def addboxx(sim, root, dims, pos, Fixed=True, color = agxRender.Color.Red(), texture=False):
+def addboxx(sim, root, dims, pos, Fixed=True, color = agxRender.Color.Red(), texture=False, alpha=1):
     if type(pos) == type([]):
         pos = agx.Vec3(pos[0], pos[1], pos[2])
     boxx = agx.RigidBody( agxCollide.Geometry( agxCollide.Box(dims[0]/2, dims[1]/2, dims[2]/2)))
@@ -449,6 +467,8 @@ def addboxx(sim, root, dims, pos, Fixed=True, color = agxRender.Color.Red(), tex
         boxx.setMotionControl(1)
     sim.add(boxx)
     vis_body = agxOSG.createVisual(boxx, root)
+    if alpha<1:
+        agxOSG.setAlpha(vis_body, alpha)
     if texture:
         agxOSG.setTexture(vis_body, texture, True, agxOSG.DIFFUSE_TEXTURE, 1.0, 1.0)
     else:
