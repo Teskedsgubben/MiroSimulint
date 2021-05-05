@@ -141,12 +141,12 @@ def sponsorFlag(MiroSystem, pos, logo, spin=0):
 
     foot_pos = [pos[0], pos[1]+foot_h/2, pos[2]]
     leg_pos = [pos[0], pos[1]+foot_h+leg_h/2, pos[2]]
-    sign_pos = [pos[0], pos[1]+foot_h+leg_h+sign_h/2, pos[2]]
+    sign_pos = [pos[0], pos[1]+foot_h+leg_h+sign_h/2+0.002, pos[2]]
 
     # Foot
     foot = MiroAPI.add_cylinderShape(MiroSystem, foot_r, foot_h, 1000, foot_pos, texture='gammal5kr.png', Fixed=False, scale=[1,-1])
     # Pole
-    leg = MiroAPI.add_cylinderShape(MiroSystem, leg_r, leg_h, 500, leg_pos, texture='gammal5kr.png', Fixed=False, scale=[1,-1])
+    leg = MiroAPI.add_cylinderShape(MiroSystem, leg_r, leg_h, 500, leg_pos, texture='gammal5kr.png', Fixed=False, scale=[1,-1], Collide=False)
     # Sign
     sign = MiroAPI.add_boxShape(MiroSystem, sign_w, sign_h, sign_t, sign_pos, density=30, texture=logo, Fixed=False)
     # Hinges
