@@ -143,6 +143,8 @@ def buildTimer(MiroSystem):
     timer.addCheckpoint([-0.1, 0.4, 2.825], [-0.1, 0.4, 3.775])
     timer.addCheckpoint([3.675, 0.4, 0.1], [2.725, 0.4, 0.1])
 
+    timer.reset()
+
     # timer.addCheckpoint([11, 0.0, 2], [9, 0.0, 2])
     # timer.addCheckpoint([11, 0.0, 1], [9, 0.0, 1])
     # timer.addCheckpoint([11, 0.0, 0], [9, 0.0, 0])
