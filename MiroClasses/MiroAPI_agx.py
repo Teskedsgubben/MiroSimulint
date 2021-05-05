@@ -260,11 +260,10 @@ def add_boxShape(MiroSystem, size_x, size_y, size_z, pos, texture=False, scale=[
             if texture not in LOADED_TEXTURES.keys():
                 agxTex = agxOSG.createTexture(TEXTURE_PATH+texture)
                 LOADED_TEXTURES.update({texture: agxTex})
-            agxOSG.setTexture(body_shape, LOADED_TEXTURES[texture], True, agxOSG.DIFFUSE_TEXTURE, scale[0], -scale[1])
-            # if TEXTURE_PATH == 'textures_lowres/' and texture=='yellow_brick.jpg':
-            #     scale[0] = 11*scale[0]
-            #     scale[1] = 8*scale[1]
-            # agxOSG.setTexture(body_shape, TEXTURE_PATH+texture, True, agxOSG.DIFFUSE_TEXTURE, scale[0], scale[1])
+            if TEXTURE_PATH == 'textures_lowres/' and texture=='yellow_brick.jpg':
+                scale[0] = 11*scale[0]
+                scale[1] = 8*scale[1]
+            agxOSG.setTexture(body_shape, TEXTURE_PATH+texture, True, agxOSG.DIFFUSE_TEXTURE, scale[0], scale[1])
         else:
             color = backupColor(texture, color)
             texture = False       
@@ -298,7 +297,7 @@ def add_cylinderShape(MiroSystem, radius, height, density, pos, texture='test.jp
         body_cylinder.setMotionControl(1)
     body_cylinder.setPosition(agxPos)
 
-    rotateBody(body_cylinder, rotX=90)
+    rotateBody(body_cylinder, rotX=-90)
     rotateBody(body_cylinder, rotX, rotY, rotZ, rotOrder, rotAngle, rotAxis, rotDegrees)
 
     # Collision shape
@@ -317,7 +316,7 @@ def add_cylinderShape(MiroSystem, radius, height, density, pos, texture='test.jp
             if texture not in LOADED_TEXTURES.keys():
                 agxTex = agxOSG.createTexture(TEXTURE_PATH+texture)
                 LOADED_TEXTURES.update({texture: agxTex})
-            agxOSG.setTexture(body_shape, LOADED_TEXTURES[texture], True, agxOSG.DIFFUSE_TEXTURE, scale[0], -scale[1])
+            agxOSG.setTexture(body_shape, LOADED_TEXTURES[texture], True, agxOSG.DIFFUSE_TEXTURE, -scale[0], scale[1])
         else:
             color = backupColor(texture, color)
             texture = False       
@@ -368,7 +367,7 @@ def add_sphereShape(MiroSystem, radius, pos, texture='test.jpg', density=1000, s
             if texture not in LOADED_TEXTURES.keys():
                 agxTex = agxOSG.createTexture(TEXTURE_PATH+texture)
                 LOADED_TEXTURES.update({texture: agxTex})
-            agxOSG.setTexture(body_shape, LOADED_TEXTURES[texture], True, agxOSG.DIFFUSE_TEXTURE, scale[0], -scale[1])
+            agxOSG.setTexture(body_shape, LOADED_TEXTURES[texture], True, agxOSG.DIFFUSE_TEXTURE, scale[0], scale[1])
         else:
             color = backupColor(texture, color)
             texture = False       
