@@ -1094,6 +1094,17 @@ class LaserTrigger(agxSDK.ContactEventListener):
 
         return agxSDK.ContactEventListener.REMOVE_CONTACT_IMMEDIATELY
 
+class TimerReset(agxSDK.GuiEventListener):
+    def __init__(self, timer):
+        super().__init__(agxSDK.GuiEventListener.KEYBOARD)
+        self.timer = timer
+    
+    def keyboard(self, key, alt, x, y, keydown):
+        if keydown and key == ord('R'):
+            self.timer.reset()
+            return True
+        else: 
+            return False
 
 class LaserTimer(agxSDK.StepEventListener):
     def __init__(self, MiroSystem, useRealTime=True):
@@ -1105,7 +1116,9 @@ class LaserTimer(agxSDK.StepEventListener):
         self.complete = False
         self.started = False
         self.useRealTime = useRealTime
+        self.bestTime = False
         agxPython.getContext().environment.getSimulation().add(self)
+        agxPython.getContext().environment.getSimulation().add(TimerReset(self))
 
     def addCheckpoint(self, posA, posB):
         posA = np.array(posA)
@@ -1132,6 +1145,8 @@ class LaserTimer(agxSDK.StepEventListener):
             laser.setTriggered(False)
             laser.setActive(False)
         self.lasers[0].setActive(True)
+        if self.bestTime:
+            self.app.getSceneDecorator().setText(len(self.checks), 'Best lap: '+self.getTimeStr(self.bestTime))
 
     def getTime(self):
         if self.useRealTime:
@@ -1172,10 +1187,11 @@ class LaserTimer(agxSDK.StepEventListener):
 
         return 
     
-    def getTimeStr(self):
+    def getTimeStr(self, timenum=False):
         if not self.started:
-            return "--:--:--"
-        timenum = self.getTime() - self.startTime
+            return "--:--.--"
+        if not timenum:
+            timenum = self.getTime() - self.startTime
         seconds = round(timenum % 60, 2)
         if seconds < 10:
             seconds = '0'+str(seconds)
