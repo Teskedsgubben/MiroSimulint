@@ -1022,8 +1022,6 @@ class LidarContactSensor(agxSDK.ContactEventListener):
 ###############################
     
 ###############################
-
-
 class LaserTrigger(agxSDK.ContactEventListener):
     def __init__(self, sideA, sideB, pos, length, rotY=0):
         super().__init__(agxSDK.ContactEventListener.IMPACT+agxSDK.ContactEventListener.CONTACT)
@@ -1053,7 +1051,7 @@ class LaserTrigger(agxSDK.ContactEventListener):
         
         # Visualization shape
         self.laser_vis = agxOSG.createVisual(self.laser_body, agxRoot)
-        agxOSG.setAlpha(self.laser_vis, 0.6)
+        agxOSG.setAlpha(self.laser_vis, 0.5)
         
         agxSim.add(self.laser_body)
         agxSim.add(self)
@@ -1074,20 +1072,20 @@ class LaserTrigger(agxSDK.ContactEventListener):
         else:
             agxColor = agxRender.Color(1, 0, 0)
         agxOSG.setDiffuseColor(self.laser_vis, agxColor)
+        agxOSG.setAlpha(self.laser_vis, 0.5)
 
     def setActive(self, active_status):
         self.active = active_status
 
     def handle(self, t, gc):
-        # print('yess')
         if self.triggered or not self.active:
             return agxSDK.ContactEventListener.REMOVE_CONTACT_IMMEDIATELY
         g0 = gc.geometry(0)
         g1 = gc.geometry(1)
         triggered = False
-        if g0.getUuid() == self.laser_geo.getUuid():
+        if g0.getUuid() == self.laser_geo.getUuid() and g1.getName() != 'Ray':
             triggered = True
-        if g1.getUuid() == self.laser_geo.getUuid():
+        if g1.getUuid() == self.laser_geo.getUuid() and g0.getName() != 'Ray':
             triggered = True
         if triggered:
             self.setTriggered(triggered)
@@ -1123,7 +1121,7 @@ class LaserTimer(agxSDK.StepEventListener):
     def addCheckpoint(self, posA, posB):
         posA = np.array(posA)
         posB = np.array(posB)
-        h = 0.08
+        h = 0.06
         sideA = add_cylinderShape(self.system, 0.025, h, 1000, posA+np.array([0,h/2,0]), texture='black_smere.jpg')
         sideB = add_cylinderShape(self.system, 0.025, h, 1000, posB+np.array([0,h/2,0]), texture='black_smere.jpg')
         dirr = (posA-posB)/np.linalg.norm(posA-posB)
@@ -1145,8 +1143,6 @@ class LaserTimer(agxSDK.StepEventListener):
             laser.setTriggered(False)
             laser.setActive(False)
         self.lasers[0].setActive(True)
-        if self.bestTime:
-            self.app.getSceneDecorator().setText(len(self.checks), 'Best lap: '+self.getTimeStr(self.bestTime))
 
     def getTime(self):
         if self.useRealTime:
@@ -1182,7 +1178,10 @@ class LaserTimer(agxSDK.StepEventListener):
         if isComplete and not self.complete:
             self.complete = True
             lapTime = self.getTime() - self.startTime
-            self.app.getSceneDecorator().setText(len(self.checks)+1, 'Last lap: '+self.getTimeStr())
+            if not self.bestTime or lapTime < self.bestTime:
+                self.bestTime = lapTime
+            self.app.getSceneDecorator().setText(len(self.checks), 'Last lap: '+self.getTimeStr())
+            self.app.getSceneDecorator().setText(len(self.checks)+1, 'Best lap: '+self.getTimeStr(self.bestTime))
             self.reset()
 
         return 
