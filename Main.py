@@ -21,7 +21,7 @@ from src import Props
 import numpy as np
 
 # Import Demomodules
-import DemoModules
+ import DemoModules
 
 # Function that runs the simulation
 def buildScene():
@@ -48,6 +48,19 @@ def buildScene():
     # Use mouse, scroll wheel, arrow keys and pg up & pg down to move
     # Press I and see the help section for a full list of controls
     Simulation.Set_Perspective('4th floor observing launcher')
+
+    # ----- SWEEPING FUNCTIONS FOR RECORDING -----
+    # Sweeping across the map
+    #Simulation.Add_Camview('last_sweep_pos', [11, 6,-7], [0,0,0], look_at_point=[1,1,-1])
+    #Simulation.Set_Perspective('last_sweep_pos')
+    #Simulation.Set_CameraSweep([[11, 6,-7],[3,7,-7],[-4,3,-7],[-3,7,-5],[2,5,-7],[4,2,-6],[8,6,-7]], [[0,0,0],[0,0,0],[0,0,0],[-1.5,1.5,3],[-1,0.5,3],[1,1,2],[0,0,0]])
+
+    # Sweep onto the stage
+    # MiroSystem.py line 178: sweep_divs = 1000
+    # src -> MIT_Props.py line 104: Comment out the MeasureBox.
+    #Simulation.Add_Camview('last_sweep_pos', [0,0.8,-4], [0,0,0], look_at_point=[-3.5,1.2,-7])
+    #Simulation.Set_Perspective('last_sweep_pos')
+    #Simulation.Set_CameraSweep([[7, 2.7,8],[-1,3,-2]], [[-3,1,-7],[-3.5,1.2,-7]])   
 
     # Entry point for custom AGX code
     if MiroAPI.API == 'AGX':

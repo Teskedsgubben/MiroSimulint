@@ -191,8 +191,8 @@ def MIT_floors(system, H, SPEEDMODE):
         y_pos = floor*H - floor_t
         floor_pos_3 = np.array([-7.425, y_pos, -7])      # Add roof in NTK cooriodor (-x direction)
         floor_pos_4 = np.array([1.5, y_pos, -10.8])      # Add roof in NTK cooriodor (-z direction)
-        MiroAPI.add_boxShapeHemi(system, 1.925, floor_t, floor_l, floor_pos_3, 'textures/BHgang.jpg', [35,80])
-        MiroAPI.add_boxShapeHemi(system, 7, floor_t, 1.8, floor_pos_4, 'textures/BHgang.jpg', [100,10])
+        MiroAPI.add_boxShapeHemi(system, 1.925, floor_t, floor_l, floor_pos_3, 'wood_ikea_style.png', [35,80])
+        MiroAPI.add_boxShapeHemi(system, 7, floor_t, 1.8, floor_pos_4, 'wood_ikea_style.png', [100,10])
 
     for roof in range(floorsNum):
         # Add roof

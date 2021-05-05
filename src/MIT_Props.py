@@ -103,3 +103,19 @@ def AddProps(system):
     # props.sponsorFlag(system, [0,0,-7], 'zert2.png')
 
     props.measureBox(system, [-4,0.3,-6], [0.4,0.4,0.4])
+
+    # ------- SPONSORS ---------
+    # Algoryx
+    props.painting(system, [-1.5,2.1,5], 'spons_algoryx.png', 0, [2,0.6])
+    props.sponsorFlag(system, [-4.8,0.3,-4.4], 'algoryx-flagga.png', 0.5)
+
+    # RS Components
+    props.sponsorFlag(system, [-4.8,0.3,3.5], 'rs test.jpg', 0.5)
+    props.sponsorFlag(system, [-4.8,0.3,-3.4], 'rs test.jpg', -0.5)
+
+    # ProAnt 
+    props.sponsorFlag(system, [-4,0.3,4.5], 'proant-logo.png', -0.5)
+    props.sponsorFlag(system, [-1,0.3,-8], 'proant-logo.png', -0.5)
+
+    # PODIUM
+    # props.podium(system, [-3.6,0.3,-7.25], 2)
