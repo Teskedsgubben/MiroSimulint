@@ -27,7 +27,7 @@ from MiroClasses import BackupColors
 API = 'AGX'
 
 TEXTURES_ON = True
-TEXTURE_PATH ='textures_lowres/'
+TEXTURE_PATH ='textures/'
 TEXTURE_EXEPTIONS = {
     'MITfloor.png': False,
     'tf-logo.jpg': True,
@@ -35,6 +35,7 @@ TEXTURE_EXEPTIONS = {
     'MIT_stone_floor.jpg': True,
     'MIT_inner_roof.jpg': False,
 }
+LOADED_TEXTURES = {}
 
 important_textures = []
 for texture, include in TEXTURE_EXEPTIONS.items():
@@ -256,19 +257,14 @@ def add_boxShape(MiroSystem, size_x, size_y, size_z, pos, texture=False, scale=[
             if texture[0:len('textures/')] == 'textures/':
                 texture = texture[len('textures/'):]
         if TEXTURES_ON or texture in important_textures:
-                # diffuseColor = agxRender.Color(1.0, 1.0, 1.0, 1)
-                # ambientColor = agxRender.Color(1, 1, 1, 1)
-                # specularColor = agxRender.Color(1, 1, 1, 1)
-                # agxOSG.setDiffuseColor(body_shape, diffuseColor )
-                # agxOSG.setAmbientColor(body_shape, ambientColor )
-                # agxOSG.setSpecularColor(body_shape, specularColor )
-                # agxOSG.setShininess(body_shape, 120  )
-                # agxOSG.setAlpha(body_shape, 1.0 )
-                # agxOSG.setTexture(body_geo, agxRoot, 'textures/'+texture)
-            if TEXTURE_PATH == 'textures_lowres/' and texture=='yellow_brick.jpg':
-                scale[0] = 11*scale[0]
-                scale[1] = 8*scale[1]
-            agxOSG.setTexture(body_shape, TEXTURE_PATH+texture, True, agxOSG.DIFFUSE_TEXTURE, scale[0], scale[1])
+            if texture not in LOADED_TEXTURES.keys():
+                agxTex = agxOSG.createTexture(TEXTURE_PATH+texture)
+                LOADED_TEXTURES.update({texture: agxTex})
+            agxOSG.setTexture(body_shape, LOADED_TEXTURES[texture], True, agxOSG.DIFFUSE_TEXTURE, scale[0], -scale[1])
+            # if TEXTURE_PATH == 'textures_lowres/' and texture=='yellow_brick.jpg':
+            #     scale[0] = 11*scale[0]
+            #     scale[1] = 8*scale[1]
+            # agxOSG.setTexture(body_shape, TEXTURE_PATH+texture, True, agxOSG.DIFFUSE_TEXTURE, scale[0], scale[1])
         else:
             color = backupColor(texture, color)
             texture = False       
@@ -318,7 +314,10 @@ def add_cylinderShape(MiroSystem, radius, height, density, pos, texture='test.jp
             if texture[0:len('textures/')] == 'textures/':
                 texture = texture[len('textures/'):]
         if TEXTURES_ON:
-            agxOSG.setTexture(body_shape, TEXTURE_PATH+texture, True, agxOSG.DIFFUSE_TEXTURE, scale[0], -scale[1])
+            if texture not in LOADED_TEXTURES.keys():
+                agxTex = agxOSG.createTexture(TEXTURE_PATH+texture)
+                LOADED_TEXTURES.update({texture: agxTex})
+            agxOSG.setTexture(body_shape, LOADED_TEXTURES[texture], True, agxOSG.DIFFUSE_TEXTURE, scale[0], -scale[1])
         else:
             color = backupColor(texture, color)
             texture = False       
@@ -366,7 +365,10 @@ def add_sphereShape(MiroSystem, radius, pos, texture='test.jpg', density=1000, s
             if texture[0:len('textures/')] == 'textures/':
                 texture = texture[len('textures/'):]
         if TEXTURES_ON:
-            agxOSG.setTexture(body_shape, TEXTURE_PATH+texture, True, agxOSG.DIFFUSE_TEXTURE, scale[0], scale[1])
+            if texture not in LOADED_TEXTURES.keys():
+                agxTex = agxOSG.createTexture(TEXTURE_PATH+texture)
+                LOADED_TEXTURES.update({texture: agxTex})
+            agxOSG.setTexture(body_shape, LOADED_TEXTURES[texture], True, agxOSG.DIFFUSE_TEXTURE, scale[0], -scale[1])
         else:
             color = backupColor(texture, color)
             texture = False       
@@ -518,6 +520,11 @@ def SetBodyFixed(body, Fixed=True):
 def SetBodyVelocity(body, velocity):
     agxVel = agxVecify(velocity)
     body.setVelocity(agxVel)
+
+def SetBodyAngularFrequency(body, frequency, axis = [0,1,0]):
+    agxFreq=agxVecify(axis)
+    agxFreq.setLength(frequency)
+    body.setAngularVelocity(agxFreq)
 
 def SetCollisionModel_Box(body, dimensions, mass, offset):
     return
@@ -1013,3 +1020,195 @@ class LidarContactSensor(agxSDK.ContactEventListener):
 
         return agxSDK.ContactEventListener.REMOVE_CONTACT_IMMEDIATELY
 
+###############################
+    
+###############################
+
+
+class LaserTrigger(agxSDK.ContactEventListener):
+    def __init__(self, sideA, sideB, pos, length, rotY=0):
+        super().__init__(agxSDK.ContactEventListener.IMPACT+agxSDK.ContactEventListener.CONTACT)
+        self.createBeam(pos, length, rotY)
+        self.laser_geo.setEnableCollisions(sideA.getGeometry("body"), False)
+        self.laser_geo.setEnableCollisions(sideB.getGeometry("body"), False)
+        self.setFilter(agxSDK.RigidBodyFilter(self.laser_body))
+        self.triggered = False
+        self.active = False
+
+    def createBeam(self, pos, length, rotY):
+        agxSim = agxPython.getContext().environment.getSimulation()
+        agxApp = agxPython.getContext().environment.getApplication()
+        agxRoot = agxPython.getContext().environment.getSceneRoot()
+
+        agxPos = agxVecify(pos)
+        
+        self.laser_geo = agxCollide.Geometry(agxCollide.Cylinder(0.005, length))
+        self.laser_geo.setName("body")
+        # self.laser_geo.setEnableCollisions(False)
+
+        self.laser_body = agx.RigidBody(self.laser_geo)
+        self.laser_body.setMotionControl(1)
+        self.laser_body.setPosition(agxPos)
+
+        rotateBody(self.laser_body, rotY=rotY, rotDegrees=False)
+        
+        # Visualization shape
+        self.laser_vis = agxOSG.createVisual(self.laser_body, agxRoot)
+        agxOSG.setAlpha(self.laser_vis, 0.6)
+        
+        agxSim.add(self.laser_body)
+        agxSim.add(self)
+
+    def contact(self, t, gc):
+        return self.handle(t, gc)
+
+    def impact(self, t, gc):
+        return self.handle(t, gc)
+
+    def getTriggered(self):
+        return self.triggered
+
+    def setTriggered(self, trigger_status):
+        self.triggered = trigger_status
+        if self.triggered:
+            agxColor = agxRender.Color(0, 1, 0)
+        else:
+            agxColor = agxRender.Color(1, 0, 0)
+        agxOSG.setDiffuseColor(self.laser_vis, agxColor)
+
+    def setActive(self, active_status):
+        self.active = active_status
+
+    def handle(self, t, gc):
+        # print('yess')
+        if self.triggered or not self.active:
+            return agxSDK.ContactEventListener.REMOVE_CONTACT_IMMEDIATELY
+        g0 = gc.geometry(0)
+        g1 = gc.geometry(1)
+        triggered = False
+        if g0.getUuid() == self.laser_geo.getUuid():
+            triggered = True
+        if g1.getUuid() == self.laser_geo.getUuid():
+            triggered = True
+        if triggered:
+            self.setTriggered(triggered)
+
+        return agxSDK.ContactEventListener.REMOVE_CONTACT_IMMEDIATELY
+
+
+class LaserTimer(agxSDK.StepEventListener):
+    def __init__(self, MiroSystem, useRealTime=True):
+        super().__init__(agxSDK.StepEventListener.POST_STEP)
+        self.system = MiroSystem
+        self.app = agxPython.getContext().environment.getApplication()
+        self.lasers = []
+        self.checks = []
+        self.complete = False
+        self.started = False
+        self.useRealTime = useRealTime
+        agxPython.getContext().environment.getSimulation().add(self)
+
+    def addCheckpoint(self, posA, posB):
+        posA = np.array(posA)
+        posB = np.array(posB)
+        h = 0.08
+        sideA = add_cylinderShape(self.system, 0.025, h, 1000, posA+np.array([0,h/2,0]), texture='black_smere.jpg')
+        sideB = add_cylinderShape(self.system, 0.025, h, 1000, posB+np.array([0,h/2,0]), texture='black_smere.jpg')
+        dirr = (posA-posB)/np.linalg.norm(posA-posB)
+        theta = -np.arccos(np.dot(dirr, np.array([0,0,1])))
+        self.lasers.append(LaserTrigger(sideA, sideB, (posA+posB)/2+np.array([0,0.9*h,0]), np.linalg.norm(posA-posB), rotY=theta))
+        self.lasers[-1].setTriggered(False)
+        if len(self.lasers) == 1:
+            self.lasers[0].setActive(True)
+        self.checks.append(False)
+
+    def reset(self):
+        self.started = False
+        self.complete = False
+        for i in range(len(self.checks)):
+            self.checks[i] = False
+            self.app.getSceneDecorator().setText(i+1, str(i+1)+': '+self.getTime())
+        for laser in self.lasers:
+            laser.setTriggered(False)
+            laser.setActive(False)
+        self.lasers[0].setActive(True)
+
+    def simTime(self):
+        if self.useRealTime:
+            return TIME.time()
+        else:
+            return self.time
+
+    def post(self, time):
+        # Check if all checkpoints have been reached
+        isComplete = True
+        self.time = time
+        self.app.getSceneDecorator().setText(0, 'Current time: '+self.getTime())
+        N = len(self.checks)
+        for i in range(N):
+            if not self.checks[i]:
+                if self.lasers[i].getTriggered():
+                    if i == 0:
+                        self.startTime = TIME.time()
+                        self.started = True
+                    if self.started:
+                        self.checks[i] = True
+                        app = agxPython.getContext().environment.getApplication()
+                        self.app.getSceneDecorator().setText(0, 'Last event: Checkpoint '+str(i+1)+' reached at '+self.getTime())
+                        self.app.getSceneDecorator().setText(i+1, str(i+1)+': '+self.getTime())
+                        if i < N-1:
+                            self.lasers[i+1].setActive(True)
+
+                    else:
+                        self.app.getSceneDecorator().setText(0, 'Clock has not been started.')
+            if not self.checks[i]:
+                isComplete = False
+        
+        if isComplete and not self.complete:
+            self.complete = True
+            lapTime = self.simTime() - self.startTime
+            self.app.getSceneDecorator().setText(len(self.checks)+1, 'Finished in '+self.getTime())
+            self.reset()
+
+        # if(not self.complete and contact.contains(self.start_object) >= 0):
+        #     if TIME.time() - self.start > 10:
+        #         self.start = TIME.time()
+        #         self.checks = [False]*len(self.checks)
+        #         for i in range(len(self.checks)):
+        #             for j in range(len(self.checkpoints[i])):
+        #                 obj = self.checkpoints[i][j]
+        #                 obj.setPosition(self.check_positions[i][j])
+        #                 obj.setRotation(self.check_rotations[i][j])
+        #                 obj.setVelocity(agx.Vec3(0,0,0))
+        #                 obj.setAngularVelocity(agx.Vec3(0,0,0))
+        #         app = agxPython.getContext().environment.getApplication()
+        #         app.getSceneDecorator().setText(0, 'Starting the time, hit the '+str(len(self.checks))+' cones!')
+        #         for i in range(len(self.checks)):
+        #             app.getSceneDecorator().setText(i+1, str(i+1)+': --:--')
+        
+        # if(self.complete and contact.contains(self.end_object) >= 0):
+        #     if TIME.time() - self.start > 10:
+        #         self.app.getSceneDecorator().clearText()
+        #         self.app.getSceneDecorator().setText(2,'CHALLENGE COMPLETED!')
+        #         self.app.getSceneDecorator().setText(4,'Time: '+self.getTime())
+        #         self.complete = False
+        #         self.checks = [False]*len(self.checks)
+        return agxSDK.ContactEventListener.KEEP_CONTACT
+    
+    def getTime(self):
+        if not self.started:
+            return "--:--:--"
+        timenum = TIME.time() - self.startTime
+        seconds = round(timenum % 60, 2)
+        if seconds < 10:
+            seconds = '0'+str(seconds)
+        else:
+            seconds = str(seconds)
+        if len(seconds) < 5:
+            seconds = seconds[0:3]+'0'+seconds[3]
+        minutes = round(np.floor(timenum/60))
+        if minutes < 10:
+            minutes = '0'+str(minutes)
+        else:
+            minutes = str(minutes)
+        return minutes+':'+seconds
