@@ -35,7 +35,7 @@ def AddProps(system):
     props.painting(system, [13.77,5.1,-1.9], 'corkboard.jpg', wall_angle, [1.0,0.5])
     props.painting(system, [13.977,5.1,-3.9], 'corkboard.jpg', wall_angle, [1.0,0.5])
 
-    props.painting(system, [-3.5,2.1,5], 'walkplanck.png', 0, [0.8,0.6])
+    # props.painting(system, [-3.5,2.1,5], 'walkplanck.png', 0, [0.8,0.6])
     props.pokeball(system, [1.75,0.85,-7.15], 0)
     props.sodacan(system, [1.25,0.85,-7.05], 'schrodbull.png', 180)
     props.sodacan(system, [4.25,0.85,-7.25], 'joultcola.png')
@@ -106,16 +106,16 @@ def AddProps(system):
 
     # ------- SPONSORS ---------
     # Algoryx
-    props.painting(system, [-1.5,2.1,5], 'spons_algoryx.png', 0, [2,0.6])
-    props.sponsorFlag(system, [-4.8,0.3,-4.4], 'algoryx-flagga.png', 0.5)
+    props.painting(system, [-1.5,2.1,5], 'sponsorer/spons_algoryx.png', 0, [2,0.6])
+    props.sponsorFlag(system, [-4.8,0,-4.4], 'sponsorer/algoryx-flagga.png', 0.8)
 
     # RS Components
-    props.sponsorFlag(system, [-4.8,0.3,3.5], 'rs test.jpg', 0.5)
-    props.sponsorFlag(system, [-4.8,0.3,-3.4], 'rs test.jpg', -0.5)
+    props.sponsorFlag(system, [-4.8,0,3.5], 'sponsorer/rs logo.png', 0.8)
+    props.sponsorFlag(system, [-4.8,0,-3.4], 'sponsorer/rs logo.png', -0.8)
 
     # ProAnt 
-    props.sponsorFlag(system, [-4,0.3,4.5], 'proant-logo.png', -0.5)
-    props.sponsorFlag(system, [-1,0.3,-8], 'proant-logo.png', -0.5)
+    props.sponsorFlag(system, [-4,0,4.5], 'sponsorer/proant-logo.png', -0.8)
+    props.sponsorFlag(system, [-1,0,-8], 'sponsorer/proant-logo.png', -0.8)
 
     # PODIUM
-    # props.podium(system, [-3.6,0.3,-7.25], 2)
+    # props.podium(system, [-3.6,0.3,-7.25], 1)
