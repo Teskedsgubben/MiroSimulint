@@ -136,7 +136,7 @@ def buildTimer(MiroSystem):
     timer = MiroAPI.LaserTimer(MiroSystem, useRealTime=False)
 
     timer.addCheckpoint([3.675, 0.37, -0.3], [2.725, 0.37, -0.3])
-    timer.addCheckpoint([-0.5, 0.6, -3.85], [-0.05, 0.6, -0.45])
+    timer.addCheckpoint([-0.2, 0.6, -4], [-0.2, 0.6, -0.55])
     timer.addCheckpoint([-3.51, 0.2, 0], [-2.58, 0.2, 0])
     timer.addCheckpoint([-0.1, 0.36, 2.825], [-0.1, 0.36, 3.775])
     timer.addCheckpoint([3.675, 0.37, 0.1], [2.725, 0.37, 0.1])

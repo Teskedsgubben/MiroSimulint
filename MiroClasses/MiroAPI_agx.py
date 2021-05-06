@@ -1039,7 +1039,7 @@ class LaserTrigger(agxSDK.ContactEventListener):
 
         agxPos = agxVecify(pos)
         
-        self.laser_geo = agxCollide.Geometry(agxCollide.Cylinder(0.005, length))
+        self.laser_geo = agxCollide.Geometry(agxCollide.Cylinder(0.004, length))
         self.laser_geo.setName("body")
         # self.laser_geo.setEnableCollisions(False)
 
@@ -1115,6 +1115,8 @@ class LaserTimer(agxSDK.StepEventListener):
         self.started = False
         self.useRealTime = useRealTime
         self.bestTime = False
+        self.lapNr = 0
+        self.timeLog = []
         agxPython.getContext().environment.getSimulation().add(self)
         agxPython.getContext().environment.getSimulation().add(TimerReset(self))
 
@@ -1122,11 +1124,13 @@ class LaserTimer(agxSDK.StepEventListener):
         posA = np.array(posA)
         posB = np.array(posB)
         h = 0.06
-        sideA = add_cylinderShape(self.system, 0.025, h, 1000, posA+np.array([0,h/2,0]), texture='black_smere.jpg')
-        sideB = add_cylinderShape(self.system, 0.025, h, 1000, posB+np.array([0,h/2,0]), texture='black_smere.jpg')
+        sideA = add_cylinderShape(self.system, 0.025, h, 1000, posA+np.array([0,h/2,0]), texture='chrome.png')
+        lidA = add_cylinderShape(self.system, 0.026, 0.006, 1000, posA+np.array([0,h+0.003,0]), texture='brushsteel.jpg')
+        sideB = add_cylinderShape(self.system, 0.025, h, 1000, posB+np.array([0,h/2,0]), texture='chrome.png')
+        lidB = add_cylinderShape(self.system, 0.026, 0.006, 1000, posB+np.array([0,h+0.003,0]), texture='brushsteel.jpg')
         dirr = (posA-posB)/np.linalg.norm(posA-posB)
         theta = -np.arccos(np.dot(dirr, np.array([0,0,1])))
-        self.lasers.append(LaserTrigger(sideA, sideB, (posA+posB)/2+np.array([0,0.9*h,0]), np.linalg.norm(posA-posB), rotY=theta))
+        self.lasers.append(LaserTrigger(sideA, sideB, (posA+posB)/2+np.array([0,h-0.007,0]), np.linalg.norm(posA-posB), rotY=theta))
         self.lasers[-1].setTriggered(False)
         if len(self.lasers) == 1:
             self.lasers[0].setActive(True)
@@ -1162,11 +1166,16 @@ class LaserTimer(agxSDK.StepEventListener):
                     if i == 0:
                         self.startTime = self.getTime()
                         self.started = True
+                        times = [-1]*N
+                        times[0] = 0
+                        self.timeLog.append(times) # append list of -1s
                     if self.started:
                         self.checks[i] = True
                         app = agxPython.getContext().environment.getApplication()
                         if i > 0:
-                            self.app.getSceneDecorator().setText(i, str(i)+': '+self.getTimeStr())
+                            self.timeLog[self.lapNr][i] = self.getTime() - self.startTime 
+                            self.printLap(self.lapNr)
+                            # self.app.getSceneDecorator().setText(i, str(i)+': '+self.getTimeStr(self.timeLog[self.lapNr][i]))
                         if i < N-1:
                             self.lasers[i+1].setActive(True)
 
@@ -1180,27 +1189,45 @@ class LaserTimer(agxSDK.StepEventListener):
             lapTime = self.getTime() - self.startTime
             if not self.bestTime or lapTime < self.bestTime:
                 self.bestTime = lapTime
-            self.app.getSceneDecorator().setText(len(self.checks), 'Last lap: '+self.getTimeStr())
-            self.app.getSceneDecorator().setText(len(self.checks)+1, 'Best lap: '+self.getTimeStr(self.bestTime))
+            # print(self.getTimeStr(self.timeLog[self.lapNr][4]))
+            self.app.getSceneDecorator().setText(len(self.checks)+1, 'Last lap: '+self.getTimeStr(lapTime))
+            self.printLap(self.lapNr, len(self.checks)+1)
+            self.app.getSceneDecorator().setText(2*(len(self.checks)+1), 'Best lap: '+self.getTimeStr(self.bestTime))
+            self.lapNr = self.lapNr + 1
             self.reset()
 
         return 
     
+    def printLap(self, lapIndex, startRow=0):
+        for i in range(1,len(self.checks)):
+            if self.timeLog[lapIndex][i] >= 0:
+                zoneTime=self.timeLog[lapIndex][i]-self.timeLog[lapIndex][i-1]
+            else:
+                zoneTime=-1
+            self.app.getSceneDecorator().setText(startRow+i, str(i)+': '+self.getTimeStr(zoneTime))
+
     def getTimeStr(self, timenum=False):
-        if not self.started:
-            return "--:--.--"
+        if not self.started or timenum < 0:
+            return "--:--:--"
         if not timenum:
             timenum = self.getTime() - self.startTime
+        minutes = round(np.floor(timenum/60))
         seconds = round(timenum % 60, 2)
+        ms = round((seconds-round(np.floor(seconds)))*100)
+        seconds = round(np.floor(seconds))
+        
+        ms_str = ''
+        if ms < 10:
+            ms_str = ms_str + '0'
+        ms = ms_str+str(ms)
+
         if seconds < 10:
             seconds = '0'+str(seconds)
         else:
             seconds = str(seconds)
-        if len(seconds) < 5:
-            seconds = seconds[0:3]+'0'+seconds[3]
-        minutes = round(np.floor(timenum/60))
+
         if minutes < 10:
             minutes = '0'+str(minutes)
         else:
             minutes = str(minutes)
-        return minutes+':'+seconds
+        return minutes+':'+seconds+':'+ms
