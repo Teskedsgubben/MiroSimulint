@@ -386,13 +386,11 @@ class Module():
     def AddControllerGUI(self, Controller, Controls):
         self.controller = Controller
         self.controls = Controls
-        area = self.system.Get_Environment().Get_Area('AI')
-        MiroAPI.AddController(self, area)
+        MiroAPI.AddController(self, self.system)
 
     def AddControllerAI(self, ControllerAI):
         self.controllerAI = ControllerAI
-        area = self.system.Get_Environment().Get_Area('AI')
-        MiroAPI.AddControllerAI(self, area)  
+        MiroAPI.AddControllerAI(self, self.system)  
 
     def UseController(self, keydown, key, alt, x = False, y = False, AI = False):
         if AI:

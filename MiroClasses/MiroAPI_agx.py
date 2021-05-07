@@ -205,7 +205,7 @@ def RunSimulation(MiroSystem):
     [sim, app, root] = MiroSystem.Get_APIsystem()
     MiroSystem.Set_Camera()
     sim.add(SimStepper(MiroSystem))
-    sim.add(ModuleReleaser(MiroSystem))
+    # sim.add(ModuleReleaser(MiroSystem))
     return
 
 ####### SIMPLE SHAPE SHORTHANDS #######
@@ -374,8 +374,8 @@ def add_sphereShape(MiroSystem, radius, pos, texture='test.jpg', density=1000, s
     if not texture:
         agxColor = agxRender.Color(color[0], color[1], color[2])
         agxOSG.setDiffuseColor(body_shape, agxColor)
-        if len(color) > 3:
-                agxOSG.setAlpha(body_shape, color[3])
+    if len(color) > 3:
+            agxOSG.setAlpha(body_shape, color[3])
     
     agxSim.add(body_ball)
     return body_ball
@@ -624,10 +624,10 @@ def Keyboard(key):
 ####### SCENE CONFIGURATION #######
 # Simulation stuff
 def SetCamera(system_list, camera_position, look_at_point, up_direction=[0,1,0]):
-    sim = agxPython.getContext().environment.getSimulation()
-    app = agxPython.getContext().environment.getApplication()
-    root = agxPython.getContext().environment.getSceneRoot()
-
+    # sim = agxPython.getContext().environment.getSimulation()
+    # app = agxPython.getContext().environment.getApplication()
+    # root = agxPython.getContext().environment.getSceneRoot()
+    [sim, app, root] = system_list
     cameraData                   = app.getCameraData()
     cameraData.eye               = agxVecify(camera_position)
     cameraData.center            = agxVecify(look_at_point)
@@ -636,6 +636,18 @@ def SetCamera(system_list, camera_position, look_at_point, up_direction=[0,1,0])
     cameraData.farClippingPlane  = 5000
     app.applyCameraData( cameraData )
     return
+
+def GetCamera(system_list):
+    [sim, app, root] = system_list
+    camData = {}
+    cameraData = app.getCameraData()
+    cam_pos = cameraData.eye
+    obs_pos = cameraData.center 
+    cam_up = cameraData.up  
+    camData.update({'cam_pos': xyzTransform([cam_pos.x(), cam_pos.y(), cam_pos.z()], reverse=True)})  
+    camData.update({'obs_pos': xyzTransform([obs_pos.x(), obs_pos.y(), obs_pos.z()], reverse=True)})    
+    camData.update({'cam_up': xyzTransform([cam_up.x(), cam_up.y(), cam_up.z()], reverse=True)})      
+    return camData
 
 def Set_Lights(ChSimulation, Sources, ambients = True):
     return
@@ -676,6 +688,7 @@ class SimStepper(agxSDK.StepEventListener):
 
     def post(self, time):
         return
+
 
 
 def addGround(MiroSystem, size_x, size_y, size_z, pos, heightmap, texture='test.jpg', scale=[4,3], Collide=True, Fixed=True, rotX=0, rotY=0, rotZ=0, rotOrder=['x','y','z'], rotAngle=0, rotAxis=[1,0,0], rotDegrees=True, mass=False, density=1000, dynamic=False, color=[0.5, 0.5, 0.5]):
@@ -750,23 +763,33 @@ class AutoController(agxSDK.StepEventListener):
             print('No AI controller added to Module!')
             return 
 
-def AddControllerAI(Module, Area):
-    sim = agxPython.getContext().environment.getSimulation()
-    app = agxPython.getContext().environment.getApplication()
-    root = agxPython.getContext().environment.getSceneRoot()
+def AddControllerAI(Module, MiroSystem):
+    [sim, app, root] = MiroSystem.Get_APIsystem()
+    Area = MiroSystem.Get_Environment().Get_Area('AI')
     
     controller = AutoController(Module, Area)
 
     sim.add(controller)
 
+def MiroControls(MiroSystem, key, alt, x, y, keydown):
+    # This function returns True if MiroControls performs something, otherwise False
+    if keydown and key == agxSDK.GuiEventListener.KEY_F1:
+        MiroSystem.Toggle_Cameralock()
+    else:
+        return False
+    return True
+
 class UserController(agxSDK.GuiEventListener):
-    def __init__(self, Module, Area):
+    def __init__(self, Module, MiroSystem):
         super().__init__(agxSDK.GuiEventListener.KEYBOARD)
         self.module = Module
-        self.area = Area
+        self.system = MiroSystem
+        self.area = MiroSystem.Get_Environment().Get_Area('AI')
     
     def keyboard(self, key, alt, x, y, keydown):
-        if self.module.controller:
+        if MiroControls(self.system, key, alt, x, y, keydown):
+            return True
+        elif self.module.controller:
             modpos = self.module.GetCenterOfMass()
             hasControl = True
             if(modpos[0] > self.area[0][0] and modpos[0] < self.area[0][1]):
@@ -774,18 +797,17 @@ class UserController(agxSDK.GuiEventListener):
                     hasControl = False
             if hasControl:
                 self.module.UseController(keydown, key, 1*(alt>0))
-            return True
         else: 
             print('No controller added to Module!')
             return False
+        return True
     
 
-def AddController(Module, Area):
-    sim = agxPython.getContext().environment.getSimulation()
-    app = agxPython.getContext().environment.getApplication()
-    root = agxPython.getContext().environment.getSceneRoot()
+def AddController(Module, MiroSystem):
+    [sim, app, root] = MiroSystem.Get_APIsystem()
+    Area = MiroSystem.Get_Environment().Get_Area('AI')
     
-    controller = UserController(Module, Area)
+    controller = UserController(Module, MiroSystem)
 
     sim.add(controller)
 

@@ -28,6 +28,9 @@ class MiroSystem():
         self.released = False
         
         # Camera properties
+        self.freecam = False
+        self.last_camtoggle = time.time()
+        self.cam_up = np.array([0,1,0])
         self.follow = False
         self.cycle = False
         self.fps = 300
@@ -144,6 +147,8 @@ class MiroSystem():
     def Set_Camera(self):
         '''This sets the camera during simulation. For internal usage when the simulation is being run, 
         use SetPerspective to configure the camera before running the simulation.'''
+        if self.freecam:
+            return
         if self.cycle:
             self.cam_to_obs = MiroAPI.rotateVector(self.cam_to_obs, self.cycle_angle/self.fps, [0,1,0], rotDegrees=False)
             self.cam_to_obs = (49*self.cam_to_obs + self.followmod.GetCenterOfMassVelocity())/50
@@ -160,14 +165,17 @@ class MiroSystem():
                 #cam_to_obs[0] = cam_to_obs[0] * np.cos(self.follow_angle)
                 #cam_to_obs[1] = cam_to_obs[0] * np.sin(self.follow_angle)
                 #cam_to_obs[2] = cam_to_obs[2] * np.cos(self.follow_angle)
-                self.obs_pos = self.followmod.GetCenterOfMass()
+                self.obs_pos = (12*self.obs_pos + self.followmod.GetCenterOfMass())/13
+                self.cam_up = (9*self.cam_up + np.array([0,1,0]))/10
                 
                 
                 cam_to_obs = (self.followmod.GetCenterOfMassVelocity()/np.linalg.norm(self.followmod.GetCenterOfMassVelocity()))
                 cam_to_obs *= self.follow_distance
-                self.cam_pos = self.obs_pos - self.cam_to_obs
-                self.cam_pos[1] += self.follow_height             # good val = 1/2
-                MiroAPI.SetCamera(self.system_list, self.cam_pos, self.obs_pos)
+                cam_pos = self.obs_pos - self.cam_to_obs
+                cam_pos[1] += self.follow_height  
+                
+                self.cam_pos = (9*self.cam_pos + cam_pos)/10           # good val = 1/2
+                MiroAPI.SetCamera(self.system_list, self.cam_pos, self.obs_pos, self.cam_up)
 
                 cam_to_obs = (49 * self.cam_to_obs + cam_to_obs)/(49 + 1)
 
@@ -188,6 +196,16 @@ class MiroSystem():
 
         if not self.cycle and not self.follow:
             return
+
+    def Toggle_Cameralock(self):
+        if time.time() - self.last_camtoggle > 0.7:
+            self.freecam = not self.freecam
+            self.last_camtoggle = time.time()
+            camData = MiroAPI.GetCamera(self.system_list)
+            self.cam_pos = camData['cam_pos']
+            self.obs_pos = camData['obs_pos']
+            self.cam_to_obs = self.obs_pos - self.cam_pos
+            self.cam_up = camData['cam_up']
 
     def Set_CameraSweep(self, cam_positions, obs_positions):
            
