@@ -129,6 +129,10 @@ def buildArena(MiroSystem, arena_pos):
     MiroAPI.add_boxShape(MiroSystem, 0.5, 0.05, 1.5, arena_pos + dr, texture='black_smere.jpg')
     obstacles(sim, root, arena_pos[1]+arena_size[1])
 
+    # # meme jump
+    # MiroAPI.add_boxShape(MiroSystem, 0.4, 0.5, 1.0, [-0.25, 0.4, -3.4], texture='dirt.png', rotX=12)
+    MiroAPI.add_boxShape(MiroSystem, 1.0, 0.8, 2.0, [-0.25, -0.15, -4.87], texture='dirt.png', rotX=-22)
+
     # Timer
     buildTimer(MiroSystem)
 
@@ -272,17 +276,18 @@ def pendulumSwing(MiroSystem, arena_pos, arena_size):
     slant = 20
     pos = (2*pos1+pos2)/3 + np.array([0,h_v/2+r_v,0])# + np.array([0, h_v/2 + r_v, 0])
     dr = MiroAPI.rotateVector([0,-1,0], slant, pos1-pos2)
-    pendulum(MiroSystem, pos, toprod, pos1-pos2, slant, r_v/4, rad, length)
+    pendulum(MiroSystem, pos, toprod, pos1-pos2, slant, r_v/4, rad, length, 1.5)
 
     slant = -20
     pos = (pos1+2*pos2)/3  + np.array([0,h_v/2+r_v,0])# + np.array([0, h_v/2 + r_v, 0])
     dr = MiroAPI.rotateVector([0,-1,0], slant, pos1-pos2)
-    pendulum(MiroSystem, pos, toprod, pos1-pos2, slant, r_v/4, rad, length)
+    pendulum(MiroSystem, pos, toprod, pos1-pos2, slant, r_v/4, rad, length, -2)
 
-def pendulum(MiroSystem, pos, stem_body, axis, slant, rad_rod, rad_ball, length):
+def pendulum(MiroSystem, pos, stem_body, axis, slant, rad_rod, rad_ball, length, spin=0):
     dr=MiroAPI.rotateVector([0,-1,0], slant, axis)
     pedulum_rod = MiroAPI.add_cylinderShape(MiroSystem, rad_rod, length-2*rad_ball, 1000, pos+dr*(length-2*rad_ball)/2, texture='carbonfiber.png', Fixed=False, rotAngle=slant, rotAxis=axis)
     pedulum_ball = MiroAPI.add_sphereShape(MiroSystem, rad_ball, pos+dr*(length-rad_ball), texture='eyeball.png', Fixed=False, rotAngle=slant, rotAxis=axis)
+    MiroAPI.SetBodyAngularFrequency(pedulum_ball, spin)
     MiroAPI.LinkBodies_Hinge(stem_body, pedulum_rod, pos, axis, MiroSystem)
     MiroAPI.LinkBodies_Hinge(pedulum_rod, pedulum_ball, pos+dr*(length-2*rad_ball), dr, MiroSystem)
 
