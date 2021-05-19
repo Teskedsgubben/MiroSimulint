@@ -892,7 +892,7 @@ def CreateLidar1D(lidar_body, nr_of_beams, angle, reach):
     # sim, lidar_body.getPosition(), agxVecify([0,1,0]), nr_of_beams, angle, reach, lidar_body, True
     # (sim, world_position, world_direction, num_side_rayst, rad_range_side, max_length, rb_origin, draw_lines):
     sim.add(lidar)
-    return lidar.get_distances
+    return lidar
 
 
 
@@ -956,6 +956,8 @@ class LidarSensor1D(agxSDK.StepEventListener):
             ray.setEnableCollisions(geom, False)
             lidar_body.add(ray)
             rays_dict[ray.getUuid()] = [ray, max_length]
+            if i == num_side_rays:
+                self.midRay = ray
 
         self.cel = LidarContactSensor(lidar_body, rays_dict, max_length, rb_origin)
         sim.add(self.cel)
@@ -995,6 +997,11 @@ class LidarSensor1D(agxSDK.StepEventListener):
         d.reverse()
         return d
     
+    def get_direction(self):
+        q = self.midRay.getRigidBody().getRotation()
+        r = xyzTransform(q*agx.Vec3().Y_AXIS(), reverse=True)
+        return r/np.linalg.norm(r)
+
     def getBody(self):
         return self.lidar_body
 
