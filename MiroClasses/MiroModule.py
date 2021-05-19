@@ -23,6 +23,7 @@ class Module():
         self.controller = False
         self.controls = False
         self.max_force = 100
+        self.memory = {}
 
         # Extra bodies or links for props, not to be counted into module
         self.hidden_bodies = []
@@ -44,6 +45,15 @@ class Module():
         ModuleMap.append(self.graph_links)
         ModuleMap.writeToFile(filename)
         # NodeMap.WriteGraph(self.graph_links)
+
+    def Recall(self, memory_name):
+        '''Returns memory content stored in the robot's memory. Returns None if memory_name is not registered with Memorize()'''
+        if memory_name not in self.memory.keys():
+            return None
+        return self.memory[memory_name]
+
+    def Memorize(self, memory_name, memory_content):
+        self.memory.update({memory_name: memory_content})
     
     def AddComponent(self, comp, name='unnamed'):
         if not self.base:
