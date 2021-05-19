@@ -54,6 +54,9 @@ class Module():
 
     def Memorize(self, memory_name, memory_content):
         self.memory.update({memory_name: memory_content})
+
+    def IsMemorized(self, memory_name):
+        return memory_name in self.memory.keys()
     
     def AddComponent(self, comp, name='unnamed'):
         if not self.base:
