@@ -999,7 +999,7 @@ class LidarSensor1D(agxSDK.StepEventListener):
     
     def get_direction(self):
         q = self.midRay.getRigidBody().getRotation()
-        r = xyzTransform(q*agx.Vec3().Y_AXIS(), reverse=True)
+        r = xyzTransform(q*agx.Vec3().Z_AXIS(), reverse=True)
         return r/np.linalg.norm(r)
 
     def getBody(self):
