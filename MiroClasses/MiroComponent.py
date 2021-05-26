@@ -233,6 +233,10 @@ class MiroSensor_Lidar(MiroSensor):
         d = self.lidar.get_direction()
         return d
     
+    def GetAngle(self):
+        d = self.lidar.get_angle()
+        return d
+    
 
 # Booster class extends Sensor class
 class MiroBooster(MiroSensor):

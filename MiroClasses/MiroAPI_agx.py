@@ -943,6 +943,7 @@ class LidarSensor1D(agxSDK.StepEventListener):
         if num_side_rays > 0:
             delta = rad_range_side/num_side_rays
             start = -rad_range_side
+        self.delta=delta
 
         for i in range(2*num_side_rays + 1):
             angle = start + i * delta
@@ -996,6 +997,9 @@ class LidarSensor1D(agxSDK.StepEventListener):
             d.append(v[1])
         d.reverse()
         return d
+
+    def get_angle(self):
+        return self.delta
     
     def get_direction(self):
         q = self.midRay.getRigidBody().getRotation()
